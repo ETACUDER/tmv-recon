@@ -1,0 +1,24 @@
+# Bank statement → Receipt/Payment vouchers.
+# Each row is one transaction. Money out of bank → Payment, money in → Receipt.
+# Customise: bank_ledger, default_contra_ledger, column names per your bank export.
+
+mode: row_per_voucher
+
+voucher_type: { value: "" }     # blank → inferred from Dr/Cr direction
+date:          { column: "Date",        transform: date,    required: true }
+voucher_number: { column: "Ref No" }
+narration:     { column: "Description", transform: string }
+reference:     { column: "UTR" }
+
+bank_ledger: "HDFC Bank"
+
+# Either supply both Dr/Cr columns, OR a single signed_amount column.
+debit_amount:  { column: "Withdrawal", transform: amount }
+credit_amount: { column: "Deposit",    transform: amount }
+# signed_amount: { column: "Amount", transform: amount }
+
+contra_ledger:         { column: "Counterparty" }   # optional per-row override
+default_contra_ledger: "Suspense"
+
+payment_voucher_type: "Payment"
+receipt_voucher_type: "Receipt"

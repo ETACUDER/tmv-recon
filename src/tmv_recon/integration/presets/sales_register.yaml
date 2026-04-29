@@ -1,0 +1,21 @@
+# Sales register → Sales vouchers (compound, no inventory).
+# Group rows by Invoice No: each invoice = one voucher; rows = ledger entries.
+
+mode: compound
+
+voucher_type: { value: "Sales" }
+date:           { column: "Invoice Date", transform: date, required: true }
+voucher_number: { column: "Invoice No" }
+narration:      { column: "Narration" }
+reference:      { column: "Invoice No" }
+party:          { column: "Party Name" }
+
+group_by: { column: "Invoice No" }
+
+# Convention: each row in the register has Party (Dr) and one or more income/tax (Cr) splits.
+# Simplest layout: Ledger column + signed Amount column per row.
+entries:
+  - ledger: { column: "Ledger" }
+    amount: { column: "Amount", transform: amount }
+    is_deemed_positive: { column: "DrCr" }    # cell value Dr/Cr
+    is_party_ledger: false

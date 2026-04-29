@@ -1,0 +1,17 @@
+# Reconciliation summary
+
+Canonical inputs:
+  invoices: 304
+  bookings: 3476
+  payments (PTM): 316
+  bank lines: 1363
+
+Matches:
+  PTM ↔ Bank (amt+date):    66 payout batches covering 146 txns
+  PTM ↔ Invoice (amt+date): 0 of 316 txns (0%)
+  Booking ↔ Invoice:        40 of 3476 rows (1%)
+
+Unmatched residuals (review):
+  data/recon/matches/unmatched_ptm.csv          (PTM with no bank UTR hit)
+  data/recon/matches/unmatched_ptm_invoice.csv  (PTM not amount-matched to invoice)
+  data/recon/matches/unmatched_booking.csv      (Agoda rows not matched to invoice)

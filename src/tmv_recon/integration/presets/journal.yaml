@@ -1,0 +1,16 @@
+# Generic journal: rows grouped by Voucher No into compound entries.
+
+mode: compound
+
+voucher_type: { value: "Journal" }
+date:           { column: "Date", transform: date, required: true }
+voucher_number: { column: "Voucher No" }
+narration:      { column: "Narration" }
+reference:      { column: "Reference" }
+
+group_by: { column: "Voucher No" }
+
+entries:
+  - ledger: { column: "Ledger" }
+    amount: { column: "Amount", transform: amount }
+    is_deemed_positive: { column: "DrCr" }

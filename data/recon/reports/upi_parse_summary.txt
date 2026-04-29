@@ -1,0 +1,16 @@
+UPI PARSER VALIDATION SUMMARY
+======================================================================
+
+Total raw transactions: 4373
+Total aggregated payments: 551
+Null UTR count: 270
+Null UTR rate: 6.2%
+Unique UTRs: 281
+UTR dup rate (before agg): 93.2%
+High confidence payments: 281
+Low confidence payments: 270
+Total amount (raw): ₹4,336,088.25
+Total amount (agg): ₹4,336,088.25
+Amount reconciliation: PASS
+
+======================================================================

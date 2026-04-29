@@ -1,0 +1,13 @@
+metric,value,percentage,notes
+total_files,20,100.0,All AGODA files parsed
+total_bookings,3476,100.0,Total rows extracted
+parse_success_rate,20,100.0,0 files failed
+invoice_no_coverage,3476,100.0,Bookings with invoice number
+booking_id_coverage,3476,100.0,Bookings with Agoda booking ID
+null_guest_name,0,0.0,Null values in guest_name
+null_arrival_date,41,1.1795166858458,Null values in arrival_date
+null_departure_date,41,1.1795166858458,Null values in departure_date
+null_gross_amount,638,18.354430379746837,Null values in gross_amount
+null_net_settled,638,18.354430379746837,Null values in net_settled
+credit_notes_detected,349,10.040276179516686,Multi-row invoice IDs (rate change)
+unrecognized_columns,11,0.0,"AGODA DEC  2025- 2030043.35 AMT.xlsx::Unnamed: 4; AGODA DEC  2025- 2030043.35 AMT.xlsx::Unnamed: 5; AGODA MARCH 2026, AMT 759282.14.xlsx::e-f =g; AGODA SEPT 2025- AMT- 80280.25 ISSUED.xlsx::ISSUED SHEET; AGODA SEPT 2025- AMT- 80280.25 ISSUED.xlsx::Unnamed: 1; AGODA SEPT 2025- AMT- 80280.25 ISSUED.xlsx::Unnamed: 3; AGODA SEPT 2025- AMT- 80280.25 ISSUED.xlsx::Unnamed: 4; AGODA SEPT 2025- AMT- 80280.25 ISSUED.xlsx::Unnamed: 5; AGODA SEPT 2025- AMT- 80280.25 ISSUED.xlsx::Unnamed: 6; AGODA SEPT 2025- AMT- 80280.25 ISSUED.xlsx::Unnamed: 7"

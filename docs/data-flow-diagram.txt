@@ -1,0 +1,210 @@
+================================================================================
+TMV RECONCILIATION - DATA FLOW & RELATIONSHIPS
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            RAW DATA SOURCES                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    AGODA                 BANK STATEMENTS           UPI PAYMENTS        INVOICE
+ (20 files)                (15 files)              (12 files)         (1 file)
+┌───────────┐            ┌──────────────┐         ┌────────────┐    ┌──────────┐
+│ Booking   │            │ Indian Bank  │         │ Paytm      │    │ Property │
+│ Remittance│            │ Statements   │         │ Settlements│    │ Mgmt Sys │
+│           │            │              │         │            │    │          │
+│ 17 header │            │ NO HEADERS   │         │ 4 variants │    │ 55 cols  │
+│ variants  │            │ Row 21 start │         │ 93% UTR    │    │ 39% null │
+│           │            │ CR/DR suffix │         │ duplicates │    │ Invoice# │
+└─────┬─────┘            └──────┬───────┘         └──────┬─────┘    └────┬─────┘
+      │                         │                        │               │
+      │                         │                        │               │
+      ▼                         ▼                        ▼               ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           PARSING LAYER                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│ AgodaParser  │    │ BankParser   │    │ UPIParser    │    │InvoiceParser │
+│              │    │              │    │              │    │              │
+│ • Normalize  │    │ • Find header│    │ • Strip "'"  │    │ • Clean names│
+│   columns    │    │   row (21+)  │    │ • Aggregate  │    │ • Parse dates│
+│ • Clean      │    │ • Extract    │    │   by UTR     │    │ • Handle null│
+│   names      │    │   metadata   │    │ • Clean UTR  │    │   Invoice#   │
+│ • Parse      │    │ • Parse      │    │ • Remove     │    │ • Filter     │
+│   dates      │    │   CR/DR      │    │   TOTAL rows │    │   null cols  │
+└──────┬───────┘    └──────┬───────┘    └──────┬───────┘    └──────┬───────┘
+       │                   │                   │                   │
+       │                   │                   │                   │
+       ▼                   ▼                   ▼                   ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      CANONICAL DATA MODELS                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│  Booking     │    │BankTxn       │    │  Payment     │    │  Invoice     │
+│──────────────│    │──────────────│    │──────────────│    │──────────────│
+│ booking_id   │    │ txn_date     │    │ txn_date     │    │ invoice_no   │
+│ guest_name   │    │ description  │    │ amount       │    │ guest_name   │
+│ checkin_date │    │ utr_no       │    │ commission   │    │ arrival_date │
+│ checkout_date│    │ debit_amt    │    │ gst          │    │ gross_amount │
+│ invoice_amt  │    │ credit_amt   │    │ settled_amt  │    │ net_amount   │
+│ from_agoda   │    │ balance      │    │ utr_no       │    │ reservation# │
+│ commission   │    │              │    │ settled_date │    │              │
+└──────┬───────┘    └──────┬───────┘    └──────┬───────┘    └──────┬───────┘
+       │                   │                   │                   │
+       │                   │                   │                   │
+       ▼                   ▼                   ▼                   ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      RECONCILIATION ENGINE                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                         ┌─────────────────────┐
+                         │  Join Strategies    │
+                         └─────────────────────┘
+                                    │
+           ┌────────────────────────┼────────────────────────┐
+           │                        │                        │
+           ▼                        ▼                        ▼
+    ┌──────────────┐        ┌──────────────┐        ┌──────────────┐
+    │ UPI → BANK   │        │INVOICE→AGODA │        │ AGODA→BANK   │
+    │──────────────│        │──────────────│        │──────────────│
+    │ Join Type:   │        │ Join Type:   │        │ Join Type:   │
+    │   DIRECT     │        │   FUZZY      │        │   FUZZY      │
+    │              │        │              │        │              │
+    │ Match On:    │        │ Match On:    │        │ Match On:    │
+    │ • UTR_NO     │        │ • Guest name │        │ • Amount±1%  │
+    │   (exact)    │        │   (similarity│        │ • Date range │
+    │ • Amount     │        │    >0.8)     │        │   (-7 to +30)│
+    │   (exact)    │        │ • Arrival =  │        │              │
+    │              │        │   Checkin    │        │              │
+    │ Pre-step:    │        │              │        │ Challenge:   │
+    │ GROUP BY UTR │        │ Pre-step:    │        │ No direct key│
+    │ SUM(amount)  │        │ Normalize    │        │              │
+    │              │        │ guest names  │        │              │
+    │              │        │ UPPER, strip │        │              │
+    │              │        │ titles       │        │              │
+    │              │        │              │        │              │
+    │ Accuracy:    │        │ Accuracy:    │        │ Accuracy:    │
+    │   95%        │        │   80%        │        │   70%        │
+    └──────────────┘        └──────────────┘        └──────────────┘
+
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │ Reconciliation      │
+                         │ Results             │
+                         │─────────────────────│
+                         │ • Matched (80-85%)  │
+                         │ • Unmatched (15-20%)│
+                         │ • Confidence scores │
+                         │ • Exception reports │
+                         └─────────────────────┘
+
+================================================================================
+KEY RELATIONSHIPS
+================================================================================
+
+1. UPI → BANK (Direct join - 95% accuracy)
+   ─────────────────────────────────────────
+   Payment.utr_no = BankTxn.utr_no
+   Payment.settled_amount = BankTxn.credit_amt
+   
+   CRITICAL: Must aggregate UPI first!
+   ✓ GROUP BY utr_no because 93% duplicates
+   
+   Example:
+   UPI row 1:  UTR=YESAP123, Amount=500
+   UPI row 2:  UTR=YESAP123, Amount=200  
+   UPI row 3:  UTR=YESAP123, Amount=300  → SUM = 1000
+   Bank row:   UTR=YESAP123, Credit=1000 ✓ MATCH
+
+2. INVOICE → AGODA (Fuzzy join - 80% accuracy)
+   ──────────────────────────────────────────
+   UPPER(REPLACE(Invoice.guest_name, 'Mr.|Mrs.', '')) 
+     SIMILARITY > 0.8
+   Invoice.arrival_date = Booking.checkin_date
+   Invoice.gross_amount ≈ Booking.invoice_amt (±5%)
+   
+   Example:
+   Invoice: "Mr.Nikhil Jat", 2025-04-05, 10999
+   Agoda:   "NIKHIL JAT",    2025-04-05, 10950  ✓ MATCH (similarity=0.95)
+
+3. AGODA → BANK (Fuzzy join - 70% accuracy)
+   ─────────────────────────────────────────
+   Booking.from_agoda BETWEEN BankTxn.credit_amt * 0.99 AND * 1.01
+   BankTxn.txn_date BETWEEN Booking.checkin_date - 7 AND + 30
+   
+   Example:
+   Agoda: From Agoda=11687.12, Checkin=2025-07-03
+   Bank:  Credit=11687.12, Date=2025-07-05  ✓ MATCH (within range)
+
+================================================================================
+DATA QUALITY METRICS
+================================================================================
+
+Source      Files  Rows  Variants  Null%  Duplicates  Date Format
+──────────  ─────  ────  ────────  ─────  ──────────  ───────────
+AGODA         20    2K+      17      5%      14%      M/D/YYYY HH:MM:SS
+BANK          15    1.5K+     4      0%       -       DD/MM/YYYY
+UPI           12    1.2K+     4     54%      93%      'YYYY-MM-DD HH:MM:SS'
+INVOICE        1    100+      1     39%      40%      YYYY-MM-DD
+
+Critical Issues:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✗ AGODA:   17 header variants (typos: INVOICE/INVOCIE, spacing: COMM+GST)
+✗ UPI:     93% UTR duplicates (must aggregate before join)
+✗ UPI:     54% null UTRs in recent files (unsettled transactions)
+✗ INVOICE: 39% null Invoice# (use composite key instead)
+✗ BANK:    No standard headers (detect row 21+)
+
+================================================================================
+NORMALIZATION REQUIREMENTS
+================================================================================
+
+1. Column Headers (AGODA)
+   ───────────────────────
+   INVOICE NO.  ┐
+   INVOCIE NO.  ├─→ invoice_no
+   INVOICE  NO. ┘
+   
+   COMM + GST ┐
+   COMM+GST   ├─→ commission_gst
+   COMM +GST  ┘
+
+2. Guest Names
+   ───────────
+   "Mr.Nikhil Jat"    ──→ "NIKHIL JAT"
+   "Mrs. Priya Kumar" ──→ "PRIYA KUMAR"
+   "indrajeet tiwari" ──→ "INDRAJEET TIWARI"
+   
+   Rules: UPPER() + strip titles (Mr./Mrs./Ms./Dr./Prof.)
+
+3. Dates
+   ──────
+   AGODA:   "7/3/2025 12:00:00 AM"  ──→ 2025-07-03
+   BANK:    "01/07/2025"             ──→ 2025-07-01
+   UPI:     "'2025-07-01 08:48:19'" ──→ 2025-07-01
+   INVOICE: "2025-03-27"             ──→ 2025-03-27
+
+4. Amounts
+   ────────
+   "11687.12"     ──→ 11687.12
+   "470414.15CR"  ──→ 470414.15
+   "35,997.98"    ──→ 35997.98
+
+5. UTR Numbers
+   ────────────
+   "'YESAP51833296492'" ──→ "YESAP51833296492"
+   " YESBN12025... "    ──→ "YESBN12025..."
+
+================================================================================
+RECOMMENDED TECH STACK
+================================================================================
+
+Parsing:     pandas, openpyxl
+Validation:  pydantic (data models)
+Fuzzy Match: rapidfuzz / fuzzywuzzy
+Database:    PostgreSQL + SQLAlchemy
+Testing:     pytest (1 test per variant = 17+ tests)
+
+================================================================================

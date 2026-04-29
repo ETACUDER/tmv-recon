@@ -1,0 +1,552 @@
+utr,amount_gross,commission,gst,settled_amount,settled_dt,txn_dt,payment_mode,issuing_bank,unit,raw_path,utr_txn_count,confidence
+AXNPM01099541324,11897.0,51.81,6.58,11838.61,2026-01-10 02:24:31,2026-01-09 08:52:41,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,20,high
+AXNPM07898040152,500.0,19.95,0.0,480.05,2026-03-19 10:38:11,2026-03-18 13:20:41,CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,high
+AXNPM08122492643,500.0,0.0,0.0,500.0,2026-03-22 10:39:03,2026-03-21 11:02:37,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,high
+AXNPM08226753568,500.0,0.0,0.0,500.0,2026-03-23 03:51:00,2026-03-22 12:38:28,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,high
+AXNPM25646131482,2013.0,0.0,0.0,2013.0,2025-09-13 10:56:52,2025-09-12 08:29:32,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,5,high
+YESAP51833296492,20186.0,201.39,36.25,19948.36,2025-07-02 10:44:43,2025-07-01 08:48:19,DEBIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,15,high
+YESAP51843173906,20363.0,175.07000000000002,31.52,20156.41,2025-07-03 10:46:34,2025-07-02 08:20:34,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,14,high
+YESAP51853112608,39828.0,81.36,14.65,39731.99,2025-07-04 10:40:38,2025-07-03 08:26:11,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,16,high
+YESAP51866004539,31829.0,229.75,41.36,31557.89,2025-07-05 12:05:26,2025-07-04 09:23:07,UPI (CREDIT CARD),,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,21,high
+YESAP51873091687,44145.0,261.32,47.04,43836.64,2025-07-06 14:16:06,2025-07-05 08:57:12,DEBIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,21,high
+YESAP51883005249,26736.0,112.08,20.18,26603.74,2025-07-07 10:43:41,2025-07-06 08:33:59,UPI (CREDIT CARD),,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,29,high
+YESAP51893100216,26241.07,196.59,35.39,26009.09,2025-07-08 10:41:14,2025-07-07 09:29:15,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,14,high
+YESAP51903207243,63174.7,522.8299999999999,94.1,62557.770000000004,2025-07-09 10:35:25,2025-07-08 09:24:22,DEBIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,25,high
+YESAP51913133667,18524.0,0.0,0.0,18524.0,2025-07-10 10:44:41,2025-07-09 09:38:05,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,11,high
+YESAP51923091119,12019.0,54.49999999999999,9.81,11954.69,2025-07-11 10:38:52,2025-07-10 09:36:16,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,9,high
+YESAP51933166109,12698.0,45.0,8.1,12644.9,2025-07-12 10:36:31,2025-07-11 09:01:33,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,13,high
+YESAP51943145592,64493.95,533.87,96.1,63863.979999999996,2025-07-13 10:42:34,2025-07-12 09:41:33,CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,31,high
+YESAP51953105806,48595.14,236.04000000000002,42.49,48316.61,2025-07-14 10:50:24,2025-07-13 09:31:08,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,28,high
+YESAP51963052873,20464.0,129.56,23.32,20311.12,2025-07-15 10:36:40,2025-07-14 07:09:04,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,14,high
+YESAP51973330061,40848.08,213.51,38.43,40596.14,2025-07-16 10:38:07,2025-07-15 09:38:55,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,25,high
+YESAP51983199517,30657.0,200.3,36.05,30420.65,2025-07-17 10:34:09,2025-07-16 09:26:06,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,20,high
+YESAP51993140374,13665.0,153.26,27.58,13484.16,2025-07-18 10:45:01,2025-07-17 08:46:02,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,18,high
+YESAP52003190021,13293.0,65.69,11.830000000000002,13215.48,2025-07-19 10:41:08,2025-07-18 09:24:41,DEBIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,21,high
+YESAP52011059213,53073.83,116.16999999999999,20.91,52936.75,2025-07-20 10:43:45,2025-07-19 09:03:12,UPI (CREDIT CARD),,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,19,high
+YESAP52023149626,38261.0,210.54,37.91,38012.55,2025-07-21 10:37:47,2025-07-20 09:10:21,CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,34,high
+YESAP52033146355,12449.0,8.53,1.54,12438.93,2025-07-22 10:38:35,2025-07-21 09:29:24,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,16,high
+YESAP52043236473,6194.0,0.0,0.0,6194.0,2025-07-23 10:38:18,2025-07-22 09:39:20,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,8,high
+YESAP52053320831,36219.0,216.49,38.97,35963.54,2025-07-24 10:40:30,2025-07-23 08:17:44,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,19,high
+YESAP52063335438,6110.0,50.4,9.07,6050.530000000001,2025-07-25 10:40:48,2025-07-24 11:10:56,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,7,high
+YESAP52073298889,19705.0,85.5,15.39,19604.11,2025-07-26 10:40:29,2025-07-25 08:37:15,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,8,high
+YESAP52083231467,32062.0,9.33,1.68,32050.989999999998,2025-07-27 10:41:06,2025-07-26 08:56:06,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,7,high
+YESAP52093161474,19494.68,513.92,92.50999999999999,18888.25,2025-07-28 11:12:44,2025-07-27 07:24:17,CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,7,high
+YESAP52103428873,20859.0,67.5,12.15,20779.35,2025-07-29 10:38:11,2025-07-28 09:01:02,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,8,high
+YESAP52113539294,26660.85,383.16,68.97,26208.719999999998,2025-07-30 10:47:51,2025-07-29 08:59:26,CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,10,high
+YESAP52123428861,9831.0,0.0,0.0,9831.0,2025-07-31 11:29:38,2025-07-30 09:27:55,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,7,high
+YESAP52133413728,7400.0,172.8,31.1,7196.1,2025-08-01 12:42:01,2025-07-31 10:47:28,CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,2,high
+YESAP52452132924,3651.0,0.0,0.0,3651.0,2025-09-02 07:07:38,2025-09-01 08:27:37,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,9,high
+YESAP52453235855,469.0,0.0,0.0,469.0,2025-09-02 10:39:47,2025-09-01 10:14:14,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,2,high
+YESAP52462587295,3374.0,9.91,1.78,3362.31,2025-09-03 07:50:46,2025-09-02 09:47:03,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,7,high
+YESAP52463513165,11178.44,246.96,44.45,10887.03,2025-09-03 10:48:19,2025-09-02 09:14:34,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,3,high
+YESAP52472428956,5924.0,0.0,0.0,5924.0,2025-09-04 06:38:28,2025-09-03 10:50:32,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,8,high
+YESAP52473450822,12480.0,191.8,34.52,12253.68,2025-09-04 10:38:28,2025-09-03 07:20:11,DEBIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,4,high
+YESAP52482272358,5329.0,0.0,0.0,5329.0,2025-09-05 06:44:00,2025-09-04 12:56:20,UPI_LITE,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,7,high
+YESAP52483461761,5227.0,21.95,3.95,5201.1,2025-09-05 11:12:14,2025-09-04 05:37:22,DEBIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,5,high
+YESAP52492439044,7006.0,8.14,1.46,6996.4,2025-09-06 07:42:26,2025-09-05 08:49:08,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,13,high
+YESAP52493528621,7233.0,68.74,12.37,7151.89,2025-09-06 11:30:10,2025-09-05 06:59:36,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,5,high
+YESAP52501799987,15011.0,0.0,0.0,15011.0,2025-09-07 07:18:11,2025-09-06 08:36:53,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,18,high
+YESAP52503651846,31418.0,0.0,0.0,31418.0,2025-09-07 10:57:31,2025-09-06 05:59:23,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,6,high
+YESAP52511666982,17223.0,65.15,11.73,17146.12,2025-09-08 05:01:29,2025-09-07 07:52:46,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,19,high
+YESAP52513534837,16200.0,0.0,0.0,16200.0,2025-09-08 10:35:48,2025-09-07 10:10:23,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,5,high
+YESAP52523035182,9485.0,0.0,0.0,9485.0,2025-09-09 05:22:28,2025-09-08 08:59:29,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,11,high
+YESAP52525703201,24138.0,0.0,0.0,24138.0,2025-09-09 10:35:38,2025-09-08 09:26:44,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,7,high
+YESAP52533305153,7479.0,0.0,0.0,7479.0,2025-09-10 05:52:24,2025-09-09 11:55:13,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,10,high
+YESAP52535748030,6880.0,54.0,9.72,6816.280000000001,2025-09-10 10:39:38,2025-09-09 08:22:49,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,6,high
+YESAP52543889638,2614.0,0.0,0.0,2614.0,2025-09-11 07:57:20,2025-09-10 08:32:24,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,9,high
+YESAP52545727914,8099.0,0.0,0.0,8099.0,2025-09-11 10:39:08,2025-09-10 08:51:15,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,3,high
+YESAP52554531245,15371.0,0.4,0.07,15370.529999999999,2025-09-12 07:29:50,2025-09-11 08:47:14,UPI_CREDIT_CARD,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,11,high
+YESAP52555633236,24522.12,384.56,69.23,24068.33,2025-09-12 10:34:28,2025-09-11 09:53:46,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,9,high
+YESAP52562056059,12717.0,38.31,6.9,12671.79,2025-09-13 09:16:39,2025-09-12 07:44:53,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,17,high
+YESAP52572924883,19859.0,191.39,34.45,19633.16,2025-09-14 07:51:52,2025-09-13 12:44:58,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,19,high
+YESAP52575601017,11797.0,152.55,27.46,11616.99,2025-09-14 12:24:01,2025-09-13 09:45:53,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,11,high
+YESAP52582756752,11137.0,67.03,12.06,11057.91,2025-09-15 05:54:02,2025-09-14 10:30:35,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,17,high
+YESAP52585451367,5450.0,9.0,1.62,5439.38,2025-09-15 10:44:56,2025-09-14 09:34:11,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,7,high
+YESAP52591809044,7416.0,9.530000000000001,1.71,7404.76,2025-09-16 04:37:28,2025-09-15 08:32:04,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,13,high
+YESAP52595424105,2791.0,0.0,0.0,2791.0,2025-09-16 11:39:25,2025-09-15 07:34:21,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,5,high
+YESAP52602802294,9117.0,0.0,0.0,9117.0,2025-09-17 05:02:59,2025-09-16 14:47:26,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,14,high
+YESAP52605707028,33599.64,0.0,0.0,33599.64,2025-09-17 11:26:49,2025-09-16 09:54:16,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,7,high
+YESAP52613140340,3149.0,9.23,1.66,3138.11,2025-09-18 07:12:46,2025-09-17 08:33:21,UPI_LITE,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,6,high
+YESAP52615650277,9684.16,0.0,0.0,9684.16,2025-09-18 10:52:19,2025-09-17 02:04:23,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,7,high
+YESAP52622411741,6480.0,6.14,1.11,6472.75,2025-09-19 04:48:37,2025-09-18 09:27:00,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,10,high
+YESAP52625678847,15417.0,56.260000000000005,10.13,15350.61,2025-09-19 11:04:42,2025-09-18 09:11:59,CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,5,high
+YESAP52632684907,11493.0,0.0,0.0,11493.0,2025-09-20 05:33:04,2025-09-19 08:36:02,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,17,high
+YESAP52635667106,15416.0,17.67,3.18,15395.15,2025-09-20 10:34:18,2025-09-19 05:32:52,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,6,high
+YESAP52644606728,16107.0,70.98,12.77,16023.25,2025-09-21 08:27:15,2025-09-20 08:30:40,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,20,high
+YESAP52645722043,947.0,0.0,0.0,947.0,2025-09-21 13:24:11,2025-09-20 08:47:57,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,2,high
+YESAP52652381192,14455.0,42.519999999999996,7.66,14404.82,2025-09-22 04:56:15,2025-09-21 09:20:21,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,20,high
+YESAP52655652455,11032.0,34.89,6.28,10990.83,2025-09-22 10:36:12,2025-09-21 09:32:10,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,6,high
+YESAP52664885430,12503.0,77.65,13.98,12411.369999999999,2025-09-23 06:32:37,2025-09-22 11:38:28,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,14,high
+YESAP52665542634,20782.32,348.45,62.709999999999994,20371.16,2025-09-23 12:06:32,2025-09-22 07:53:57,DEBIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,7,high
+YESAP52672854157,3037.0,0.0,0.0,3037.0,2025-09-24 05:31:34,2025-09-23 21:10:25,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,2,high
+YESAP52675566978,1400.0,0.0,0.0,1400.0,2025-09-24 10:45:47,2025-09-23 13:03:57,DEBIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,2,high
+YESAP52682603406,5642.0,14.09,2.54,5625.37,2025-09-25 05:36:34,2025-09-24 14:40:27,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,10,high
+YESAP52685653103,19034.760000000002,115.05,20.71,18899.0,2025-09-25 10:35:06,2025-09-24 07:00:11,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,8,high
+YESAP52693409547,5074.0,52.8,9.51,5011.6900000000005,2025-09-26 06:37:15,2025-09-25 14:56:24,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,6,high
+YESAP52695577334,6188.0,20.99,3.78,6163.23,2025-09-26 10:39:33,2025-09-25 09:00:05,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,5,high
+YESAP52703961559,4387.0,12.13,2.18,4372.6900000000005,2025-09-27 08:15:57,2025-09-26 11:58:24,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,8,high
+YESAP52705581410,4237.0,22.26,4.01,4210.73,2025-09-27 11:02:21,2025-09-26 03:59:18,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,3,high
+YESAP52714160734,6132.0,40.68,7.32,6084.0,2025-09-28 07:32:44,2025-09-27 18:46:49,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,7,high
+YESAP52715521939,9591.880000000001,40.8,7.34,9543.74,2025-09-28 10:40:10,2025-09-27 06:06:48,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,8,high
+YESAP52722115807,11599.0,60.45,10.879999999999999,11527.67,2025-09-29 05:28:44,2025-09-28 12:18:53,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,17,high
+YESAP52725458828,20112.4,451.58,81.28,19579.54,2025-09-29 10:38:05,2025-09-28 06:54:48,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,7,high
+YESAP52734016873,2604.0,29.15,5.24,2569.61,2025-09-30 07:09:51,2025-09-29 08:27:33,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,5,high
+YESAP52735501389,2678.0,87.15,15.690000000000001,2575.16,2025-09-30 13:27:18,2025-09-29 09:28:19,UPI_CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,2,high
+YESAP52743476728,3502.0,40.91,7.369999999999999,3453.7200000000003,2025-10-01 07:02:28,2025-09-30 11:56:18,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,5,high
+YESAP52745771051,19185.0,551.67,99.3,18534.03,2025-10-01 13:27:19,2025-09-30 09:20:59,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,9,high
+YESAP52754435631,4760.0,24.66,4.4399999999999995,4730.9,2025-10-02 07:32:20,2025-10-01 11:55:46,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,8,high
+YESAP52762950127,6820.0,21.8,3.92,6794.28,2025-10-03 06:26:38,2025-10-02 20:41:28,CREDIT_CARD,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,10,high
+YESAP52772631307,13766.0,32.739999999999995,5.890000000000001,13727.37,2025-10-04 06:48:16,2025-10-03 12:49:30,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,18,high
+YESAP52784076080,22273.0,121.17,21.82,22130.01,2025-10-05 08:29:36,2025-10-04 08:49:17,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,21,high
+YESAP52793414912,6347.0,55.26,9.95,6281.79,2025-10-06 07:09:09,2025-10-05 13:37:36,UPI_CREDIT_CARD,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,10,high
+YESAP52802824500,4790.0,0.0,0.0,4790.0,2025-10-07 05:33:45,2025-10-06 08:52:21,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,9,high
+YESAP52812347041,11594.0,8.96,1.61,11583.43,2025-10-08 06:48:54,2025-10-07 19:12:37,UPI_CREDIT_CARD,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,7,high
+YESAP52822834544,3009.0,26.21,4.72,2978.0699999999997,2025-10-09 05:57:37,2025-10-08 15:43:00,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,3,high
+YESAP52832007425,4862.0,0.0,0.0,4862.0,2025-10-10 05:49:42,2025-10-09 19:25:43,UPI,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,5,high
+YESAP52881123751,6986.0,45.0,8.1,6932.9,2025-10-15 04:01:57,2025-10-14 19:34:00,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,11,high
+YESAP52890029170,10631.0,0.0,0.0,10631.0,2025-10-16 02:49:47,2025-10-15 08:35:42,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,19,high
+YESAP52900106435,5213.0,0.0,0.0,5213.0,2025-10-17 02:07:17,2025-10-16 09:19:23,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,12,high
+YESAP52912714727,5252.0,3.31,0.6,5248.09,2025-10-18 05:03:21,2025-10-17 11:06:31,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,8,high
+YESAP52921481666,9847.0,48.68,8.76,9789.56,2025-10-19 04:32:54,2025-10-18 18:39:38,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,12,high
+YESAP52931427734,14240.0,47.44,8.530000000000001,14184.03,2025-10-20 04:53:39,2025-10-19 07:51:33,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,15,high
+YESAP52940064925,18104.0,81.27,14.63,18008.1,2025-10-21 03:22:34,2025-10-20 09:13:52,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,17,high
+YESAP52951809742,33058.0,157.75,28.41,32871.84,2025-10-22 04:51:33,2025-10-21 08:34:00,UPI_CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,27,high
+YESAP52961191621,18854.0,56.089999999999996,10.1,18787.809999999998,2025-10-23 04:24:27,2025-10-22 08:31:21,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,24,high
+YESAP52970972396,22851.0,129.42000000000002,23.3,22698.28,2025-10-24 05:49:49,2025-10-23 08:04:11,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,23,high
+YESAP52981219969,23635.0,5.6,1.01,23628.39,2025-10-25 04:22:38,2025-10-24 09:08:41,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,22,high
+YESAP52990068962,24955.0,66.87,12.04,24876.09,2025-10-26 03:11:53,2025-10-25 14:11:04,UPI_CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,16,high
+YESAP53001174810,18840.0,38.25,6.89,18794.86,2025-10-27 04:06:46,2025-10-26 09:10:35,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,17,high
+YESAP53011799286,14030.0,85.11,15.33,13929.56,2025-10-28 04:39:10,2025-10-27 10:11:41,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,17,high
+YESAP53021422999,13740.0,100.7,18.14,13621.16,2025-10-29 03:38:01,2025-10-28 08:28:23,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,20,high
+YESAP53030129746,21684.0,22.14,3.9800000000000004,21657.88,2025-10-30 02:12:01,2025-10-29 09:27:25,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,25,high
+YESAP53042105252,22556.0,79.84,14.37,22461.79,2025-10-31 04:58:19,2025-10-30 08:27:14,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,27,high
+YESAP53050892504,15026.0,20.76,3.74,15001.5,2025-11-01 04:37:07,2025-10-31 14:04:09,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,16,high
+YESAP53361803532,18792.0,105.4,18.97,18667.63,2025-12-02 05:20:29,2025-12-01 14:01:48,UPI_CREDIT_CARD,HDFC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,20,high
+YESAP53371156801,10248.0,44.26,7.96,10195.78,2025-12-03 04:26:06,2025-12-02 09:41:27,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,21,high
+YESAP53381970785,13830.0,58.58,9.99,13761.43,2025-12-04 05:21:54,2025-12-03 09:35:13,UPI,AXIS,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,21,high
+YESAP53392000862,15677.0,114.81,19.86,15542.329999999998,2025-12-05 05:51:09,2025-12-04 08:18:00,UPI,SBI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,11,high
+YESAP53400947544,9422.0,62.290000000000006,11.21,9348.5,2025-12-06 03:49:05,2025-12-05 09:04:19,UPI_CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,23,high
+YESAP53410173877,13195.0,78.02,12.09,13104.89,2025-12-07 03:22:08,2025-12-06 14:48:24,UPI,IDFC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,18,high
+YESAP53421131350,9768.0,48.94,6.25,9712.81,2025-12-08 03:29:01,2025-12-07 15:22:56,UPI,AXIS,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,14,high
+YESAP53431196092,22059.0,67.11,4.53,21987.36,2025-12-09 03:05:30,2025-12-08 09:07:43,UPI,HDFC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,26,high
+YESAP53440820434,13295.0,56.58,7.920000000000001,13230.5,2025-12-10 04:33:38,2025-12-09 15:21:18,UPI,HDFC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,26,high
+YESAP53450150091,21919.0,110.42,19.880000000000003,21788.7,2025-12-11 02:10:17,2025-12-10 09:33:23,UPI,HDFC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,17,high
+YESAP53460536926,11083.0,82.7,11.17,10989.130000000001,2025-12-12 04:09:02,2025-12-11 09:00:18,UPI_LITE,SBI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,16,high
+YESAP53470079081,30229.0,174.11,21.97,30032.92,2025-12-13 09:16:48,2025-12-12 15:36:12,UPI,ICICI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,25,high
+YESAP53480773917,22314.0,168.02,24.02,22121.96,2025-12-14 04:48:59,2025-12-13 15:22:54,UPI_LITE,HDFC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,25,high
+YESAP53491828541,24668.0,19.79,2.41,24645.8,2025-12-15 04:47:34,2025-12-14 09:39:55,UPI,IDBI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,18,high
+YESAP53501558150,16136.0,87.34,15.72,16032.94,2025-12-16 04:32:23,2025-12-15 09:33:36,UPI,SBI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,20,high
+YESAP53511047156,19669.0,6.5,1.17,19661.33,2025-12-17 03:57:51,2025-12-16 07:48:18,UPI,IDBI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,15,high
+YESAP53521008543,10890.0,14.67,0.0,10875.33,2025-12-18 04:06:15,2025-12-17 15:26:16,UPI,SBI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,14,high
+YESAP53530014289,16401.0,89.14999999999999,0.89,16310.96,2025-12-19 02:18:41,2025-12-18 08:51:08,UPI,HDFC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,25,high
+YESAP53540221692,21510.0,189.42000000000002,21.02,21299.56,2025-12-20 02:18:19,2025-12-19 08:14:11,UPI,SBI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,24,high
+YESAP53550234004,15150.0,36.010000000000005,5.68,15108.31,2025-12-21 02:21:45,2025-12-20 09:21:13,UPI_LITE,HDFC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,23,high
+YESAP53560136351,25451.0,110.22999999999999,5.8,25334.97,2025-12-22 03:05:35,2025-12-21 09:26:52,UPI,ICICI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,30,high
+YESAP53571466891,22635.0,133.83,14.33,22486.84,2025-12-23 04:39:22,2025-12-22 00:31:32,UPI_CREDIT_CARD,CAPB,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,29,high
+YESAP53580331663,22606.0,193.23,17.97,22394.8,2025-12-24 02:59:10,2025-12-23 15:39:28,UPI,SBI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,26,high
+YESAP53594170641,27299.0,212.67000000000002,7.1899999999999995,27079.14,2025-12-25 07:52:54,2025-12-24 08:54:53,CREDIT_CARD,HDFC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,28,high
+YESAP53602019417,34112.0,181.5,18.95,33911.55,2025-12-26 04:59:05,2025-12-25 01:02:07,UPI,HDFC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,37,high
+YESAP53610035949,39511.0,326.96999999999997,40.97,39143.06,2025-12-27 02:15:28,2025-12-26 00:04:19,UPI,SBI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,42,high
+YESAP53621660615,38333.0,241.35,35.25,38056.4,2025-12-28 04:51:13,2025-12-27 15:40:13,UPI,HSBC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,30,high
+YESAP53632051211,13801.0,44.650000000000006,5.29,13751.06,2025-12-29 04:45:11,2025-12-28 09:37:32,UPI,ICICI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,26,high
+YESAP53640142979,22671.0,204.11,28.63,22438.26,2025-12-30 02:45:59,2025-12-29 08:34:59,UPI,HDFC,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,25,high
+YESAP53650067226,31785.0,192.27,15.270000000000001,31577.46,2025-12-31 02:22:10,2025-12-30 14:56:18,UPI,XBVM,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,29,high
+YESAP60011347483,27625.0,166.32,29.93,27428.75,2026-01-01 05:28:18,2025-12-31 09:35:09,UPI_CREDIT_CARD,SBI,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,30,high
+YESAP60021140361,25752.0,124.61000000000001,13.41,25613.98,2026-01-02 04:15:09,2026-01-01 00:15:58,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,32,high
+YESAP60031498160,7773.0,15.61,1.37,7756.02,2026-01-03 04:11:57,2026-01-02 08:36:36,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,16,high
+YESAP60040094172,22479.0,86.32000000000001,8.2,22384.48,2026-01-04 02:14:19,2026-01-03 09:23:29,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,36,high
+YESAP60050946571,21042.0,123.11,2.46,20916.43,2026-01-05 03:43:19,2026-01-04 08:19:28,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,29,high
+YESAP60060062926,8380.0,35.72,3.29,8340.99,2026-01-06 01:42:48,2026-01-05 07:22:07,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,22,high
+YESAP60070136129,12204.0,0.0,0.0,12204.0,2026-01-07 02:27:05,2026-01-06 09:17:07,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,11,high
+YESAP60081202537,14465.0,60.91,10.96,14393.130000000001,2026-01-08 03:34:59,2026-01-07 10:08:10,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,19,high
+YESAP60090338911,15432.0,100.53999999999999,12.65,15318.81,2026-01-09 02:30:43,2026-01-08 07:35:29,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,23,high
+YESAP60110019697,13906.0,62.620000000000005,5.69,13837.69,2026-01-11 02:18:06,2026-01-10 13:13:40,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,19,high
+YESAP60120039317,24793.0,38.01,3.16,24751.83,2026-01-12 02:12:36,2026-01-11 09:23:44,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,28,high
+YESAP60130066358,26558.0,187.89,18.5,26351.61,2026-01-13 02:21:54,2026-01-12 08:45:54,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,23,high
+YESAP60141385650,21966.0,212.89000000000001,28.89,21724.22,2026-01-14 04:25:39,2026-01-13 14:02:15,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,23,high
+YESAP60150122715,14231.0,81.9,6.89,14142.21,2026-01-15 02:20:45,2026-01-14 07:50:54,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,19,high
+YESAP60160022027,14212.0,81.03999999999999,12.72,14118.24,2026-01-16 02:07:23,2026-01-15 07:27:15,UPI_LITE,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,20,high
+YESAP60170065187,24884.0,119.03999999999999,1.09,24763.87,2026-01-17 02:17:45,2026-01-16 09:35:59,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,25,high
+YESAP60181218132,22403.0,123.76,13.01,22266.23,2026-01-18 04:48:24,2026-01-17 08:13:00,UPI_PPIWALLET,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,20,high
+YESAP60190908079,16561.0,75.39,2.83,16482.78,2026-01-19 03:27:07,2026-01-18 08:26:20,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,19,high
+YESAP60200184860,8210.0,40.25,3.9499999999999997,8165.8,2026-01-20 02:25:03,2026-01-19 07:13:59,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,13,high
+YESAP60210210892,18853.0,153.07999999999998,15.61,18684.31,2026-01-21 02:32:58,2026-01-20 07:50:44,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,19,high
+YESAP60220731387,10305.0,146.76,0.0,10158.24,2026-01-22 03:11:34,2026-01-21 10:30:29,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,14,high
+YESAP60230200691,8996.0,22.84,0.0,8973.16,2026-01-23 02:20:11,2026-01-22 11:33:00,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,11,high
+YESAP60242178739,13903.0,0.0,0.0,13903.0,2026-01-24 05:39:05,2026-01-23 10:49:30,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,24,high
+YESAP60251171157,24482.0,186.35,13.23,24282.42,2026-01-25 06:16:22,2026-01-24 10:05:39,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,27,high
+YESAP60261285474,25568.0,96.99,8.77,25462.24,2026-01-26 03:04:13,2026-01-25 08:44:20,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,37,high
+YESAP60270121542,13263.0,70.87,7.33,13184.8,2026-01-27 02:10:28,2026-01-26 14:24:20,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,17,high
+YESAP60280275595,6655.0,60.78,5.98,6588.24,2026-01-28 02:26:42,2026-01-27 07:31:10,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,13,high
+YESAP60291575259,13871.0,188.18,33.86,13648.960000000001,2026-01-29 04:02:23,2026-01-28 09:31:27,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,14,high
+YESAP60303131653,9127.0,0.0,0.0,9127.0,2026-01-30 05:31:41,2026-01-29 07:57:39,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,18,high
+YESAP60312751210,9070.0,0.0,0.0,9070.0,2026-01-31 05:24:26,2026-01-30 07:52:28,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,13,high
+YESAP60321172159,14937.0,60.41,6.08,14870.51,2026-02-01 03:59:55,2026-01-31 14:05:59,CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,20,high
+YESAP60331726969,11159.0,43.21,0.0,11115.79,2026-02-02 04:04:06,2026-02-01 07:50:46,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,13,high
+YESAP60341459902,21300.0,168.79999999999998,30.39,21100.81,2026-02-03 03:49:21,2026-02-02 14:20:05,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,14,high
+YESAP60352468559,6265.0,54.89,9.870000000000001,6200.24,2026-02-04 06:40:32,2026-02-03 09:15:25,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,11,high
+YESAP60362458983,4658.0,74.84,7.199999999999999,4575.96,2026-02-05 06:10:17,2026-02-04 11:51:04,UPI_LITE,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,10,high
+YESAP60371449318,11936.0,38.230000000000004,3.6199999999999997,11894.15,2026-02-06 04:36:27,2026-02-05 08:32:24,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,16,high
+YESAP60382812711,24601.0,147.96,19.380000000000003,24433.66,2026-02-07 06:24:22,2026-02-06 00:37:06,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,28,high
+YESAP60391695473,18835.0,119.77000000000001,21.55,18693.68,2026-02-08 03:47:35,2026-02-07 08:05:10,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,27,high
+YESAP60401872658,15177.0,35.39,2.91,15138.699999999999,2026-02-09 04:40:09,2026-02-08 08:35:13,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,17,high
+YESAP60412187849,14976.0,47.989999999999995,0.81,14927.2,2026-02-10 04:31:45,2026-02-09 01:53:57,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,27,high
+YESAP60421919917,20889.0,63.61,6.86,20818.53,2026-02-11 04:08:15,2026-02-10 07:50:26,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,35,high
+YESAP60432190357,11090.0,129.07,6.83,10954.1,2026-02-12 04:27:37,2026-02-11 07:10:26,UPI_PPIWALLET,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,19,high
+YESAP60441056175,15277.0,206.23000000000002,13.61,15057.16,2026-02-13 03:40:30,2026-02-12 06:46:14,UPI_PPIWALLET,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,26,high
+YESAP60450625917,14269.0,124.66,6.16,14138.18,2026-02-14 09:00:59,2026-02-13 11:27:51,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,20,high
+YESAP60461428531,23528.0,205.35,28.74,23293.91,2026-02-15 03:44:29,2026-02-14 09:37:29,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,23,high
+YESAP60471635860,15352.0,37.56,5.49,15308.95,2026-02-16 04:33:58,2026-02-15 09:02:46,UPI_CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,18,high
+YESAP60481823811,20760.0,348.81,55.089999999999996,20356.100000000002,2026-02-17 04:51:43,2026-02-16 08:49:06,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,19,high
+YESAP60492685010,16956.0,61.2,9.63,16885.17,2026-02-18 06:01:58,2026-02-17 12:04:35,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,20,high
+YESAP60501629671,10504.0,18.81,3.39,10481.8,2026-02-19 04:48:55,2026-02-18 08:49:33,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,20,high
+YESAP60511745265,14895.0,58.55,8.21,14828.24,2026-02-20 04:36:51,2026-02-19 07:46:40,UPI_CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,22,high
+YESAP60522895520,25103.0,270.99,36.98,24795.03,2026-02-21 05:18:50,2026-02-20 09:16:32,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,32,high
+YESAP60530895925,18453.0,130.0,21.33,18301.67,2026-02-22 03:44:09,2026-02-21 07:58:15,UPI_PPIWALLET,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,28,high
+YESAP60541970881,11609.0,34.96,1.7,11572.34,2026-02-23 05:36:51,2026-02-22 10:53:37,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,16,high
+YESAP60551247303,9588.0,72.78,3.9400000000000004,9511.28,2026-02-24 04:38:56,2026-02-23 00:16:42,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,17,high
+YESAP60561424570,23385.0,98.69999999999999,17.759999999999998,23268.54,2026-02-25 04:32:11,2026-02-24 14:14:38,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,24,high
+YESAP60571487848,15972.0,43.7,7.87,15920.43,2026-02-26 04:23:43,2026-02-25 13:10:08,UPI_CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,19,high
+YESAP60581273140,7833.0,44.94,8.08,7779.98,2026-02-27 04:08:00,2026-02-26 06:39:49,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,12,high
+YESAP60592326023,29361.0,234.41000000000003,27.37,29099.22,2026-02-28 04:56:35,2026-02-27 09:33:10,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,25,high
+YESAP60601576267,16472.0,148.58,26.740000000000002,16296.68,2026-03-01 04:08:20,2026-02-28 10:21:21,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,20,high
+YESAP60611409014,10075.0,65.86000000000001,8.2,10000.94,2026-03-02 04:13:55,2026-03-01 06:42:39,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,14,high
+YESAP60615253073,16600.0,0.0,0.0,16600.0,2026-03-02 13:24:07,2026-03-01 18:12:18,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,3,high
+YESAP60621733652,15678.0,169.51,21.06,15487.43,2026-03-03 06:38:31,2026-03-02 08:44:04,UPI_CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,14,high
+YESAP60625380858,22000.0,0.0,0.0,22000.0,2026-03-03 11:37:13,2026-03-02 19:51:35,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,2,high
+YESAP60631483476,39677.0,212.26,38.21,39426.53,2026-03-04 06:56:45,2026-03-03 12:43:29,UPI_LITE,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,34,high
+YESAP60635000224,29942.4,0.0,0.0,29942.4,2026-03-04 13:21:21,2026-03-03 08:47:55,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,4,high
+YESAP60641089156,10017.0,30.72,5.53,9980.75,2026-03-05 03:42:40,2026-03-04 09:52:43,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,15,high
+YESAP60644397189,6500.0,0.0,0.0,6500.0,2026-03-05 10:38:02,2026-03-04 15:04:21,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,3,high
+YESAP60651843943,16470.0,164.6,29.42,16275.98,2026-03-06 04:53:29,2026-03-05 09:00:58,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,20,high
+YESAP60653051158,9450.0,330.75,59.54,9059.71,2026-03-06 06:33:10,2026-03-05 15:39:57,DEBIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,high
+YESAP60655185051,4551.5,89.3,16.07,4446.13,2026-03-06 10:39:00,2026-03-05 06:22:41,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,4,high
+YESAP60662549927,12248.0,24.98,2.32,12220.7,2026-03-07 05:21:32,2026-03-06 08:21:01,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,25,high
+YESAP60672905857,20882.0,84.48,15.21,20782.31,2026-03-08 05:35:53,2026-03-07 00:46:19,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,29,high
+YESAP60675429703,4000.0,0.0,0.0,4000.0,2026-03-08 10:38:34,2026-03-07 12:03:09,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,2,high
+YESAP60681392014,14712.0,94.45,9.99,14607.56,2026-03-09 03:08:25,2026-03-08 08:33:37,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,25,high
+YESAP60682581345,1500.0,0.0,0.0,1500.0,2026-03-09 05:02:22,2026-03-08 15:25:45,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,high
+YESAP60685255395,17001.0,0.0,0.0,17001.0,2026-03-09 10:38:28,2026-03-08 07:27:38,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,5,high
+YESAP60693066763,8621.0,38.54,2.06,8580.4,2026-03-10 04:42:39,2026-03-09 09:57:17,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,15,high
+YESAP60701890814,12771.0,38.83,5.59,12726.58,2026-03-11 04:21:58,2026-03-10 01:01:27,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,20,high
+YESAP60702112136,3000.0,0.0,0.0,3000.0,2026-03-11 04:34:40,2026-03-10 14:34:30,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,high
+YESAP60705507113,3000.0,0.0,0.0,3000.0,2026-03-11 10:40:36,2026-03-10 07:39:10,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,2,high
+YESAP60710798384,12524.0,56.46,9.170000000000002,12458.37,2026-03-12 03:20:36,2026-03-11 09:18:51,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,21,high
+YESAP60715444150,16254.0,0.0,0.0,16254.0,2026-03-12 10:40:33,2026-03-11 10:41:16,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,5,high
+YESAP60721511720,3730.0,26.38,4.13,3699.49,2026-03-13 04:42:07,2026-03-12 08:14:06,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,8,high
+YESAP60725429345,8000.0,0.0,0.0,8000.0,2026-03-13 10:36:37,2026-03-12 19:56:46,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,2,high
+YESAP60730451571,10725.0,62.26,7.13,10655.61,2026-03-14 08:49:21,2026-03-13 08:37:58,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,15,high
+YESAP60732827429,29595.8,808.35,145.5,28641.95,2026-03-14 10:36:51,2026-03-13 08:52:53,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,3,high
+YESAP60741859145,9561.0,20.42,3.68,9536.9,2026-03-15 05:07:30,2026-03-14 09:11:53,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,15,high
+YESAP60742863724,8500.0,92.95,16.740000000000002,8390.31,2026-03-15 05:59:00,2026-03-14 10:41:15,CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,4,high
+YESAP60745446597,5500.0,0.0,0.0,5500.0,2026-03-15 10:38:22,2026-03-14 22:07:14,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,high
+YESAP60751801061,2000.0,0.0,0.0,2000.0,2026-03-16 10:40:00,2026-03-15 05:07:21,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,2,high
+YESAP60758721379,12563.0,166.87,18.19,12377.94,2026-03-16 05:32:15,2026-03-15 19:11:05,CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,12,high
+YESAP60759627008,1000.0,0.0,0.0,1000.0,2026-03-16 05:51:51,2026-03-15 21:06:17,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,high
+YESAP60761041222,13201.0,109.81,18.13,13073.06,2026-03-17 03:18:39,2026-03-16 08:29:02,UPI_CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,20,high
+YESAP60761719060,10000.0,169.0,30.42,9800.58,2026-03-17 04:06:46,2026-03-16 09:47:55,CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,high
+YESAP60765444702,9000.0,0.0,0.0,9000.0,2026-03-17 10:36:07,2026-03-16 21:03:13,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,high
+YESAP60771496874,5543.0,6.71,0.0,5536.29,2026-03-18 03:52:22,2026-03-17 08:44:31,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,10,high
+YESAP60775387260,22143.760000000002,110.03,19.81,22013.92,2026-03-18 10:39:15,2026-03-17 08:51:57,DEBIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,4,high
+YESAP60780495541,5500.0,42.25,7.61,5450.139999999999,2026-03-19 04:28:48,2026-03-18 06:58:57,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,2,high
+YESAP60782642794,9656.0,8.09,0.0,9647.91,2026-03-19 05:00:45,2026-03-18 13:22:58,CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,10,high
+YESAP60791124623,18050.0,80.89999999999999,5.36,17963.739999999998,2026-03-20 03:29:47,2026-03-19 08:22:28,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,20,high
+YESAP60793096822,6000.0,50.7,9.13,5940.17,2026-03-20 04:45:14,2026-03-19 08:04:08,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,2,high
+YESAP60795310385,37283.770000000004,392.11,70.58,36821.08,2026-03-20 10:38:19,2026-03-19 07:01:26,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,6,high
+YESAP60801609470,19723.0,79.12,9.51,19634.37,2026-03-21 04:19:17,2026-03-20 07:14:13,UPI_CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,32,high
+YESAP60811735293,29039.0,290.35,48.550000000000004,28700.1,2026-03-22 04:23:17,2026-03-21 00:41:16,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,33,high
+YESAP60812883183,9000.0,152.1,27.38,8820.52,2026-03-22 05:09:38,2026-03-21 22:21:06,CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,high
+YESAP60821629909,24285.0,286.08,49.07,23949.85,2026-03-23 03:53:52,2026-03-22 07:39:48,UPI_CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,35,high
+YESAP60825183862,1500.0,0.0,0.0,1500.0,2026-03-23 10:54:08,2026-03-22 08:03:28,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,high
+YESAP60831630950,6417.0,48.5,6.09,6362.41,2026-03-24 03:32:46,2026-03-23 00:16:35,UPI_LITE,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,13,high
+YESAP60835366949,8650.0,0.0,0.0,8650.0,2026-03-24 10:34:59,2026-03-23 08:17:02,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,3,high
+YESAP60841706113,19248.0,54.449999999999996,1.48,19192.07,2026-03-25 04:23:43,2026-03-24 00:40:14,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,22,high
+YESAP60842042697,59000.0,0.0,0.0,59000.0,2026-03-25 04:39:19,2026-03-24 06:51:35,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,high
+YESAP60845315390,2000.0,0.0,0.0,2000.0,2026-03-25 10:36:16,2026-03-24 21:50:25,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,high
+YESAP60851893790,14408.0,101.13,5.95,14300.92,2026-03-26 04:40:22,2026-03-25 13:00:30,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,20,high
+YESAP60855434238,9500.0,0.0,0.0,9500.0,2026-03-26 10:39:28,2026-03-25 08:53:09,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,2,high
+YESAP60862118043,10000.0,0.0,0.0,10000.0,2026-03-27 06:03:30,2026-03-26 12:01:20,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,3,high
+YESAP60862596819,19665.0,44.120000000000005,6.0,19614.88,2026-03-27 06:29:51,2026-03-26 10:17:16,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,27,high
+YESAP60865351581,19900.0,0.0,0.0,19900.0,2026-03-27 10:38:57,2026-03-26 11:03:05,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,4,high
+YESAP60872354671,15502.0,56.53,10.17,15435.3,2026-03-28 05:09:34,2026-03-27 07:37:45,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,24,high
+YESAP60872969482,14000.0,84.5,15.21,13900.29,2026-03-28 05:19:41,2026-03-27 11:13:43,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,4,high
+YESAP60881745982,15461.0,14.0,0.0,15447.0,2026-03-29 04:28:35,2026-03-28 08:07:44,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,26,high
+YESAP60884348285,1500.0,25.35,0.0,1474.65,2026-03-29 06:35:10,2026-03-28 23:26:33,CREDIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,high
+YESAP60885325098,3500.0,0.0,0.0,3500.0,2026-03-29 10:37:56,2026-03-28 08:41:12,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,2,high
+YESAP60892851964,36550.0,61.370000000000005,5.88,36482.75,2026-03-30 04:54:48,2026-03-29 08:26:55,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,26,high
+YESAP60895315814,6500.0,0.0,0.0,6500.0,2026-03-30 10:40:14,2026-03-29 12:13:04,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,high
+YESAP60901532296,10675.0,114.37,3.97,10556.66,2026-03-31 04:23:15,2026-03-30 07:33:26,CREDIT_CARD,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,15,high
+YESAP60903379439,1000.0,35.0,0.0,965.0,2026-03-31 05:18:55,2026-03-30 07:31:02,DEBIT_CARD,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,high
+YESAP60905849752,3200.0,0.0,0.0,3200.0,2026-03-31 10:37:26,2026-03-30 12:06:02,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,2,high
+YESAP60913735649,4494.0,14.67,0.0,4479.33,2026-04-01 05:40:10,2026-03-31 07:32:11,UPI,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,6,high
+YESAP60916323377,14500.0,337.5,60.75,14101.75,2026-04-01 10:56:29,2026-03-31 15:56:44,UPI,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,2,high
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - OCTOBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,f&b,meet-recording/data_sheets_historical/mangal all data sheet/F&B UPI/PTM - SEPTEMBER 2025 (F&B SERVICE).xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - DECEMBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - FEBRUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - JANUARY 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP - MARCH 2026.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,rooftop,meet-recording/data_sheets_historical/mangal all data sheet/PTM ROOFTOP/TMV ROOFTOP- PTM - OCTOBER 2025.xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - JULY 2025 (1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - MARCH 2026 (FRONT OFFICE1).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low
+,,,,,,,,,front_office,meet-recording/data_sheets_historical/mangal all data sheet/UPI STATMENT/PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx,1,low

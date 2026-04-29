@@ -1,0 +1,30 @@
+# PTM (Paytm card/UPI aggregator) settlement → Tally Journal vouchers.
+# Per Mangal View workflow (meet-recording context):
+#   Dr  CARD / UPI / PAYTM / G PAY  (gross Amount)
+#   Cr  Sundry Debtors              (gross Amount)
+#   New Ref = Invoice No (filled by matcher in a later step; absent here)
+#
+# Commission + GST handling is currently NOT POSTED in their Tally
+# (see tally-recon-todo.md §C — flagged as a gap). This preset matches
+# the existing manual workflow.
+
+mode: row_per_voucher
+
+voucher_type: { value: "Journal" }
+date:           { column: "Settled_Date",  transform: date, required: true }
+voucher_number: { column: "UTR_No." }
+narration:      { column: "Transaction_ID" }
+reference:      { column: "UTR_No." }
+
+bank_ledger: "CARD / UPI / PAYTM / G PAY"
+
+# All PTM rows are deposits (money settled to merchant). Treat Amount as a Receipt.
+credit_amount: { column: "Amount", transform: amount }
+# debit_amount left empty -> credit_amount-only rows always classified as Receipt
+
+contra_ledger:         { value: "Sundry Debtors" }
+default_contra_ledger: "Sundry Debtors"
+
+# Override inferred Receipt → use Journal as company convention
+payment_voucher_type: "Journal"
+receipt_voucher_type: "Journal"

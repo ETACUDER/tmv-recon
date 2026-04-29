@@ -1,0 +1,590 @@
+================================================================================
+COMPLETE COLUMN VARIANT INVENTORY
+Generated: 2026-04-29
+================================================================================
+
+================================================================================
+AGODA - 17 HEADER VARIANTS
+================================================================================
+
+VARIANT 1 (2 file(s)):
+   1. Transaction type
+   2. Booking ID
+   3. Property ID
+   4. Guest name
+   5. Booking paid by
+   6. Currency
+   7. From Agoda
+   8. To property
+   9. Check-in date
+  10. Check-out date
+  11. Payout method
+
+  Example files:
+    - AGODA AUGUST 2025.xlsx
+    - AGODA AUGUST 2025 -AMT 44912.xlsx
+
+VARIANT 2 (1 file(s)):
+   1. INVOICE NO.
+   2. Reference number
+   3. Guest name
+   4. Booking paid by
+   5. AGODA SITE
+   6. INVOICE AMT.
+   7. e-f =g
+   8. From Agoda
+   9. COMM + GST
+  10. CREDIT NOTE
+  11. Check-in date
+  12. Check-out date
+
+  Example files:
+    - AGODA MARCH 2026, AMT 759282.14.xlsx
+
+VARIANT 3 (1 file(s)):
+   1. INVOICE NO.
+   2. Booking ID
+   3. Guest name
+   4. Booking paid by
+   5. INVOCIE AMT
+   6. From Agoda
+   7. COMM+GST
+   8. Check-in date
+   9. Check-out date
+
+  Example files:
+    - AGODA AMT 113763.07, NOV 5.11.25.xlsx
+
+VARIANT 4 (1 file(s)):
+   1. INVOICE  NO.
+   2. Reference number
+   3. Guest name
+   4. Booking paid by
+   5. AGODA SITE
+   6. INVOCIE AMT.
+   7. From Agoda
+   8. COMM + GST
+   9. CREDIT NOTE
+  10. Check-in date
+  11. Check-out date
+
+  Example files:
+    - AGODA FEB 2026, AMT-115771.58 RS.xlsx
+
+VARIANT 5 (1 file(s)):
+   1. INVOCIE NO
+   2. Reference number
+   3. Guest name
+   4. Booking paid by
+   5. AGODA SITE
+   6. INVOICE AMT
+   7. From Agoda
+   8. COMM+GST
+   9. CREDIT NOTE
+  10. Check-in date
+  11. Check-out date
+
+  Example files:
+    - AGODA 14 APRIL 2026  AMT- 734555.64 RS.xlsx
+
+VARIANT 6 (2 file(s)):
+   1. INVOICE NO.
+   2. Reference number
+   3. Guest name
+   4. Booking paid by
+   5. AGODA SITE
+   6. INVOICE AMT.
+   7. From Agoda
+   8. COMM + GST
+   9. CREDIT NOTE
+  10. Check-in date
+  11. Check-out date
+
+  Example files:
+    - AGODA FEB 2026, AMT- 630617.67 RS.xlsx
+    - AGODA MARCH 2026, AMT 34274.02.xlsx
+
+VARIANT 7 (1 file(s)):
+   1. INVOICE NO.
+   2. Reference number
+   3. Guest name
+   4. Booking paid by
+   5. AGODA SITE
+   6. INVOICE AMT.
+   7. From Agoda
+   8. COMM+GST
+   9. CREDIT NOTE
+  10. Check-in date
+  11. Check-out date
+
+  Example files:
+    - AGODA MARCH 2026, AMT 798339.41.xlsx
+
+VARIANT 8 (1 file(s)):
+   1. INVOICE NO.
+   2. Booking ID
+   3. Guest name
+   4. Booking paid by
+   5. site amt
+   6. INVOCIE AMT
+   7. From Agoda
+   8. COMM+GST
+   9. AMEND
+  10. Check-in date
+  11. Check-out date
+
+  Example files:
+    - AGODA DEC 2025 -98974.39 AMT.xlsx
+
+VARIANT 9 (1 file(s)):
+   1. INVOICE NO.
+   2. Booking ID
+   3. Guest name
+   4. Booking paid by
+   5. INVOCIE AMT.
+   6. From Agoda
+   7. COMM+ GST
+   8. CREDIT NOTE
+   9. Check-in date
+  10. Check-out date
+
+  Example files:
+    - AGODA 16540.78 AMT  [8.10.25].xlsx
+
+VARIANT 10 (1 file(s)):
+   1. INVOCIE NO.
+   2. Reference number
+   3. Guest name
+   4. Booking paid by
+   5. AGODAT SITE
+   6. INVOICE AMT.
+   7. From Agoda
+   8. COMM + GST
+   9. CREDIT NOTE
+  10. Check-in date
+  11. Check-out date
+
+  Example files:
+    - AGODA MARCH 2026, AMT 65443.57.xlsx
+
+VARIANT 11 (1 file(s)):
+   1. INVOCIE NO.
+   2. Booking ID
+   3. Guest name
+   4. Booking paid by
+   5. INVOICE AMT.
+   6. From Agoda
+   7. COMM + GST
+   8. Check-in date
+   9. Check-out date
+
+  Example files:
+    - AGODA SEPT 2025-AMT 1876144.81.xlsx
+
+VARIANT 12 (1 file(s)):
+   1. INVOCIE NO.
+   2. Booking ID
+   3. Guest name
+   4. Booking paid by
+   5. INVOCIE AMT
+   6. From Agoda
+   7. COMM +GST
+   8. Check-in date
+   9. Check-out date
+
+  Example files:
+    - AGODA  SEP 2025 AMT 80280.25 RS.xlsx
+
+VARIANT 13 (1 file(s)):
+   1. Unnamed: 0
+   2. Unnamed: 1
+   3. ISSUED SHEET
+   4. Unnamed: 3
+   5. Unnamed: 4
+   6. Unnamed: 5
+   7. Unnamed: 6
+   8. Unnamed: 7
+   9. Unnamed: 8
+
+  Example files:
+    - AGODA SEPT 2025- AMT- 80280.25 ISSUED.xlsx
+
+VARIANT 14 (1 file(s)):
+   1. INVOICE NO.
+   2. Booking ID
+   3. Guest name
+   4. Booking paid by
+   5. ament amt absoulte
+   6. INVOICE AMT
+   7. From Agoda
+   8. COMM+GST
+   9. credit note
+  10. Check-in date
+  11. Check-out date
+
+  Example files:
+    - AGODA NOV 2025 - 2140075.38 AMT.xlsx
+
+VARIANT 15 (2 file(s)):
+   1. INVOCIE NO.
+   2. Booking ID
+   3. Guest name
+   4. Booking paid by
+   5. INVOCIE AMT.
+   6. From Agoda
+   7. COMM + GST
+   8. Check-in date
+   9. Check-out date
+
+  Example files:
+    - AGODA SEPT 2025 -AMT 66570.86.xlsx
+    - AGODA SEPT 2025- AMT 845285.71.xlsx
+
+VARIANT 16 (1 file(s)):
+   1. INVOICE NO.
+   2. Booking ID
+   3. Guest name
+   4. Booking paid by
+   5. INVOICE AMT.
+   6. From Agoda
+   7. COMM + GST
+   8. Check-in date
+   9. Check-out date
+
+  Example files:
+    - AGODA OCT -802760.07 AMT.  [8.10.25].xlsx
+
+VARIANT 17 (1 file(s)):
+   1. INVOCIE NO.
+   2. Booking ID
+   3. Guest name
+   4. Booking paid by
+   5. Unnamed: 4
+   6. Unnamed: 5
+   7. invoice amt.
+   8. From Agoda
+   9. comm + gst
+  10. amend amt
+  11. Check-in date
+  12. Check-out date
+
+  Example files:
+    - AGODA DEC  2025- 2030043.35 AMT.xlsx
+
+
+================================================================================
+BANK - 4 STRUCTURE VARIANTS
+================================================================================
+
+NOTE: Bank statements have variable column counts due to metadata headers.
+Actual data headers appear around row 21.
+
+Expected headers (when data starts):
+  1. Value Date
+  2. Description
+  3. Chq No/REF No/UTR No
+  4. Debit Amount
+  5. Credit Amount
+  6. Balance
+
+5 columns variant (2 file(s)):
+  - Statement Of Account - FEBRUARY 2026.xlsx
+  - Statement Of Account - JANUARY 2026.xlsx
+
+6 columns variant (5 file(s)):
+  - Statement Of Account - JULY 2025.xlsx
+  - Statement Of Account - OCTOBER 2025.xlsx
+  - Statement Of Account - MARCH 2026.xlsx
+
+8 columns variant (2 file(s)):
+  - Statement Of Account - AUGUST 2025.xlsx
+  - TMV - ROOFTOP  Statement Of Account - OCTOBER 2025.xlsx
+
+14 columns variant (2 file(s)):
+  - TMV - STATEMENT Of Account - JANUARY 2026-imp.xlsx
+  - TMV - Statement Of Account - February 2026-imp.xlsx
+
+
+================================================================================
+UPI PAYMENTS - 4 VARIANTS
+================================================================================
+
+VARIANT 1 (1 file(s)):
+   1. Updated_Date
+   2. Amount
+   3. Commission
+   4. GST
+   5. Settled_Amount
+   6. UTR_No.
+   7. Settled_Date
+   8. Payment_Mode
+
+  Example files:
+    - PTM - JULY 2025 (1).xlsx
+
+VARIANT 2 (9 file(s)):
+   1. Transaction_Date
+   2. Amount
+   3. Commission
+   4. GST
+   5. Settled_Amount
+   6. UTR_No.
+   7. Settled_Date
+   8. Payment_Mode
+
+  Example files:
+    - PTM - MARCH 2026 (FRONT OFFICE1).xlsx
+    - PTM - MARCH 2026 (FRONT OFFICE).xlsx
+    - PTM - SEPTEMBER 2025 (FRONT OFFICE).xlsx
+    (+ 6 more)
+
+VARIANT 3 (1 file(s)):
+   1. Transaction_Date
+   2. Amount
+   3. Commission
+   4. GST
+   5. Settled_Amount
+   6. UTR_No.
+   7. Settled_Date
+   8. Payment_Mode
+   9. Issuing_Bank
+
+  Example files:
+    - TMV ROOFTOP - DECEMBER 2025.xlsx
+
+VARIANT 4 (1 file(s)):
+   1. Unnamed: 0
+   2. UPI STATEMENT F&B JULY 2025
+   3. Unnamed: 2
+   4. Unnamed: 3
+   5. Unnamed: 4
+   6. Unnamed: 5
+   7. Unnamed: 6
+   8. Unnamed: 7
+
+  Example files:
+    - PTM - JULY 2025 (F&B) (1).xlsx
+
+
+================================================================================
+INVOICES - 1 VARIANT
+================================================================================
+
+File: transaction_detail20250428.xlsx
+Total columns: 55
+
+All columns:
+   1. Transaction Type
+   2. Reservation #
+   3. Group Code
+   4. Reservation Date
+   5. Folio #
+   6. Invoice #
+   7. Invoice date
+   8. Arrival
+   9. Dept.
+  10. Room Type
+  11. Rate Type
+  12. Room #
+  13. Owner Name
+  14. Is Paymaster
+  15. Pax
+  16. Guest Name
+  17. VIP Status
+  18. Nationality
+  19. Market Code
+  20. Travel Agent
+  21. Travel Agent Voucher #
+  22. Business Source
+  23. Company Name
+  24. Sales Person Name
+  25. Reservation Type
+  26. Booking Status
+  27. Bill To Name
+  28. RegNo.
+  29. Transaction
+  30. Transaction Date
+  31. Charge
+  32. Extra Charge Type
+  33. HSN/SAC
+  34. Settlement/Particular
+  35. Reference #
+  36. User Name
+  37. Comment
+  38. Qty
+  39. Actual Rate(Configured Rate)
+  40. Slab Information
+  41. Net Amount
+  42. Discount Name
+  43. Discount %
+  44. Discount Amount
+  45. Taxable Amount
+  46. Tax Name
+  47. Tax %
+  48. Tax Amount
+  49. Tax Name.1
+  50. Tax %.1
+  51. Tax Amount.1
+  52. Adjustment(Room Charge/Extra Charges)
+  53. Gross Amount
+  54. Settlement Amount
+  55. Folio Status
+
+
+================================================================================
+UNIQUE COLUMNS BY CATEGORY
+================================================================================
+
+AGODA - 44 unique column names:
+  - AGODA SITE
+  - AGODAT SITE
+  - AMEND
+  - Booking ID
+  - Booking paid by
+  - COMM + GST
+  - COMM +GST
+  - COMM+ GST
+  - COMM+GST
+  - CREDIT NOTE
+  - Check-in date
+  - Check-out date
+  - Currency
+  - From Agoda
+  - Guest name
+  - INVOCIE AMT
+  - INVOCIE AMT.
+  - INVOCIE NO
+  - INVOCIE NO.
+  - INVOICE  NO.
+  - INVOICE AMT
+  - INVOICE AMT.
+  - INVOICE NO.
+  - ISSUED SHEET
+  - Payout method
+  - Property ID
+  - Reference number
+  - To property
+  - Transaction type
+  - Unnamed: 0
+  - Unnamed: 1
+  - Unnamed: 3
+  - Unnamed: 4
+  - Unnamed: 5
+  - Unnamed: 6
+  - Unnamed: 7
+  - Unnamed: 8
+  - amend amt
+  - ament amt absoulte
+  - comm + gst
+  - credit note
+  - e-f =g
+  - invoice amt.
+  - site amt
+
+BANK - 14 unique column names:
+  - Unnamed: 0
+  - Unnamed: 1
+  - Unnamed: 10
+  - Unnamed: 11
+  - Unnamed: 12
+  - Unnamed: 13
+  - Unnamed: 2
+  - Unnamed: 3
+  - Unnamed: 4
+  - Unnamed: 5
+  - Unnamed: 6
+  - Unnamed: 7
+  - Unnamed: 8
+  - Unnamed: 9
+
+UPI_PAYMENTS - 18 unique column names:
+  - Amount
+  - Commission
+  - GST
+  - Issuing_Bank
+  - Payment_Mode
+  - Settled_Amount
+  - Settled_Date
+  - Transaction_Date
+  - UPI STATEMENT F&B JULY 2025
+  - UTR_No.
+  - Unnamed: 0
+  - Unnamed: 2
+  - Unnamed: 3
+  - Unnamed: 4
+  - Unnamed: 5
+  - Unnamed: 6
+  - Unnamed: 7
+  - Updated_Date
+
+INVOICES - 55 unique column names:
+  - Actual Rate(Configured Rate)
+  - Adjustment(Room Charge/Extra Charges)
+  - Arrival
+  - Bill To Name
+  - Booking Status
+  - Business Source
+  - Charge
+  - Comment
+  - Company Name
+  - Dept.
+  - Discount %
+  - Discount Amount
+  - Discount Name
+  - Extra Charge Type
+  - Folio #
+  - Folio Status
+  - Gross Amount
+  - Group Code
+  - Guest Name
+  - HSN/SAC
+  - Invoice #
+  - Invoice date
+  - Is Paymaster
+  - Market Code
+  - Nationality
+  - Net Amount
+  - Owner Name
+  - Pax
+  - Qty
+  - Rate Type
+  - Reference #
+  - RegNo.
+  - Reservation #
+  - Reservation Date
+  - Reservation Type
+  - Room #
+  - Room Type
+  - Sales Person Name
+  - Settlement Amount
+  - Settlement/Particular
+  - Slab Information
+  - Tax %
+  - Tax %.1
+  - Tax Amount
+  - Tax Amount.1
+  - Tax Name
+  - Tax Name.1
+  - Taxable Amount
+  - Transaction
+  - Transaction Date
+  - Transaction Type
+  - Travel Agent
+  - Travel Agent Voucher #
+  - User Name
+  - VIP Status
+
+
+================================================================================
+SUMMARY STATISTICS
+================================================================================
+AGODA           - 20 files, 17 variant(s)
+BANK            - 15 files,  4 variant(s)
+UPI_PAYMENTS    - 12 files,  4 variant(s)
+INVOICES        -  1 files,  1 variant(s)
+
+TOTAL           - 48 files, 26 variant(s)
+
+================================================================================
+END OF REPORT
+================================================================================

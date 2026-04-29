@@ -1,0 +1,18 @@
+# Purchase register → Purchase vouchers. Mirror of sales_register.
+
+mode: compound
+
+voucher_type: { value: "Purchase" }
+date:           { column: "Bill Date", transform: date, required: true }
+voucher_number: { column: "Bill No" }
+narration:      { column: "Narration" }
+reference:      { column: "Bill No" }
+party:          { column: "Party Name" }
+
+group_by: { column: "Bill No" }
+
+entries:
+  - ledger: { column: "Ledger" }
+    amount: { column: "Amount", transform: amount }
+    is_deemed_positive: { column: "DrCr" }
+    is_party_ledger: false

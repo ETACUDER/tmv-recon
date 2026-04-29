@@ -1,0 +1,42 @@
+stream,source_file,source_path,month,row_count,in_tally,tally_peer
+invoice,transaction_detail20250428.xlsx,data/invoices/raw/transaction_detail20250428.xlsx,,304,False,
+booking,AGODA__AGODA AUGUST 2025.xlsx,data/booking/processed/AGODA__AGODA AUGUST 2025.xlsx,,581,True,AGODA__AGODA AUGUST 2025.xlsx
+booking,AGODA__AGODA DEC  2025- 2030043.35 AMT.xlsx,data/booking/processed/AGODA__AGODA DEC  2025- 2030043.35 AMT.xlsx,DEC 2025,484,False,
+booking,AGODA__AGODA SEPT 2025-AMT 1876144.81.xlsx,data/booking/processed/AGODA__AGODA SEPT 2025-AMT 1876144.81.xlsx,SEP 2025,436,True,AGODA__AGODA SEPT 2025-AMT 1876144.81.xlsx
+booking,AGODA__AGODA NOV 2025 - 2140075.38 AMT.xlsx,data/booking/processed/AGODA__AGODA NOV 2025 - 2140075.38 AMT.xlsx,NOV 2025,435,False,
+booking,"AGODA__AGODA FEB 2026, AMT-115771.58 RS.xlsx","data/booking/processed/AGODA__AGODA FEB 2026, AMT-115771.58 RS.xlsx",FEB 2026,247,False,
+booking,AGODA__AGODA SEPT 2025- AMT 845285.71.xlsx,data/booking/processed/AGODA__AGODA SEPT 2025- AMT 845285.71.xlsx,SEP 2025,229,True,AGODA__AGODA SEPT 2025- AMT 845285.71.xlsx
+booking,"AGODA__AGODA MARCH 2026, AMT 798339.41.xlsx","data/booking/processed/AGODA__AGODA MARCH 2026, AMT 798339.41.xlsx",,205,False,
+booking,"AGODA__AGODA MARCH 2026, AMT 759282.14.xlsx","data/booking/processed/AGODA__AGODA MARCH 2026, AMT 759282.14.xlsx",,204,False,
+booking,AGODA__AGODA OCT -802760.07 AMT.  [8.10.25].xlsx,data/booking/processed/AGODA__AGODA OCT -802760.07 AMT.  [8.10.25].xlsx,,202,False,
+booking,AGODA__AGODA 14 APRIL 2026  AMT- 734555.64 RS.xlsx,data/booking/processed/AGODA__AGODA 14 APRIL 2026  AMT- 734555.64 RS.xlsx,,159,False,
+booking,"AGODA__AGODA FEB 2026, AMT- 630617.67 RS.xlsx","data/booking/processed/AGODA__AGODA FEB 2026, AMT- 630617.67 RS.xlsx",FEB 2026,153,False,
+booking,AGODA__AGODA AUGUST 2025 -AMT 44912.xlsx,data/booking/processed/AGODA__AGODA AUGUST 2025 -AMT 44912.xlsx,,31,True,AGODA__AGODA AUGUST 2025 -AMT 44912.xlsx
+booking,AGODA__AGODA DEC 2025 -98974.39 AMT.xlsx,data/booking/processed/AGODA__AGODA DEC 2025 -98974.39 AMT.xlsx,DEC 2025,28,False,
+booking,"AGODA__AGODA AMT 113763.07, NOV 5.11.25.xlsx","data/booking/processed/AGODA__AGODA AMT 113763.07, NOV 5.11.25.xlsx",,18,True,"AGODA__AGODA AMT 113763.07, NOV 5.11.25.xlsx"
+booking,"AGODA__AGODA MARCH 2026, AMT 65443.57.xlsx","data/booking/processed/AGODA__AGODA MARCH 2026, AMT 65443.57.xlsx",,14,False,
+booking,AGODA__AGODA  SEP 2025 AMT 80280.25 RS.xlsx,data/booking/processed/AGODA__AGODA  SEP 2025 AMT 80280.25 RS.xlsx,SEP 2025,13,False,
+booking,AGODA__AGODA SEPT 2025- AMT- 80280.25 ISSUED.xlsx,data/booking/processed/AGODA__AGODA SEPT 2025- AMT- 80280.25 ISSUED.xlsx,SEP 2025,12,False,
+booking,AGODA__AGODA SEPT 2025 -AMT 66570.86.xlsx,data/booking/processed/AGODA__AGODA SEPT 2025 -AMT 66570.86.xlsx,SEP 2025,11,True,AGODA__AGODA SEPT 2025 -AMT 66570.86.xlsx
+booking,"AGODA__AGODA MARCH 2026, AMT 34274.02.xlsx","data/booking/processed/AGODA__AGODA MARCH 2026, AMT 34274.02.xlsx",,9,False,
+booking,AGODA__AGODA 16540.78 AMT  [8.10.25].xlsx,data/booking/processed/AGODA__AGODA 16540.78 AMT  [8.10.25].xlsx,,5,True,AGODA__AGODA 16540.78 AMT  [8.10.25].xlsx
+payment,PTM - DECEMBER 2025 (FRONT OFFICE).xlsx,data/payments/raw/PTM - DECEMBER 2025 (FRONT OFFICE).xlsx,,107,False,
+payment,PTM - FEBRUARY 2026 (FRONT OFFICE).xlsx,data/payments/raw/PTM - FEBRUARY 2026 (FRONT OFFICE).xlsx,,86,False,
+payment,PTM - JANUARY 2026 (FRONT OFFICE).xlsx,data/payments/raw/PTM - JANUARY 2026 (FRONT OFFICE).xlsx,,76,False,
+payment,PTM - FEBRUARY 2026 (FRONT OFFICE1).xlsx,data/payments/raw/PTM - FEBRUARY 2026 (FRONT OFFICE1).xlsx,,21,False,
+payment,PTM - DECEMBER 2025 (FRONT OFFICE1).xlsx,data/payments/raw/PTM - DECEMBER 2025 (FRONT OFFICE1).xlsx,,17,False,
+payment,PTM - JANUARY 2026 (FRONT OFFICE1).xlsx,data/payments/raw/PTM - JANUARY 2026 (FRONT OFFICE1).xlsx,,9,False,
+bank,INDIAN BANK__Statement Of Account - SEPTEMBER 2025.xlsx,data/payments/processed/INDIAN BANK__Statement Of Account - SEPTEMBER 2025.xlsx,,128,True,INDIAN BANK__Statement Of Account - SEPTEMBER 2025.xlsx
+bank,INDIAN BANK__Statement Of Account - AUGUST 2025.xlsx,data/payments/processed/INDIAN BANK__Statement Of Account - AUGUST 2025.xlsx,,123,True,INDIAN BANK__Statement Of Account - AUGUST 2025.xlsx
+bank,BANK ROOFTOP__TMV - ROOFTOP  Statement Of Account - OCTOBER 2025.xlsx,data/payments/processed/BANK ROOFTOP__TMV - ROOFTOP  Statement Of Account - OCTOBER 2025.xlsx,,113,True,BANK ROOFTOP__TMV - ROOFTOP  Statement Of Account - OCTOBER 2025.xlsx
+bank,INDIAN BANK ROOFTOP__TMV - ROOFTOP  Statement Of Account - OCTOBER 2025.xlsx,data/payments/processed/INDIAN BANK ROOFTOP__TMV - ROOFTOP  Statement Of Account - OCTOBER 2025.xlsx,,113,True,INDIAN BANK ROOFTOP__TMV - ROOFTOP  Statement Of Account - OCTOBER 2025.xlsx
+bank,INDIAN BANK__Statement Of Account - NOVEMBER 2025-imp.xls,data/payments/processed/INDIAN BANK__Statement Of Account - NOVEMBER 2025-imp.xls,,108,False,
+bank,INDIAN BANK__Statement Of Account - MARCH 2026.xlsx,data/payments/processed/INDIAN BANK__Statement Of Account - MARCH 2026.xlsx,,107,False,
+bank,INDIAN BANK__Statement Of Account - OCTOBER 2025.xlsx,data/payments/processed/INDIAN BANK__Statement Of Account - OCTOBER 2025.xlsx,,106,True,INDIAN BANK__Statement Of Account - OCTOBER 2025.xlsx
+bank,INDIAN BANK__Statement Of Account - JULY 2025.xlsx,data/payments/processed/INDIAN BANK__Statement Of Account - JULY 2025.xlsx,,100,True,INDIAN BANK__Statement Of Account - JULY 2025.xlsx
+bank,INDIAN BANK__Statement Of Account - JANUARY 2026.xlsx,data/payments/processed/INDIAN BANK__Statement Of Account - JANUARY 2026.xlsx,,94,False,
+bank,INDIAN BANK__Statement Of Account - DECEMBER 2025.xls,data/payments/processed/INDIAN BANK__Statement Of Account - DECEMBER 2025.xls,,86,False,
+bank,INDIAN BANK__Statement Of Account - FEBRUARY 2026.xlsx,data/payments/processed/INDIAN BANK__Statement Of Account - FEBRUARY 2026.xlsx,,75,False,
+bank,INDIAN BANK ROOFTOP__TMV - Statement Of Account - MARCH 2026.xlsx,data/payments/processed/INDIAN BANK ROOFTOP__TMV - Statement Of Account - MARCH 2026.xlsx,,74,False,
+bank,INDIAN BANK ROOFTOP__TMV - Statement Of Account - DECEMBER 2025-imp.xls,data/payments/processed/INDIAN BANK ROOFTOP__TMV - Statement Of Account - DECEMBER 2025-imp.xls,,71,False,
+bank,"INDIAN BANK ROOFTOP__TMV - ROOFTOP STATEMNT OF AC, NOV 2025.xls","data/payments/processed/INDIAN BANK ROOFTOP__TMV - ROOFTOP STATEMNT OF AC, NOV 2025.xls",NOV 2025,65,False,
