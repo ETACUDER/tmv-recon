@@ -44,6 +44,7 @@ Thumbs.db
 meet-recording/
 data/input/
 data/output/
+data/_quarantine/
 data/tally/raw/
 data/tally/raw_backup/
 data/tally/raw_xml/
