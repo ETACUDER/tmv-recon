@@ -7,6 +7,7 @@ import pandas as pd
 from datetime import datetime
 from pathlib import Path
 import re
+from xml.sax.saxutils import escape as xml_escape
 
 
 def normalize_invoice_no(inv_no: str) -> str:
@@ -183,17 +184,17 @@ def voucher_to_xml(voucher: dict) -> str:
 
     xml_lines.append(f'  <VOUCHER VCHTYPE="{voucher["type"]}">')
     xml_lines.append(f'    <DATE>{voucher["date"]}</DATE>')
-    xml_lines.append(f'    <VOUCHERNUMBER>{voucher["number"]}</VOUCHERNUMBER>')
+    xml_lines.append(f'    <VOUCHERNUMBER>{xml_escape(voucher["number"])}</VOUCHERNUMBER>')
 
     if voucher.get('party'):
-        xml_lines.append(f'    <PARTYLEDGERNAME>{voucher["party"]}</PARTYLEDGERNAME>')
+        xml_lines.append(f'    <PARTYLEDGERNAME>{xml_escape(voucher["party"])}</PARTYLEDGERNAME>')
 
-    xml_lines.append(f'    <NARRATION>{voucher["narration"]}</NARRATION>')
+    xml_lines.append(f'    <NARRATION>{xml_escape(voucher["narration"])}</NARRATION>')
 
     # Ledger entries
     for ledger in voucher['ledgers']:
         xml_lines.append('    <ALLLEDGERENTRIES.LIST>')
-        xml_lines.append(f'      <LEDGERNAME>{ledger["name"]}</LEDGERNAME>')
+        xml_lines.append(f'      <LEDGERNAME>{xml_escape(ledger["name"])}</LEDGERNAME>')
         xml_lines.append(f'      <ISDEEMEDPOSITIVE>{ledger["is_deemed_positive"]}</ISDEEMEDPOSITIVE>')
         xml_lines.append(f'      <AMOUNT>{ledger["amount"]:.2f}</AMOUNT>')
         xml_lines.append('    </ALLLEDGERENTRIES.LIST>')
