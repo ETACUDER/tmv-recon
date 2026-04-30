@@ -4,16 +4,17 @@ from datetime import date, datetime
 from typing import Optional, List
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
 from .database import db
-from .models import Voucher, Ledger, Group, VoucherType
+from .models import Voucher, Ledger, Group, VoucherType, Company
 from .ai import parse_accounting_command, get_context_aware_response
 from .banking import BankingOperations
+from .import_etl import ImportETL, ImportValidationError
 
 # Load environment variables
 load_dotenv()
@@ -21,8 +22,9 @@ load_dotenv()
 # Initialize FastAPI
 app = FastAPI(title="RecordX.Finance", version="0.1.0")
 
-# Initialize banking operations
+# Initialize banking operations and import ETL
 banking = BankingOperations(db)
+import_etl = ImportETL(db)
 
 # Serve static files
 static_dir = Path(__file__).parent / "static"
@@ -141,6 +143,32 @@ class AgingReportRequest(BaseModel):
     group_name: Optional[str] = None
     as_of_date: Optional[str] = None
     buckets: Optional[str] = None
+
+
+class CompanyCreate(BaseModel):
+    name: str
+    financial_year_start: str
+    books_beginning_from: Optional[str] = None
+    mailing_name: Optional[str] = None
+    address: Optional[str] = None
+    state: Optional[str] = None
+    country: str = "India"
+    pincode: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
+    pan: Optional[str] = None
+    gstin: Optional[str] = None
+    gst_registration_type: Optional[str] = None
+    tan: Optional[str] = None
+    cin: Optional[str] = None
+    maintain_bill_wise: bool = True
+    use_cost_centers: bool = False
+    enable_multi_currency: bool = False
+    maintain_payroll: bool = False
+    maintain_inventory: bool = False
+    enable_gst: bool = True
+    base_currency_id: Optional[int] = None
 
 
 # Initialize database on startup
@@ -342,9 +370,70 @@ async def get_ledger(ledger_id: int):
             "id": ledger.id,
             "name": ledger.name,
             "group": ledger.group.name,
+            "group_id": ledger.group_id,
             "opening_balance": ledger.opening_balance,
             "entries": entries,
         }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.put("/api/ledgers/{ledger_id}")
+async def update_ledger(ledger_id: int, ledger: LedgerCreate):
+    """Update an existing ledger."""
+    try:
+        with db.session() as session:
+            existing = session.get(Ledger, ledger_id)
+            if not existing:
+                raise HTTPException(status_code=404, detail="Ledger not found")
+
+            group = db.get_group_by_name(ledger.group_name)
+            if not group:
+                raise HTTPException(status_code=400, detail=f"Group not found: {ledger.group_name}")
+
+            existing.name = ledger.name
+            existing.group_id = group.id
+            existing.opening_balance = ledger.opening_balance
+            session.flush()
+
+            return {
+                "id": existing.id,
+                "name": existing.name,
+                "group": group.name,
+                "opening_balance": existing.opening_balance,
+                "message": f"Ledger '{existing.name}' updated successfully"
+            }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/ledgers/{ledger_id}")
+async def delete_ledger(ledger_id: int):
+    """Delete a ledger."""
+    try:
+        with db.session() as session:
+            ledger = session.get(Ledger, ledger_id)
+            if not ledger:
+                raise HTTPException(status_code=404, detail="Ledger not found")
+
+            # Check if ledger has entries
+            if len(ledger.entries) > 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Cannot delete ledger with existing entries"
+                )
+
+            name = ledger.name
+            session.delete(ledger)
+            session.flush()
+
+            return {
+                "message": f"Ledger '{name}' deleted successfully"
+            }
     except HTTPException:
         raise
     except Exception as e:
@@ -382,12 +471,174 @@ async def list_groups():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+class GroupCreate(BaseModel):
+    name: str
+    parent_id: Optional[int] = None
+    is_revenue: bool = False
+    is_expense: bool = False
+    is_asset: bool = False
+    is_liability: bool = False
+
+
+@app.post("/api/groups")
+async def create_group(group: GroupCreate):
+    """Create a new group."""
+    try:
+        created = db.create_group(
+            name=group.name,
+            parent_id=group.parent_id,
+            is_revenue=group.is_revenue,
+            is_expense=group.is_expense,
+            is_asset=group.is_asset,
+            is_liability=group.is_liability,
+        )
+        return {
+            "id": created.id,
+            "name": created.name,
+            "parent_id": created.parent_id,
+            "message": f"Group '{created.name}' created successfully"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/groups/{group_id}")
+async def get_group(group_id: int):
+    """Get group details."""
+    try:
+        group = db.get_group(group_id)
+        if not group:
+            raise HTTPException(status_code=404, detail="Group not found")
+
+        return {
+            "id": group.id,
+            "name": group.name,
+            "parent_id": group.parent_id,
+            "is_revenue": group.is_revenue,
+            "is_expense": group.is_expense,
+            "is_asset": group.is_asset,
+            "is_liability": group.is_liability,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.put("/api/groups/{group_id}")
+async def update_group(group_id: int, group: GroupCreate):
+    """Update an existing group."""
+    try:
+        with db.session() as session:
+            existing = session.get(Group, group_id)
+            if not existing:
+                raise HTTPException(status_code=404, detail="Group not found")
+
+            existing.name = group.name
+            existing.parent_id = group.parent_id
+            existing.is_revenue = group.is_revenue
+            existing.is_expense = group.is_expense
+            existing.is_asset = group.is_asset
+            existing.is_liability = group.is_liability
+            session.flush()
+
+            return {
+                "id": existing.id,
+                "name": existing.name,
+                "parent_id": existing.parent_id,
+                "message": f"Group '{existing.name}' updated successfully"
+            }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/groups/{group_id}")
+async def delete_group(group_id: int):
+    """Delete a group."""
+    try:
+        with db.session() as session:
+            group = session.get(Group, group_id)
+            if not group:
+                raise HTTPException(status_code=404, detail="Group not found")
+
+            # Check if group has ledgers
+            if len(group.ledgers) > 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Cannot delete group with existing ledgers"
+                )
+
+            # Check if group has children
+            if len(group.children) > 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Cannot delete group with child groups"
+                )
+
+            name = group.name
+            session.delete(group)
+            session.flush()
+
+            return {
+                "message": f"Group '{name}' deleted successfully"
+            }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/voucher-types")
 async def list_voucher_types():
     """List all voucher types."""
     try:
         vtypes = db.list_voucher_types()
         return [{"id": vt.id, "name": vt.name} for vt in vtypes]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/companies")
+async def create_company(company: CompanyCreate):
+    """Create a new company."""
+    try:
+        fy_start = datetime.strptime(company.financial_year_start, "%Y-%m-%d").date()
+        books_from = None
+        if company.books_beginning_from:
+            books_from = datetime.strptime(company.books_beginning_from, "%Y-%m-%d").date()
+
+        created = db.create_company(
+            name=company.name,
+            financial_year_start=fy_start,
+            books_beginning_from=books_from,
+            mailing_name=company.mailing_name,
+            address=company.address,
+            state=company.state,
+            country=company.country,
+            pincode=company.pincode,
+            phone=company.phone,
+            email=company.email,
+            website=company.website,
+            pan=company.pan,
+            gstin=company.gstin,
+            gst_registration_type=company.gst_registration_type,
+            tan=company.tan,
+            cin=company.cin,
+            maintain_bill_wise=company.maintain_bill_wise,
+            use_cost_centers=company.use_cost_centers,
+            enable_multi_currency=company.enable_multi_currency,
+            maintain_payroll=company.maintain_payroll,
+            maintain_inventory=company.maintain_inventory,
+            enable_gst=company.enable_gst,
+            base_currency_id=company.base_currency_id,
+        )
+        return {
+            "id": created.id,
+            "name": created.name,
+            "message": f"Company '{created.name}' created successfully"
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -402,6 +653,11 @@ async def list_companies():
                 "id": c.id,
                 "name": c.name,
                 "financial_year_start": c.financial_year_start.isoformat(),
+                "books_beginning_from": c.books_beginning_from.isoformat() if c.books_beginning_from else None,
+                "gstin": c.gstin,
+                "pan": c.pan,
+                "state": c.state,
+                "country": c.country,
             }
             for c in companies
         ]
@@ -979,6 +1235,48 @@ async def allocate_payment(allocation: BillAllocationCreate):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.delete("/api/companies/{company_id}")
+async def delete_company(company_id: int):
+    """Delete a company."""
+    try:
+        with db.session() as session:
+            company = session.get(Company, company_id)
+            if not company:
+                raise HTTPException(status_code=404, detail="Company not found")
+
+            company_name = company.name
+            session.delete(company)
+            session.flush()
+
+        return {
+            "message": f"Company '{company_name}' deleted successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/companies/{company_id}/set-active")
+async def set_active_company(company_id: int):
+    """Set active company (stored in session/client state)."""
+    try:
+        company = db.get_company(company_id)
+        if not company:
+            raise HTTPException(status_code=404, detail="Company not found")
+
+        return {
+            "id": company.id,
+            "name": company.name,
+            "financial_year_start": company.financial_year_start.isoformat(),
+            "message": f"Switched to company '{company.name}'"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/bills/aging")
 async def get_aging_report(
     ledger_id: Optional[int] = None,
@@ -1020,6 +1318,372 @@ async def get_aging_report(
         return report
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==================== IMPORT/ETL ENDPOINTS ====================
+
+@app.get("/api/import/template/{master_type}")
+async def download_import_template(master_type: str, voucher_type: Optional[str] = None):
+    """Download Excel template for import.
+
+    Supported master types: ledgers, groups, vouchers, stock-items
+    For vouchers, specify voucher_type query param (Payment, Receipt, etc.)
+    """
+    try:
+        if master_type == "ledgers":
+            content = import_etl.generate_ledger_template()
+            filename = "ledgers_import_template.xlsx"
+        elif master_type == "groups":
+            content = import_etl.generate_group_template()
+            filename = "groups_import_template.xlsx"
+        elif master_type == "vouchers":
+            vtype = voucher_type or "Payment"
+            content = import_etl.generate_voucher_template(vtype)
+            filename = f"{vtype.lower()}_vouchers_template.xlsx"
+        elif master_type == "stock-items":
+            content = import_etl.generate_stock_item_template()
+            filename = "stock_items_template.xlsx"
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown master type: {master_type}")
+
+        return Response(
+            content=content,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    except ImportError as e:
+        raise HTTPException(status_code=500, detail=f"Template generation requires openpyxl: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/import/excel/ledgers")
+async def import_ledgers_excel(file: UploadFile = File(...)):
+    """Import ledgers from Excel file."""
+    try:
+        content = await file.read()
+        result = import_etl.import_ledgers_from_excel(content)
+        return {
+            "status": "completed",
+            "total_records": result["total"],
+            "success_count": result["success"],
+            "error_count": len(result["errors"]),
+            "errors": result["errors"],
+            "created_ids": result["created_ids"]
+        }
+    except ImportValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except ImportError as e:
+        raise HTTPException(status_code=500, detail=f"Excel import requires pandas: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/import/excel/vouchers")
+async def import_vouchers_excel(
+    file: UploadFile = File(...),
+    voucher_type: str = "Payment",
+    company_id: int = 1
+):
+    """Import vouchers from Excel file.
+
+    Query params:
+    - voucher_type: Payment, Receipt, Journal, etc. (default: Payment)
+    - company_id: Company ID (default: 1)
+    """
+    try:
+        content = await file.read()
+        result = import_etl.import_vouchers_from_excel(content, voucher_type, company_id)
+        return {
+            "status": "completed",
+            "total_vouchers": result["total_vouchers"],
+            "success_count": result["success"],
+            "error_count": len(result["errors"]),
+            "errors": result["errors"],
+            "created_ids": result["created_ids"]
+        }
+    except ImportValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except ImportError as e:
+        raise HTTPException(status_code=500, detail=f"Excel import requires pandas: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/import/bank-statement")
+async def import_bank_statement_file(
+    file: UploadFile = File(...),
+    ledger_id: int = None,
+    file_format: str = "excel"
+):
+    """Import bank statement from CSV/Excel.
+
+    Query params:
+    - ledger_id: Bank ledger ID (required)
+    - file_format: 'excel' or 'csv' (default: excel)
+
+    File should have columns: date, description, debit, credit, balance (optional)
+    """
+    if not ledger_id:
+        raise HTTPException(status_code=400, detail="ledger_id is required")
+
+    try:
+        content = await file.read()
+
+        # Auto-detect common bank statement column mappings
+        column_mapping = None
+        filename_lower = file.filename.lower()
+        if "hdfc" in filename_lower:
+            column_mapping = {
+                "Date": "date",
+                "Narration": "description",
+                "Withdrawal Amt.": "debit",
+                "Deposit Amt.": "credit",
+                "Closing Balance": "balance"
+            }
+        elif "icici" in filename_lower:
+            column_mapping = {
+                "Transaction Date": "date",
+                "Description": "description",
+                "Debit": "debit",
+                "Credit": "credit",
+                "Balance": "balance"
+            }
+
+        result = import_etl.import_bank_statement(
+            file_content=content,
+            ledger_id=ledger_id,
+            file_format=file_format,
+            column_mapping=column_mapping
+        )
+
+        return {
+            "status": "completed",
+            "total_records": result["total"],
+            "imported_count": result["imported"],
+            "matched_count": result["matched"],
+            "unmatched_count": result["unmatched"],
+            "error_count": len(result["errors"]),
+            "errors": result["errors"],
+            "suggestions": result["suggestions"]
+        }
+    except ImportValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except ImportError as e:
+        raise HTTPException(status_code=500, detail=f"Bank statement import requires pandas: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/import/xml")
+async def import_xml_vouchers(file: UploadFile = File(...), company_id: int = 1):
+    """Import vouchers from Tally XML format.
+
+    Accepts ENVELOPE/BODY/TALLYMESSAGE/VOUCHER structure.
+
+    Query params:
+    - company_id: Company ID (default: 1)
+    """
+    try:
+        content = await file.read()
+        xml_content = content.decode('utf-8')
+
+        result = import_etl.import_vouchers_from_xml(xml_content, company_id)
+
+        return {
+            "status": "completed",
+            "total_vouchers": result["total"],
+            "success_count": result["success"],
+            "error_count": len(result["errors"]),
+            "errors": result["errors"],
+            "created_ids": result["created_ids"]
+        }
+    except ImportValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except UnicodeDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid XML file encoding")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==================== REPORT ENDPOINTS ====================
+
+@app.get("/api/reports/trial-balance")
+async def report_trial_balance(
+    company_id: int = 1,
+):
+    """Trial balance report."""
+    try:
+        data = db.get_trial_balance(company_id)
+        return {
+            "report": "trial_balance",
+            "company_id": company_id,
+            "data": data,
+            "total_debit": sum(row["debit"] for row in data),
+            "total_credit": sum(row["credit"] for row in data),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/reports/day-book")
+async def report_day_book(
+    company_id: int = 1,
+    from_date: str = "2026-04-01",
+    to_date: str = "2026-04-30",
+):
+    """Day book report (chronological voucher listing)."""
+    try:
+        from_dt = datetime.strptime(from_date, "%Y-%m-%d").date()
+        to_dt = datetime.strptime(to_date, "%Y-%m-%d").date()
+
+        data = db.get_day_book(company_id, from_dt, to_dt)
+        return {
+            "report": "day_book",
+            "company_id": company_id,
+            "from_date": from_date,
+            "to_date": to_date,
+            "voucher_count": len(data),
+            "data": data,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/reports/balance-sheet")
+async def report_balance_sheet(
+    company_id: int = 1,
+    as_of_date: str = "2026-04-30",
+):
+    """Balance sheet report."""
+    try:
+        as_of = datetime.strptime(as_of_date, "%Y-%m-%d").date()
+        data = db.get_balance_sheet(company_id, as_of)
+        return {
+            "report": "balance_sheet",
+            "company_id": company_id,
+            **data,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/reports/profit-loss")
+async def report_profit_loss(
+    company_id: int = 1,
+    from_date: str = "2026-04-01",
+    to_date: str = "2026-04-30",
+):
+    """Profit & loss statement."""
+    try:
+        from_dt = datetime.strptime(from_date, "%Y-%m-%d").date()
+        to_dt = datetime.strptime(to_date, "%Y-%m-%d").date()
+
+        data = db.get_profit_loss(company_id, from_dt, to_dt)
+        return {
+            "report": "profit_loss",
+            "company_id": company_id,
+            **data,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/reports/export")
+async def export_report(
+    report: str,
+    format: str = "excel",
+    company_id: int = 1,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    as_of_date: Optional[str] = None,
+):
+    """Export report to Excel.
+
+    Query params:
+    - report: trial-balance, day-book, balance-sheet, profit-loss
+    - format: excel (only excel supported)
+    - company_id: Company ID
+    - from_date, to_date: For day-book and profit-loss
+    - as_of_date: For balance-sheet
+    """
+    try:
+        import pandas as pd
+        from io import BytesIO
+
+        # Get report data
+        if report == "trial-balance":
+            data = db.get_trial_balance(company_id)
+            df = pd.DataFrame(data)
+            filename = f"trial_balance_{company_id}.xlsx"
+
+        elif report == "day-book":
+            from_dt = datetime.strptime(from_date or "2026-04-01", "%Y-%m-%d").date()
+            to_dt = datetime.strptime(to_date or "2026-04-30", "%Y-%m-%d").date()
+            vouchers = db.get_day_book(company_id, from_dt, to_dt)
+
+            # Flatten for Excel
+            rows = []
+            for v in vouchers:
+                for entry in v["entries"]:
+                    rows.append({
+                        "Date": v["date"],
+                        "Voucher Type": v["voucher_type"],
+                        "Voucher Number": v["voucher_number"],
+                        "Ledger": entry["ledger_name"],
+                        "Debit": entry["debit"],
+                        "Credit": entry["credit"],
+                        "Narration": v["narration"],
+                    })
+            df = pd.DataFrame(rows)
+            filename = f"day_book_{from_date}_to_{to_date}.xlsx"
+
+        elif report == "balance-sheet":
+            as_of = datetime.strptime(as_of_date or "2026-04-30", "%Y-%m-%d").date()
+            bs_data = db.get_balance_sheet(company_id, as_of)
+
+            # Create combined dataframe
+            assets_df = pd.DataFrame(bs_data["assets"])
+            assets_df["Type"] = "Asset"
+            liabilities_df = pd.DataFrame(bs_data["liabilities"])
+            liabilities_df["Type"] = "Liability"
+            df = pd.concat([assets_df, liabilities_df], ignore_index=True)
+            filename = f"balance_sheet_{as_of_date}.xlsx"
+
+        elif report == "profit-loss":
+            from_dt = datetime.strptime(from_date or "2026-04-01", "%Y-%m-%d").date()
+            to_dt = datetime.strptime(to_date or "2026-04-30", "%Y-%m-%d").date()
+            pl_data = db.get_profit_loss(company_id, from_dt, to_dt)
+
+            # Create combined dataframe
+            income_df = pd.DataFrame(pl_data["income"])
+            income_df["Type"] = "Income"
+            expenses_df = pd.DataFrame(pl_data["expenses"])
+            expenses_df["Type"] = "Expense"
+            df = pd.concat([income_df, expenses_df], ignore_index=True)
+            filename = f"profit_loss_{from_date}_to_{to_date}.xlsx"
+
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown report: {report}")
+
+        # Export to Excel
+        buffer = BytesIO()
+        df.to_excel(buffer, index=False, engine='openpyxl')
+        buffer.seek(0)
+
+        return Response(
+            content=buffer.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+
+    except ImportError:
+        raise HTTPException(
+            status_code=500,
+            detail="Excel export requires pandas and openpyxl. Install with: pip install pandas openpyxl"
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -1,0 +1,190 @@
+<!-- INTEGRATION EXAMPLE -->
+<!-- Add this to index.html to integrate the data table components -->
+
+<!--
+Step 1: Add new workspace tabs to the tab bar (around line 285 in index.html)
+Replace the existing workspace tabs section with:
+-->
+
+<!-- Workspace Tabs -->
+<div class="bg-white border-b border-gray-200 px-6 py-2">
+    <div class="flex gap-2 overflow-x-auto">
+        <!-- Existing tabs -->
+        <button
+            @click="workspaceMode = 'dashboard'"
+            :class="workspaceMode === 'dashboard' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+            class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors whitespace-nowrap">
+            Dashboard
+        </button>
+        <button
+            @click="workspaceMode = 'voucher'"
+            :class="workspaceMode === 'voucher' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+            class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors whitespace-nowrap">
+            Create Voucher
+        </button>
+
+        <!-- NEW DATA TABLE TABS -->
+        <button
+            @click="workspaceMode = 'ledgers'"
+            :class="workspaceMode === 'ledgers' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+            class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors whitespace-nowrap">
+            Ledgers
+        </button>
+        <button
+            @click="workspaceMode = 'vouchers'"
+            :class="workspaceMode === 'vouchers' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+            class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors whitespace-nowrap">
+            Vouchers
+        </button>
+        <button
+            @click="workspaceMode = 'stock'"
+            :class="workspaceMode === 'stock' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+            class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors whitespace-nowrap">
+            Stock Items
+        </button>
+        <button
+            @click="workspaceMode = 'bills'"
+            :class="workspaceMode === 'bills' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+            class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors whitespace-nowrap">
+            Outstanding Bills
+        </button>
+
+        <!-- Keep existing tabs -->
+        <button
+            @click="workspaceMode = 'ledger'"
+            :class="workspaceMode === 'ledger' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+            class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors whitespace-nowrap">
+            Ledger View
+        </button>
+        <button
+            @click="workspaceMode = 'trial-balance'"
+            :class="workspaceMode === 'trial-balance' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+            class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors whitespace-nowrap">
+            Trial Balance
+        </button>
+    </div>
+</div>
+
+<!--
+Step 2: Add workspace views to the content section
+Add these after the existing workspace views (around line 600 in index.html)
+-->
+
+<!-- LEDGERS TABLE VIEW -->
+<div x-show="workspaceMode === 'ledgers'" class="space-y-6">
+    <!-- Copy entire content from ledger-table.html here -->
+    <!-- Or use dynamic loading (requires server-side support):
+    <div x-init="fetch('/static/components/ledger-table.html').then(r => r.text()).then(html => $el.innerHTML = html)"></div>
+    -->
+</div>
+
+<!-- VOUCHERS TABLE VIEW -->
+<div x-show="workspaceMode === 'vouchers'" class="space-y-6">
+    <!-- Copy entire content from voucher-list-table.html here -->
+</div>
+
+<!-- STOCK ITEMS TABLE VIEW -->
+<div x-show="workspaceMode === 'stock'" class="space-y-6">
+    <!-- Copy entire content from stock-items-table.html here -->
+</div>
+
+<!-- OUTSTANDING BILLS TABLE VIEW -->
+<div x-show="workspaceMode === 'bills'" class="space-y-6">
+    <!-- Copy entire content from outstanding-bills-table.html here -->
+</div>
+
+<!--
+Alternative: Simple copy-paste integration
+For quickest integration, open each component file and copy its entire content
+into the corresponding x-show div above.
+-->
+
+<!--
+Step 3: Test navigation
+Open browser, click through tabs:
+- Dashboard → Ledgers → Vouchers → Stock Items → Outstanding Bills
+Each should display the respective data table.
+-->
+
+<!--
+Step 4: Connect to backend APIs
+In each component's Alpine.js data function, replace sample data with API calls:
+
+Example for Ledgers:
+-->
+<script>
+function ledgerTable() {
+    return {
+        ledgers: [],
+
+        async init() {
+            // Fetch real data from backend
+            const response = await fetch('/api/ledgers');
+            this.ledgers = await response.json();
+        },
+
+        // ... rest of component code
+    };
+}
+</script>
+
+<!--
+Step 5: Implement modals/forms for create/edit actions
+When user clicks "Create Ledger" or clicks a row, show a modal:
+-->
+<script>
+function ledgerTable() {
+    return {
+        showModal: false,
+        selectedLedger: null,
+
+        editLedger(ledger) {
+            this.selectedLedger = ledger;
+            this.showModal = true;
+        },
+
+        createLedger() {
+            this.selectedLedger = null;
+            this.showModal = true;
+        },
+
+        async saveLedger(formData) {
+            const method = this.selectedLedger ? 'PUT' : 'POST';
+            const url = this.selectedLedger
+                ? `/api/ledgers/${this.selectedLedger.id}`
+                : '/api/ledgers';
+
+            const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                // Refresh data
+                await this.init();
+                this.showModal = false;
+            }
+        }
+    };
+}
+</script>
+
+<!--
+Modal template example (add to component):
+-->
+<div x-show="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 p-6">
+        <h3 class="text-lg font-semibold mb-4" x-text="selectedLedger ? 'Edit Ledger' : 'Create Ledger'"></h3>
+
+        <form @submit.prevent="saveLedger(Object.fromEntries(new FormData($event.target)))">
+            <!-- Form fields here -->
+            <input type="text" name="name" :value="selectedLedger?.name" placeholder="Ledger Name" class="w-full mb-4 px-4 py-2 border rounded-lg" required>
+
+            <div class="flex gap-2 justify-end">
+                <button type="button" @click="showModal = false" class="px-4 py-2 border rounded-lg">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Save</button>
+            </div>
+        </form>
+    </div>
+</div>

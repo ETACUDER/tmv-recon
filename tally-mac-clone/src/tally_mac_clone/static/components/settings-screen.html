@@ -1,0 +1,155 @@
+<!-- Settings Screen (F12) -->
+<template x-if="workspaceMode === 'settings'">
+    <div class="space-y-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">Company Settings (F12)</h2>
+                <p class="text-gray-600 mt-1">Configure features and preferences for <span x-text="activeCompany?.name || 'your company'"></span></p>
+            </div>
+            <button @click="saveSettings()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Settings</button>
+        </div>
+
+        <!-- Feature Management -->
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                Feature Management
+            </h3>
+            <div class="space-y-3">
+                <label class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-900">Inventory Management</p>
+                        <p class="text-sm text-gray-600 mt-1">Track stock items, godowns, batch numbers, and inventory transactions</p>
+                    </div>
+                    <input type="checkbox" x-model="settings.maintain_inventory" class="rounded w-5 h-5"/>
+                </label>
+                <label class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-900">Payroll</p>
+                        <p class="text-sm text-gray-600 mt-1">Manage employee salaries, deductions, and payroll processing</p>
+                    </div>
+                    <input type="checkbox" x-model="settings.maintain_payroll" class="rounded w-5 h-5"/>
+                </label>
+                <label class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-900">Cost Centers</p>
+                        <p class="text-sm text-gray-600 mt-1">Track expenses and revenues by department, project, or location</p>
+                    </div>
+                    <input type="checkbox" x-model="settings.use_cost_centers" class="rounded w-5 h-5"/>
+                </label>
+                <label class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-900">Bill-wise Details</p>
+                        <p class="text-sm text-gray-600 mt-1">Track receivables and payables against specific bills/invoices</p>
+                    </div>
+                    <input type="checkbox" x-model="settings.maintain_bill_wise" class="rounded w-5 h-5"/>
+                </label>
+                <label class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-900">Multi-Currency</p>
+                        <p class="text-sm text-gray-600 mt-1">Enable foreign currency transactions with exchange rate management</p>
+                    </div>
+                    <input type="checkbox" x-model="settings.enable_multi_currency" class="rounded w-5 h-5"/>
+                </label>
+            </div>
+        </div>
+
+        <!-- GST Configuration -->
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                GST Configuration
+            </h3>
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">GSTIN</label>
+                    <input type="text" x-model="settings.gstin" maxlength="15" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="22AAAAA0000A1Z5"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">GST Registration Type</label>
+                    <select x-model="settings.gst_registration_type" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select Type</option>
+                        <option value="Regular">Regular</option>
+                        <option value="Composition">Composition</option>
+                        <option value="Unregistered">Unregistered</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Filing Frequency</label>
+                    <select x-model="settings.gst_filing_frequency" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="Monthly">Monthly (GSTR-1 & GSTR-3B)</option>
+                        <option value="Quarterly">Quarterly (QRMP)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="flex items-center gap-2 mt-8">
+                        <input type="checkbox" x-model="settings.enable_gst" class="rounded"/>
+                        <span class="text-sm font-medium text-gray-700">Enable GST Features</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voucher Numbering -->
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                </svg>
+                Voucher Numbering Preferences
+            </h3>
+            <p class="text-sm text-gray-600 mb-4">Configure automatic numbering series for different voucher types</p>
+            <div class="space-y-3">
+                <div class="grid grid-cols-3 gap-4 items-center">
+                    <span class="text-sm font-medium text-gray-700">Payment:</span>
+                    <input type="text" value="PAY-" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"/>
+                    <span class="text-sm text-gray-600">Example: PAY-001, PAY-002</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4 items-center">
+                    <span class="text-sm font-medium text-gray-700">Receipt:</span>
+                    <input type="text" value="RCP-" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"/>
+                    <span class="text-sm text-gray-600">Example: RCP-001, RCP-002</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4 items-center">
+                    <span class="text-sm font-medium text-gray-700">Sales:</span>
+                    <input type="text" value="S-" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"/>
+                    <span class="text-sm text-gray-600">Example: S-001, S-002</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4 items-center">
+                    <span class="text-sm font-medium text-gray-700">Purchase:</span>
+                    <input type="text" value="P-" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"/>
+                    <span class="text-sm text-gray-600">Example: P-001, P-002</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4 items-center">
+                    <span class="text-sm font-medium text-gray-700">Journal:</span>
+                    <input type="text" value="JV-" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"/>
+                    <span class="text-sm text-gray-600">Example: JV-001, JV-002</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4 items-center">
+                    <span class="text-sm font-medium text-gray-700">Contra:</span>
+                    <input type="text" value="CON-" class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"/>
+                    <span class="text-sm text-gray-600">Example: CON-001, CON-002</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security & User Management -->
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                Security & User Management
+            </h3>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p class="text-sm text-blue-800">
+                    <strong>Coming Soon:</strong> Multi-user access control, role-based permissions, and audit trails will be available in a future update.
+                </p>
+            </div>
+        </div>
+    </div>
+</template>

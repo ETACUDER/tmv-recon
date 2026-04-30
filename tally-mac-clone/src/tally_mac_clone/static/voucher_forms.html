@@ -1,0 +1,563 @@
+<!-- PAYMENT VOUCHER (F5) -->
+<div x-show="workspaceMode === 'payment'" class="space-y-4">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-900">Payment Voucher</h2>
+            <span class="text-sm text-gray-500">F1: Help</span>
+        </div>
+
+        <form @submit.prevent="saveVoucher" class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ref No:</label>
+                    <input type="text" x-model="voucher.number" readonly
+                        class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-sm" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date: <span class="text-gray-500 text-xs">(F2: Change)</span></label>
+                    <input type="date" x-model="voucher.date"
+                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Account (Dr):</label>
+                <input type="text" x-model="voucher.partyAccount" @input="filterLedgers"
+                    placeholder="Type to search ledger..." list="ledger-list"
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <datalist id="ledger-list">
+                    <template x-for="ledger in filteredLedgers" :key="ledger.id">
+                        <option :value="ledger.name"></option>
+                    </template>
+                </datalist>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Ledger (Cr)</th>
+                            <th class="px-4 py-2 text-right font-medium text-gray-700 w-32">Amount</th>
+                            <th class="px-4 py-2 w-12"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(entry, idx) in voucher.entries" :key="idx">
+                            <tr class="border-t border-gray-200">
+                                <td class="px-4 py-2">
+                                    <input type="text" x-model="entry.ledger" @input="filterLedgers" list="ledger-list"
+                                        placeholder="Select ledger..."
+                                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </td>
+                                <td class="px-4 py-2">
+                                    <input type="number" x-model="entry.amount" step="0.01" @input="calculateBalance"
+                                        placeholder="0.00"
+                                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </td>
+                                <td class="px-4 py-2 text-center">
+                                    <button type="button" @click="removeEntry(idx)" class="text-red-600 hover:text-red-800">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="button" @click="addEntry" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                + Add Ledger Line
+            </button>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Narration:</label>
+                <textarea x-model="voucher.narration" rows="2"
+                    placeholder="Enter payment details..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div class="text-sm">
+                    <span class="font-medium">Total:</span>
+                    <span x-text="'Dr ' + formatCurrency(totalDebit)" class="ml-2 text-green-600"></span>
+                    <span x-text="'Cr ' + formatCurrency(totalCredit)" class="ml-4 text-red-600"></span>
+                    <span x-show="!isBalanced" class="ml-4 text-red-600 font-medium">⚠ Not balanced</span>
+                    <span x-show="isBalanced" class="ml-4 text-green-600 font-medium">✓ Balanced</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="submit" :disabled="!isBalanced"
+                    class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm">
+                    Ctrl+A: Accept
+                </button>
+                <button type="button" @click="clearVoucher" class="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 font-medium text-sm">
+                    Esc: Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-gray-800 text-white px-4 py-2 rounded text-xs">
+        <span class="font-medium">Shortcuts:</span>
+        <span class="ml-4">F2: Date</span>
+        <span class="ml-4">Ctrl+A: Accept</span>
+        <span class="ml-4">Esc: Cancel</span>
+        <span class="ml-4">F5-F9: Voucher Types</span>
+    </div>
+</div>
+
+<!-- RECEIPT VOUCHER (F6) -->
+<div x-show="workspaceMode === 'receipt'" class="space-y-4">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-900">Receipt Voucher</h2>
+            <span class="text-sm text-gray-500">F1: Help</span>
+        </div>
+
+        <form @submit.prevent="saveVoucher" class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ref No:</label>
+                    <input type="text" x-model="voucher.number" readonly
+                        class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-sm" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date: <span class="text-gray-500 text-xs">(F2: Change)</span></label>
+                    <input type="date" x-model="voucher.date"
+                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Account (Cr):</label>
+                <input type="text" x-model="voucher.partyAccount" @input="filterLedgers"
+                    placeholder="Type to search ledger..." list="ledger-list"
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            <div class="border border-gray-200 rounded-lg overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Ledger (Dr)</th>
+                            <th class="px-4 py-2 text-right font-medium text-gray-700 w-32">Amount</th>
+                            <th class="px-4 py-2 w-12"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(entry, idx) in voucher.entries" :key="idx">
+                            <tr class="border-t border-gray-200">
+                                <td class="px-4 py-2">
+                                    <input type="text" x-model="entry.ledger" @input="filterLedgers" list="ledger-list"
+                                        placeholder="Select ledger..."
+                                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </td>
+                                <td class="px-4 py-2">
+                                    <input type="number" x-model="entry.amount" step="0.01" @input="calculateBalance"
+                                        placeholder="0.00"
+                                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </td>
+                                <td class="px-4 py-2 text-center">
+                                    <button type="button" @click="removeEntry(idx)" class="text-red-600 hover:text-red-800">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="button" @click="addEntry" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                + Add Ledger Line
+            </button>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Narration:</label>
+                <textarea x-model="voucher.narration" rows="2"
+                    placeholder="Enter receipt details..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div class="text-sm">
+                    <span class="font-medium">Total:</span>
+                    <span x-text="'Dr ' + formatCurrency(totalDebit)" class="ml-2 text-green-600"></span>
+                    <span x-text="'Cr ' + formatCurrency(totalCredit)" class="ml-4 text-red-600"></span>
+                    <span x-show="!isBalanced" class="ml-4 text-red-600 font-medium">⚠ Not balanced</span>
+                    <span x-show="isBalanced" class="ml-4 text-green-600 font-medium">✓ Balanced</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="submit" :disabled="!isBalanced"
+                    class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm">
+                    Ctrl+A: Accept
+                </button>
+                <button type="button" @click="clearVoucher" class="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 font-medium text-sm">
+                    Esc: Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-gray-800 text-white px-4 py-2 rounded text-xs">
+        <span class="font-medium">Shortcuts:</span>
+        <span class="ml-4">F2: Date</span>
+        <span class="ml-4">Ctrl+A: Accept</span>
+        <span class="ml-4">Esc: Cancel</span>
+        <span class="ml-4">F5-F9: Voucher Types</span>
+    </div>
+</div>
+
+<!-- JOURNAL VOUCHER (F7) -->
+<div x-show="workspaceMode === 'journal'" class="space-y-4">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-900">Journal Voucher</h2>
+            <span class="text-sm text-gray-500">F1: Help</span>
+        </div>
+
+        <form @submit.prevent="saveVoucher" class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ref No:</label>
+                    <input type="text" x-model="voucher.number" readonly
+                        class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-sm" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date: <span class="text-gray-500 text-xs">(F2: Change)</span></label>
+                    <input type="date" x-model="voucher.date"
+                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Ledger</th>
+                            <th class="px-4 py-2 text-right font-medium text-gray-700 w-32">Debit</th>
+                            <th class="px-4 py-2 text-right font-medium text-gray-700 w-32">Credit</th>
+                            <th class="px-4 py-2 w-12"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(entry, idx) in voucher.entries" :key="idx">
+                            <tr class="border-t border-gray-200">
+                                <td class="px-4 py-2">
+                                    <input type="text" x-model="entry.ledger" @input="filterLedgers" list="ledger-list"
+                                        placeholder="Select ledger..."
+                                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </td>
+                                <td class="px-4 py-2">
+                                    <input type="number" x-model="entry.debit" step="0.01" @input="calculateBalance"
+                                        placeholder="0.00"
+                                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </td>
+                                <td class="px-4 py-2">
+                                    <input type="number" x-model="entry.credit" step="0.01" @input="calculateBalance"
+                                        placeholder="0.00"
+                                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </td>
+                                <td class="px-4 py-2 text-center">
+                                    <button type="button" @click="removeEntry(idx)" class="text-red-600 hover:text-red-800">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="button" @click="addEntry" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                + Add Ledger Line
+            </button>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Narration:</label>
+                <textarea x-model="voucher.narration" rows="2"
+                    placeholder="Enter journal entry details..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div class="text-sm">
+                    <span class="font-medium">Total:</span>
+                    <span x-text="'Dr ' + formatCurrency(totalDebit)" class="ml-2 text-green-600"></span>
+                    <span x-text="'Cr ' + formatCurrency(totalCredit)" class="ml-4 text-red-600"></span>
+                    <span x-show="!isBalanced" class="ml-4 text-red-600 font-medium">⚠ Not balanced</span>
+                    <span x-show="isBalanced" class="ml-4 text-green-600 font-medium">✓ Balanced</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="submit" :disabled="!isBalanced"
+                    class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm">
+                    Ctrl+A: Accept
+                </button>
+                <button type="button" @click="clearVoucher" class="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 font-medium text-sm">
+                    Esc: Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-gray-800 text-white px-4 py-2 rounded text-xs">
+        <span class="font-medium">Shortcuts:</span>
+        <span class="ml-4">F2: Date</span>
+        <span class="ml-4">Ctrl+A: Accept</span>
+        <span class="ml-4">Esc: Cancel</span>
+        <span class="ml-4">F5-F9: Voucher Types</span>
+    </div>
+</div>
+
+<!-- SALES VOUCHER (F8) -->
+<div x-show="workspaceMode === 'sales'" class="space-y-4">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-900">Sales Voucher</h2>
+            <span class="text-sm text-gray-500">F1: Help</span>
+        </div>
+
+        <form @submit.prevent="saveVoucher" class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ref No:</label>
+                    <input type="text" x-model="voucher.number" readonly
+                        class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-sm" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date: <span class="text-gray-500 text-xs">(F2: Change)</span></label>
+                    <input type="date" x-model="voucher.date"
+                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Party A/c Name (Dr):</label>
+                <input type="text" x-model="voucher.partyAccount" @input="filterLedgers"
+                    placeholder="Type to search customer ledger..." list="ledger-list"
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            <div>
+                <h4 class="font-medium text-gray-700 mb-2 text-sm">Particulars:</h4>
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-medium text-gray-700">Ledger (Cr)</th>
+                                <th class="px-4 py-2 text-right font-medium text-gray-700 w-24">Rate</th>
+                                <th class="px-4 py-2 text-right font-medium text-gray-700 w-24">Qty</th>
+                                <th class="px-4 py-2 text-right font-medium text-gray-700 w-32">Amount</th>
+                                <th class="px-4 py-2 w-12"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="(entry, idx) in voucher.entries" :key="idx">
+                                <tr class="border-t border-gray-200">
+                                    <td class="px-4 py-2">
+                                        <input type="text" x-model="entry.ledger" @input="filterLedgers" list="ledger-list"
+                                            placeholder="Select ledger..."
+                                            class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="number" x-model="entry.rate" step="0.01"
+                                            placeholder="0.00"
+                                            class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="number" x-model="entry.qty" step="1"
+                                            placeholder="1"
+                                            class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="number" x-model="entry.amount" step="0.01" @input="calculateBalance"
+                                            placeholder="0.00"
+                                            class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                    </td>
+                                    <td class="px-4 py-2 text-center">
+                                        <button type="button" @click="removeEntry(idx)" class="text-red-600 hover:text-red-800">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <button type="button" @click="addEntry" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                + Add Item Line
+            </button>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Narration:</label>
+                <textarea x-model="voucher.narration" rows="2"
+                    placeholder="Enter invoice details..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div class="text-sm">
+                    <span class="font-medium">Total:</span>
+                    <span x-text="'Dr ' + formatCurrency(totalDebit)" class="ml-2 text-green-600"></span>
+                    <span x-text="'Cr ' + formatCurrency(totalCredit)" class="ml-4 text-red-600"></span>
+                    <span x-show="!isBalanced" class="ml-4 text-red-600 font-medium">⚠ Not balanced</span>
+                    <span x-show="isBalanced" class="ml-4 text-green-600 font-medium">✓ Balanced</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="submit" :disabled="!isBalanced"
+                    class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm">
+                    Ctrl+A: Accept
+                </button>
+                <button type="button" @click="clearVoucher" class="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 font-medium text-sm">
+                    Esc: Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-gray-800 text-white px-4 py-2 rounded text-xs">
+        <span class="font-medium">Shortcuts:</span>
+        <span class="ml-4">F2: Date</span>
+        <span class="ml-4">Ctrl+A: Accept</span>
+        <span class="ml-4">Esc: Cancel</span>
+        <span class="ml-4">F5-F9: Voucher Types</span>
+    </div>
+</div>
+
+<!-- PURCHASE VOUCHER (F9) -->
+<div x-show="workspaceMode === 'purchase'" class="space-y-4">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-900">Purchase Voucher</h2>
+            <span class="text-sm text-gray-500">F1: Help</span>
+        </div>
+
+        <form @submit.prevent="saveVoucher" class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ref No:</label>
+                    <input type="text" x-model="voucher.number" readonly
+                        class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-sm" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date: <span class="text-gray-500 text-xs">(F2: Change)</span></label>
+                    <input type="date" x-model="voucher.date"
+                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Party A/c Name (Cr):</label>
+                <input type="text" x-model="voucher.partyAccount" @input="filterLedgers"
+                    placeholder="Type to search vendor ledger..." list="ledger-list"
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            <div>
+                <h4 class="font-medium text-gray-700 mb-2 text-sm">Particulars:</h4>
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-medium text-gray-700">Ledger (Dr)</th>
+                                <th class="px-4 py-2 text-right font-medium text-gray-700 w-24">Rate</th>
+                                <th class="px-4 py-2 text-right font-medium text-gray-700 w-24">Qty</th>
+                                <th class="px-4 py-2 text-right font-medium text-gray-700 w-32">Amount</th>
+                                <th class="px-4 py-2 w-12"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="(entry, idx) in voucher.entries" :key="idx">
+                                <tr class="border-t border-gray-200">
+                                    <td class="px-4 py-2">
+                                        <input type="text" x-model="entry.ledger" @input="filterLedgers" list="ledger-list"
+                                            placeholder="Select ledger..."
+                                            class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="number" x-model="entry.rate" step="0.01"
+                                            placeholder="0.00"
+                                            class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="number" x-model="entry.qty" step="1"
+                                            placeholder="1"
+                                            class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="number" x-model="entry.amount" step="0.01" @input="calculateBalance"
+                                            placeholder="0.00"
+                                            class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                    </td>
+                                    <td class="px-4 py-2 text-center">
+                                        <button type="button" @click="removeEntry(idx)" class="text-red-600 hover:text-red-800">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <button type="button" @click="addEntry" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                + Add Item Line
+            </button>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Narration:</label>
+                <textarea x-model="voucher.narration" rows="2"
+                    placeholder="Enter bill details..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div class="text-sm">
+                    <span class="font-medium">Total:</span>
+                    <span x-text="'Dr ' + formatCurrency(totalDebit)" class="ml-2 text-green-600"></span>
+                    <span x-text="'Cr ' + formatCurrency(totalCredit)" class="ml-4 text-red-600"></span>
+                    <span x-show="!isBalanced" class="ml-4 text-red-600 font-medium">⚠ Not balanced</span>
+                    <span x-show="isBalanced" class="ml-4 text-green-600 font-medium">✓ Balanced</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="submit" :disabled="!isBalanced"
+                    class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm">
+                    Ctrl+A: Accept
+                </button>
+                <button type="button" @click="clearVoucher" class="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 font-medium text-sm">
+                    Esc: Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-gray-800 text-white px-4 py-2 rounded text-xs">
+        <span class="font-medium">Shortcuts:</span>
+        <span class="ml-4">F2: Date</span>
+        <span class="ml-4">Ctrl+A: Accept</span>
+        <span class="ml-4">Esc: Cancel</span>
+        <span class="ml-4">F5-F9: Voucher Types</span>
+    </div>
+</div>

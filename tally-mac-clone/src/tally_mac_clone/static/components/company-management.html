@@ -1,0 +1,185 @@
+<!-- Company Info Form Component -->
+<template x-if="workspaceMode === 'company-info'">
+    <div class="space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-900">Company Information (F3)</h2>
+            <button @click="saveCompanyInfo()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border p-6 space-y-6">
+            <!-- Basic Info -->
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
+                    <input type="text" x-model="companyForm.name" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mailing Name</label>
+                    <input type="text" x-model="companyForm.mailing_name" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                <textarea x-model="companyForm.address" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">City/State</label>
+                    <input type="text" x-model="companyForm.state" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                    <input type="text" x-model="companyForm.country" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pincode</label>
+                    <input type="text" x-model="companyForm.pincode" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="grid grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                    <input type="text" x-model="companyForm.phone" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" x-model="companyForm.email" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                    <input type="text" x-model="companyForm.website" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                </div>
+            </div>
+
+            <!-- Tax Registration -->
+            <div class="border-t pt-6">
+                <h3 class="font-semibold text-gray-900 mb-4">Tax Registration</h3>
+                <div class="grid grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">GSTIN</label>
+                        <input type="text" x-model="companyForm.gstin" maxlength="15" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">PAN</label>
+                        <input type="text" x-model="companyForm.pan" maxlength="10" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">CIN</label>
+                        <input type="text" x-model="companyForm.cin" maxlength="21" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-6 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">TAN</label>
+                        <input type="text" x-model="companyForm.tan" maxlength="10" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">GST Registration Type</label>
+                        <select x-model="companyForm.gst_registration_type" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Type</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Composition">Composition</option>
+                            <option value="Unregistered">Unregistered</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Settings -->
+            <div class="border-t pt-6">
+                <h3 class="font-semibold text-gray-900 mb-4">Financial Settings</h3>
+                <div class="grid grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Financial Year Start *</label>
+                        <input type="date" x-model="companyForm.financial_year_start" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Books Beginning From</label>
+                        <input type="date" x-model="companyForm.books_beginning_from" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Base Currency</label>
+                        <select x-model="companyForm.base_currency_id" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Currency</option>
+                            <template x-for="curr in currencies" :key="curr.id">
+                                <option :value="curr.id" x-text="curr.code + ' - ' + curr.name"></option>
+                            </template>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Flags -->
+            <div class="border-t pt-6">
+                <h3 class="font-semibold text-gray-900 mb-4">Feature Configuration</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="companyForm.maintain_bill_wise" class="rounded"/>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Maintain Bill-wise Details</p>
+                            <p class="text-xs text-gray-600">Track receivables and payables by bill</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="companyForm.use_cost_centers" class="rounded"/>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Use Cost Centers</p>
+                            <p class="text-xs text-gray-600">Track expenses by department/project</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="companyForm.enable_multi_currency" class="rounded"/>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Multi-Currency</p>
+                            <p class="text-xs text-gray-600">Enable foreign currency transactions</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="companyForm.maintain_inventory" class="rounded"/>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Maintain Inventory</p>
+                            <p class="text-xs text-gray-600">Track stock items and godowns</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="companyForm.maintain_payroll" class="rounded"/>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Maintain Payroll</p>
+                            <p class="text-xs text-gray-600">Manage employee salaries</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="companyForm.enable_gst" class="rounded"/>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Enable GST</p>
+                            <p class="text-xs text-gray-600">GST compliance and returns</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" x-model="companyForm.maintain_accounts_only" class="rounded"/>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Accounts Only Mode</p>
+                            <p class="text-xs text-gray-600">Disable inventory features</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Security -->
+            <div class="border-t pt-6">
+                <h3 class="font-semibold text-gray-900 mb-4">Security</h3>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tally Vault Password</label>
+                        <input type="password" x-model="companyForm.tally_vault_password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Leave blank to disable"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -8,8 +8,17 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Alpine.js Collapse Plugin -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Gateway Menu System -->
+    <script src="/static/menu.js"></script>
+
+    <!-- Keyboard Navigation System -->
+    <script src="/static/js/keyboard.js"></script>
 
     <style>
         [x-cloak] { display: none !important; }
@@ -57,27 +66,133 @@
         }
     </style>
 </head>
-<body class="h-screen overflow-hidden bg-gray-50" x-data="appData()" x-cloak>
+<body class="h-screen overflow-hidden bg-gray-50" x-data="{ ...appData(), ...keyboardNav() }" x-cloak>
 
     <!-- Main Container -->
     <div class="h-screen flex flex-col">
 
-        <!-- Header -->
-        <header class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                    </svg>
+        <!-- Header with Menu Bar -->
+        <header class="bg-white border-b border-gray-200">
+            <!-- Top Bar -->
+            <div class="px-6 py-3 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-xl font-semibold text-gray-900">RecordX.Finance</h1>
+                    <span class="text-xs text-gray-500 ml-2">Tally Clone</span>
                 </div>
-                <h1 class="text-xl font-semibold text-gray-900">Tally AI</h1>
+
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-600" x-text="currentDate"></span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span class="text-sm text-gray-600">Connected</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="flex items-center gap-4">
-                <span class="text-sm text-gray-600" x-text="currentDate"></span>
-                <div class="flex items-center gap-2">
-                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span class="text-sm text-gray-600">Connected</span>
+            <!-- Menu Bar -->
+            <div class="px-6 py-2 bg-gray-50 border-b border-gray-200">
+                <div class="flex items-center gap-1 text-sm">
+                    <!-- Gateway Menu -->
+                    <div class="relative" @click.away="activeMenu !== 'gateway' || closeActiveMenu()">
+                        <button
+                            @click="toggleMenu('gateway')"
+                            :class="isMenuActive('gateway') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'"
+                            class="px-3 py-1.5 rounded transition-colors">
+                            <span class="font-medium">Gateway</span>
+                            <span class="text-xs ml-1 opacity-70">(Alt+G)</span>
+                        </button>
+                        <div x-show="isMenuActive('gateway')"
+                             x-transition
+                             class="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                            <div class="py-2">
+                                <a href="#" @click.prevent="toggleMenu('masters')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">1. Masters (Alt+K)</a>
+                                <a href="#" @click.prevent="workspaceMode='voucher'; closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">2. Transactions / Vouchers</a>
+                                <a href="#" @click.prevent="toggleMenu('reports')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">3. Display / Reports (Alt+R)</a>
+                                <a href="#" @click.prevent="toggleMenu('import')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">4. Import / Export (Alt+X)</a>
+                                <a href="#" @click.prevent="showUtilities(); closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">5. Utilities (Alt+U)</a>
+                                <div class="border-t border-gray-200 my-1"></div>
+                                <a href="#" @click.prevent="if(confirm('Quit?')) closeActiveMenu()" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">6. Quit (Ctrl+Q)</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Masters Menu -->
+                    <div class="relative" @click.away="activeMenu !== 'masters' || closeActiveMenu()">
+                        <button
+                            @click="toggleMenu('masters')"
+                            :class="isMenuActive('masters') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'"
+                            class="px-3 py-1.5 rounded transition-colors">
+                            <span class="font-medium">Masters</span>
+                            <span class="text-xs ml-1 opacity-70">(Alt+K)</span>
+                        </button>
+                        <div x-show="isMenuActive('masters')"
+                             x-transition
+                             class="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                            <div class="py-2">
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Groups</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Ledgers</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Stock Items</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Stock Groups</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Units of Measure</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Voucher Types</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reports Menu -->
+                    <div class="relative" @click.away="activeMenu !== 'reports' || closeActiveMenu()">
+                        <button
+                            @click="toggleMenu('reports')"
+                            :class="isMenuActive('reports') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'"
+                            class="px-3 py-1.5 rounded transition-colors">
+                            <span class="font-medium">Reports</span>
+                            <span class="text-xs ml-1 opacity-70">(Alt+R)</span>
+                        </button>
+                        <div x-show="isMenuActive('reports')"
+                             x-transition
+                             class="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                            <div class="py-2">
+                                <a href="#" @click.prevent="workspaceMode='dashboard'; closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Day Book</a>
+                                <a href="#" @click.prevent="workspaceMode='trial-balance'; closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Trial Balance</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Balance Sheet</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profit & Loss</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cash Flow</a>
+                                <div class="border-t border-gray-200 my-1"></div>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sales Register</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Purchase Register</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Outstanding</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Import Menu -->
+                    <div class="relative" @click.away="activeMenu !== 'import' || closeActiveMenu()">
+                        <button
+                            @click="toggleMenu('import')"
+                            :class="isMenuActive('import') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'"
+                            class="px-3 py-1.5 rounded transition-colors">
+                            <span class="font-medium">Import</span>
+                            <span class="text-xs ml-1 opacity-70">(Alt+X)</span>
+                        </button>
+                        <div x-show="isMenuActive('import')"
+                             x-transition
+                             class="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                            <div class="py-2">
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Import from Excel</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Import from XML</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Import Bank Statement</a>
+                                <div class="border-t border-gray-200 my-1"></div>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Export to Excel (Alt+E)</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Export to PDF (Alt+P)</a>
+                                <a href="#" @click.prevent="closeActiveMenu()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Export to XML</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -179,22 +294,40 @@
                             Dashboard
                         </button>
                         <button
-                            @click="workspaceMode = 'voucher'"
-                            :class="workspaceMode === 'voucher' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+                            @click="setVoucherMode('payment')"
+                            :class="workspaceMode === 'payment' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
                             class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors">
-                            Create Voucher
+                            Payment (F5)
                         </button>
                         <button
-                            @click="workspaceMode = 'ledger'"
-                            :class="workspaceMode === 'ledger' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+                            @click="setVoucherMode('receipt')"
+                            :class="workspaceMode === 'receipt' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
                             class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors">
-                            Ledger View
+                            Receipt (F6)
+                        </button>
+                        <button
+                            @click="setVoucherMode('journal')"
+                            :class="workspaceMode === 'journal' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+                            class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors">
+                            Journal (F7)
+                        </button>
+                        <button
+                            @click="setVoucherMode('sales')"
+                            :class="workspaceMode === 'sales' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+                            class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors">
+                            Sales (F8)
+                        </button>
+                        <button
+                            @click="setVoucherMode('purchase')"
+                            :class="workspaceMode === 'purchase' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+                            class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors">
+                            Purchase (F9)
                         </button>
                         <button
                             @click="workspaceMode = 'trial-balance'"
                             :class="workspaceMode === 'trial-balance' ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
                             class="px-4 py-2 rounded-lg border font-medium text-sm transition-colors">
-                            Trial Balance
+                            Reports
                         </button>
                     </div>
                 </div>
@@ -600,6 +733,21 @@
                 </div>
             </div>
         </div>
+
+        <!-- Status Bar -->
+        <div class="bg-gray-800 text-white px-6 py-2 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-6">
+                <span class="font-medium" id="statusMessage" x-text="statusMessage || 'Ready'"></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <template x-for="hint in getShortcutHints()" :key="hint.key">
+                    <span class="text-gray-300">
+                        <span class="font-mono bg-gray-700 px-1.5 py-0.5 rounded" x-text="hint.key"></span>
+                        <span class="ml-1" x-text="hint.label"></span>
+                    </span>
+                </template>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -623,11 +771,17 @@
 
                 // Workspace state
                 workspaceMode: 'dashboard',
+                voucherType: null,
 
                 // Current date
                 currentDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
 
                 // Methods
+                setVoucherMode(type) {
+                    this.workspaceMode = type;
+                    this.voucherType = type;
+                },
+
                 sendMessage() {
                     if (!this.inputMessage.trim()) return;
 

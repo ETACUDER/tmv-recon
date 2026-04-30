@@ -1,0 +1,352 @@
+<!-- Stock Items Table Component -->
+<div x-data="stockItemsTable()" class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">Stock Items</h2>
+            <p class="text-gray-600 mt-1">Inventory management and stock tracking</p>
+        </div>
+        <button
+            @click="createStockItem"
+            class="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center gap-2"
+        >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add Stock Item
+        </button>
+    </div>
+
+    <!-- Low Stock Alert Banner -->
+    <div x-show="lowStockCount > 0" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center gap-3">
+        <svg class="w-6 h-6 text-yellow-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <div>
+            <p class="font-semibold text-yellow-900">Low Stock Alert</p>
+            <p class="text-sm text-yellow-700 mt-1">
+                <span x-text="lowStockCount"></span> items are running low on stock. Review and reorder.
+            </p>
+        </div>
+        <button @click="showLowStockOnly = !showLowStockOnly" class="ml-auto px-3 py-1.5 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 text-sm font-medium">
+            <span x-text="showLowStockOnly ? 'Show All' : 'View Low Stock'"></span>
+        </button>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <!-- Table Header -->
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between gap-4">
+            <div class="flex-1 flex items-center gap-4">
+                <!-- Search -->
+                <div class="flex-1 max-w-md">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            x-model="searchQuery"
+                            @input="handleSearch"
+                            placeholder="Search stock items..."
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        />
+                        <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Group Filter -->
+                <select
+                    x-model="activeFilters.group"
+                    @change="applyFilters"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                    <option value="">All Groups</option>
+                    <option value="Raw Materials">Raw Materials</option>
+                    <option value="Finished Goods">Finished Goods</option>
+                    <option value="Work in Progress">Work in Progress</option>
+                    <option value="Consumables">Consumables</option>
+                    <option value="Trading Goods">Trading Goods</option>
+                </select>
+
+                <!-- Unit Filter -->
+                <select
+                    x-model="activeFilters.unit"
+                    @change="applyFilters"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                    <option value="">All Units</option>
+                    <option value="Nos">Nos</option>
+                    <option value="Kgs">Kgs</option>
+                    <option value="Ltrs">Ltrs</option>
+                    <option value="Mtr">Mtr</option>
+                    <option value="Box">Box</option>
+                </select>
+            </div>
+
+            <!-- Export -->
+            <button
+                @click="exportToExcel"
+                class="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium flex items-center gap-2"
+            >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Export Excel
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th @click="sortBy('name')" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                            <div class="flex items-center gap-2">
+                                <span>Name</span>
+                                <svg x-show="sortColumn === 'name'" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </div>
+                        </th>
+                        <th @click="sortBy('group')" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                            <div class="flex items-center gap-2">
+                                <span>Group</span>
+                                <svg x-show="sortColumn === 'group'" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </div>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Unit</th>
+                        <th @click="sortBy('rate')" class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                            <div class="flex items-center justify-end gap-2">
+                                <span>Rate</span>
+                                <svg x-show="sortColumn === 'rate'" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </div>
+                        </th>
+                        <th @click="sortBy('stock_qty')" class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                            <div class="flex items-center justify-end gap-2">
+                                <span>Stock Qty</span>
+                                <svg x-show="sortColumn === 'stock_qty'" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </div>
+                        </th>
+                        <th @click="sortBy('value')" class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                            <div class="flex items-center justify-end gap-2">
+                                <span>Value</span>
+                                <svg x-show="sortColumn === 'value'" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </div>
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <template x-for="(item, index) in paginatedData" :key="item.id">
+                        <tr
+                            @click="editStockItem(item)"
+                            @keydown.enter="editStockItem(item)"
+                            @keydown.arrow-down="focusNextRow($event, index)"
+                            @keydown.arrow-up="focusPrevRow($event, index)"
+                            tabindex="0"
+                            class="hover:bg-blue-50 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                            :class="item.stock_qty <= item.min_qty ? 'bg-yellow-50' : ''"
+                        >
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900" x-text="item.name"></td>
+                            <td class="px-6 py-4 text-sm text-gray-600" x-text="item.group"></td>
+                            <td class="px-6 py-4 text-sm text-gray-600" x-text="item.unit"></td>
+                            <td class="px-6 py-4 text-sm text-right text-gray-900" x-text="formatCurrency(item.rate)"></td>
+                            <td class="px-6 py-4 text-sm text-right font-medium" :class="item.stock_qty <= item.min_qty ? 'text-red-600' : 'text-gray-900'">
+                                <span x-text="item.stock_qty + ' ' + item.unit"></span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-right font-semibold text-gray-900" x-text="formatCurrency(item.value)"></td>
+                            <td class="px-6 py-4 text-sm text-center">
+                                <span x-show="item.stock_qty > item.min_qty" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                    In Stock
+                                </span>
+                                <span x-show="item.stock_qty <= item.min_qty && item.stock_qty > 0" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    Low Stock
+                                </span>
+                                <span x-show="item.stock_qty === 0" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                    Out of Stock
+                                </span>
+                            </td>
+                        </tr>
+                    </template>
+
+                    <!-- Empty State -->
+                    <tr x-show="filteredData.length === 0">
+                        <td colspan="7" class="px-6 py-12 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            </svg>
+                            <p class="mt-4 text-sm text-gray-600">No stock items found</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div x-show="filteredData.length > 10" class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div class="text-sm text-gray-600">
+                Showing <span x-text="((currentPage - 1) * 10) + 1"></span> to
+                <span x-text="Math.min(currentPage * 10, filteredData.length)"></span> of
+                <span x-text="filteredData.length"></span> items
+            </div>
+            <div class="flex gap-2">
+                <button
+                    @click="currentPage--"
+                    :disabled="currentPage === 1"
+                    class="px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                    Previous
+                </button>
+                <button
+                    @click="currentPage++"
+                    :disabled="currentPage === totalPages"
+                    class="px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function stockItemsTable() {
+    return {
+        // Sample data
+        stockItems: [
+            { id: 1, name: 'Steel Rods - 10mm', group: 'Raw Materials', unit: 'Kgs', rate: 55, stock_qty: 450, min_qty: 100, value: 24750 },
+            { id: 2, name: 'Cement - 50kg bags', group: 'Raw Materials', unit: 'Box', rate: 350, stock_qty: 85, min_qty: 50, value: 29750 },
+            { id: 3, name: 'Finished Product A', group: 'Finished Goods', unit: 'Nos', rate: 1200, stock_qty: 150, min_qty: 50, value: 180000 },
+            { id: 4, name: 'Paint - White', group: 'Consumables', unit: 'Ltrs', rate: 280, stock_qty: 25, min_qty: 30, value: 7000 },
+            { id: 5, name: 'Sandpaper Sheets', group: 'Consumables', unit: 'Nos', rate: 15, stock_qty: 0, min_qty: 100, value: 0 },
+            { id: 6, name: 'Wooden Planks', group: 'Raw Materials', unit: 'Nos', rate: 450, stock_qty: 200, min_qty: 50, value: 90000 },
+            { id: 7, name: 'Fabric - Cotton', group: 'Raw Materials', unit: 'Mtr', rate: 120, stock_qty: 18, min_qty: 20, value: 2160 },
+            { id: 8, name: 'Trading Item X', group: 'Trading Goods', unit: 'Nos', rate: 850, stock_qty: 75, min_qty: 25, value: 63750 },
+        ],
+
+        searchQuery: '',
+        sortColumn: 'name',
+        sortDirection: 'asc',
+        activeFilters: { group: '', unit: '' },
+        showLowStockOnly: false,
+        currentPage: 1,
+
+        get lowStockCount() {
+            return this.stockItems.filter(item => item.stock_qty <= item.min_qty).length;
+        },
+
+        get filteredData() {
+            let data = this.stockItems;
+
+            // Low stock filter
+            if (this.showLowStockOnly) {
+                data = data.filter(item => item.stock_qty <= item.min_qty);
+            }
+
+            // Search
+            if (this.searchQuery) {
+                const query = this.searchQuery.toLowerCase();
+                data = data.filter(item =>
+                    item.name.toLowerCase().includes(query)
+                );
+            }
+
+            // Filters
+            if (this.activeFilters.group) {
+                data = data.filter(item => item.group === this.activeFilters.group);
+            }
+            if (this.activeFilters.unit) {
+                data = data.filter(item => item.unit === this.activeFilters.unit);
+            }
+
+            // Sort
+            if (this.sortColumn) {
+                data = [...data].sort((a, b) => {
+                    const aVal = a[this.sortColumn];
+                    const bVal = b[this.sortColumn];
+                    const comparison = typeof aVal === 'number'
+                        ? aVal - bVal
+                        : String(aVal).localeCompare(String(bVal));
+                    return this.sortDirection === 'asc' ? comparison : -comparison;
+                });
+            }
+
+            return data;
+        },
+
+        get paginatedData() {
+            const start = (this.currentPage - 1) * 10;
+            return this.filteredData.slice(start, start + 10);
+        },
+
+        get totalPages() {
+            return Math.ceil(this.filteredData.length / 10);
+        },
+
+        handleSearch() {
+            this.currentPage = 1;
+        },
+
+        applyFilters() {
+            this.currentPage = 1;
+        },
+
+        sortBy(column) {
+            if (this.sortColumn === column) {
+                this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.sortColumn = column;
+                this.sortDirection = 'asc';
+            }
+        },
+
+        formatCurrency(value) {
+            return '₹' + value.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+        },
+
+        editStockItem(item) {
+            alert('Edit Stock Item: ' + item.name);
+            // Implement edit modal
+        },
+
+        createStockItem() {
+            alert('Create New Stock Item');
+            // Implement create modal
+        },
+
+        focusNextRow(event, index) {
+            event.preventDefault();
+            const rows = event.target.closest('tbody').querySelectorAll('tr');
+            if (rows[index + 1]) rows[index + 1].focus();
+        },
+
+        focusPrevRow(event, index) {
+            event.preventDefault();
+            const rows = event.target.closest('tbody').querySelectorAll('tr');
+            if (rows[index - 1]) rows[index - 1].focus();
+        },
+
+        exportToExcel() {
+            const headers = 'Name,Group,Unit,Rate,Stock Qty,Value';
+            const rows = this.filteredData.map(i =>
+                `"${i.name}","${i.group}","${i.unit}",${i.rate},${i.stock_qty},${i.value}`
+            ).join('\n');
+            const csv = headers + '\n' + rows;
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'stock-items.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+    };
+}
+</script>

@@ -1,0 +1,414 @@
+<!-- Generic Reusable Data Table Component -->
+<!-- Usage: Include this component and initialize with x-data="dataTable(config)" -->
+
+<template x-if="true" x-data>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <!-- Table Header with Search, Filters, and Export -->
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between gap-4">
+            <div class="flex-1 flex items-center gap-4">
+                <!-- Search -->
+                <div x-show="config.searchable" class="flex-1 max-w-md">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            x-model="searchQuery"
+                            @input="handleSearch"
+                            :placeholder="'Search ' + config.searchPlaceholder + '...'"
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        />
+                        <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Filter Dropdowns -->
+                <template x-for="filter in config.filters" :key="filter.key">
+                    <select
+                        x-model="activeFilters[filter.key]"
+                        @change="applyFilters"
+                        class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    >
+                        <option value="">All <span x-text="filter.label"></span></option>
+                        <template x-for="option in filter.options" :key="option.value">
+                            <option :value="option.value" x-text="option.label"></option>
+                        </template>
+                    </select>
+                </template>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2">
+                <!-- Batch Delete (if selection enabled) -->
+                <button
+                    x-show="config.batchDelete && selectedRows.length > 0"
+                    @click="handleBatchDelete"
+                    class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium flex items-center gap-2"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Delete <span x-text="selectedRows.length"></span>
+                </button>
+
+                <!-- Export to Excel -->
+                <button
+                    @click="exportToExcel"
+                    class="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium flex items-center gap-2"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Export Excel
+                </button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <!-- Selection checkbox -->
+                        <th x-show="config.selectable" class="px-4 py-3 w-12">
+                            <input
+                                type="checkbox"
+                                @change="toggleSelectAll"
+                                :checked="selectedRows.length === filteredData.length && filteredData.length > 0"
+                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                        </th>
+
+                        <!-- Column Headers -->
+                        <template x-for="column in config.columns" :key="column.key">
+                            <th
+                                class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                                :class="column.align === 'right' ? 'text-right' : (column.align === 'center' ? 'text-center' : 'text-left')"
+                                @click="sortBy(column.key)"
+                            >
+                                <div class="flex items-center gap-2" :class="column.align === 'right' ? 'justify-end' : ''">
+                                    <span x-text="column.label"></span>
+                                    <svg x-show="sortColumn === column.key" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                    </svg>
+                                </div>
+                            </th>
+                        </template>
+
+                        <!-- Actions column -->
+                        <th x-show="config.actions" class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <template x-for="(row, index) in paginatedData" :key="row[config.rowKey] || index">
+                        <tr
+                            @click="handleRowClick(row)"
+                            class="hover:bg-gray-50 transition-colors"
+                            :class="config.clickable ? 'cursor-pointer' : ''"
+                            @keydown.enter="handleRowClick(row)"
+                            @keydown.arrow-down="focusNextRow($event, index)"
+                            @keydown.arrow-up="focusPrevRow($event, index)"
+                            tabindex="0"
+                        >
+                            <!-- Selection checkbox -->
+                            <td x-show="config.selectable" class="px-4 py-4" @click.stop>
+                                <input
+                                    type="checkbox"
+                                    :checked="selectedRows.includes(row[config.rowKey])"
+                                    @change="toggleRowSelection(row[config.rowKey])"
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                            </td>
+
+                            <!-- Data Columns -->
+                            <template x-for="column in config.columns" :key="column.key">
+                                <td
+                                    class="px-6 py-4 text-sm"
+                                    :class="[
+                                        column.align === 'right' ? 'text-right' : (column.align === 'center' ? 'text-center' : 'text-left'),
+                                        column.className || 'text-gray-900'
+                                    ]"
+                                >
+                                    <span x-html="formatCell(row, column)"></span>
+                                </td>
+                            </template>
+
+                            <!-- Actions -->
+                            <td x-show="config.actions" class="px-6 py-4 text-right text-sm" @click.stop>
+                                <div class="flex justify-end gap-2">
+                                    <button
+                                        @click="handleEdit(row)"
+                                        class="text-blue-600 hover:text-blue-900 font-medium"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        @click="handleDelete(row)"
+                                        class="text-red-600 hover:text-red-900 font-medium"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+
+                    <!-- Empty State -->
+                    <tr x-show="filteredData.length === 0">
+                        <td :colspan="config.columns.length + (config.selectable ? 1 : 0) + (config.actions ? 1 : 0)" class="px-6 py-12 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <p class="mt-4 text-sm text-gray-600">No records found</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div x-show="config.pagination && filteredData.length > config.pageSize" class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div class="text-sm text-gray-600">
+                Showing <span x-text="((currentPage - 1) * config.pageSize) + 1"></span> to
+                <span x-text="Math.min(currentPage * config.pageSize, filteredData.length)"></span> of
+                <span x-text="filteredData.length"></span> entries
+            </div>
+            <div class="flex gap-2">
+                <button
+                    @click="currentPage--"
+                    :disabled="currentPage === 1"
+                    class="px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                    Previous
+                </button>
+                <template x-for="page in totalPages" :key="page">
+                    <button
+                        @click="currentPage = page"
+                        :class="currentPage === page ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+                        class="px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium"
+                        x-text="page"
+                    ></button>
+                </template>
+                <button
+                    @click="currentPage++"
+                    :disabled="currentPage === totalPages"
+                    class="px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+function dataTable(config) {
+    return {
+        config: {
+            data: [],
+            columns: [],
+            rowKey: 'id',
+            searchable: true,
+            searchPlaceholder: 'records',
+            sortable: true,
+            selectable: false,
+            clickable: true,
+            batchDelete: false,
+            actions: false,
+            pagination: true,
+            pageSize: 10,
+            filters: [],
+            onRowClick: null,
+            onEdit: null,
+            onDelete: null,
+            onBatchDelete: null,
+            ...config
+        },
+
+        // State
+        searchQuery: '',
+        sortColumn: '',
+        sortDirection: 'asc',
+        selectedRows: [],
+        activeFilters: {},
+        currentPage: 1,
+
+        // Computed
+        get filteredData() {
+            let data = this.config.data;
+
+            // Apply search
+            if (this.searchQuery) {
+                const query = this.searchQuery.toLowerCase();
+                data = data.filter(row => {
+                    return this.config.columns.some(col => {
+                        const value = this.getNestedValue(row, col.key);
+                        return value && String(value).toLowerCase().includes(query);
+                    });
+                });
+            }
+
+            // Apply filters
+            Object.keys(this.activeFilters).forEach(key => {
+                if (this.activeFilters[key]) {
+                    data = data.filter(row => {
+                        const value = this.getNestedValue(row, key);
+                        return value === this.activeFilters[key];
+                    });
+                }
+            });
+
+            // Apply sorting
+            if (this.sortColumn) {
+                data = [...data].sort((a, b) => {
+                    const aVal = this.getNestedValue(a, this.sortColumn);
+                    const bVal = this.getNestedValue(b, this.sortColumn);
+
+                    if (aVal === null || aVal === undefined) return 1;
+                    if (bVal === null || bVal === undefined) return -1;
+
+                    let comparison = 0;
+                    if (typeof aVal === 'number' && typeof bVal === 'number') {
+                        comparison = aVal - bVal;
+                    } else {
+                        comparison = String(aVal).localeCompare(String(bVal));
+                    }
+
+                    return this.sortDirection === 'asc' ? comparison : -comparison;
+                });
+            }
+
+            return data;
+        },
+
+        get paginatedData() {
+            if (!this.config.pagination) return this.filteredData;
+            const start = (this.currentPage - 1) * this.config.pageSize;
+            const end = start + this.config.pageSize;
+            return this.filteredData.slice(start, end);
+        },
+
+        get totalPages() {
+            return Math.ceil(this.filteredData.length / this.config.pageSize);
+        },
+
+        // Methods
+        getNestedValue(obj, path) {
+            return path.split('.').reduce((curr, prop) => curr?.[prop], obj);
+        },
+
+        formatCell(row, column) {
+            let value = this.getNestedValue(row, column.key);
+
+            if (column.format) {
+                return column.format(value, row);
+            }
+
+            if (value === null || value === undefined) {
+                return '-';
+            }
+
+            return value;
+        },
+
+        handleSearch() {
+            this.currentPage = 1;
+        },
+
+        applyFilters() {
+            this.currentPage = 1;
+        },
+
+        sortBy(columnKey) {
+            if (!this.config.sortable) return;
+
+            if (this.sortColumn === columnKey) {
+                this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.sortColumn = columnKey;
+                this.sortDirection = 'asc';
+            }
+        },
+
+        toggleSelectAll(event) {
+            if (event.target.checked) {
+                this.selectedRows = this.filteredData.map(row => row[this.config.rowKey]);
+            } else {
+                this.selectedRows = [];
+            }
+        },
+
+        toggleRowSelection(rowKey) {
+            const index = this.selectedRows.indexOf(rowKey);
+            if (index > -1) {
+                this.selectedRows.splice(index, 1);
+            } else {
+                this.selectedRows.push(rowKey);
+            }
+        },
+
+        handleRowClick(row) {
+            if (this.config.onRowClick) {
+                this.config.onRowClick(row);
+            }
+        },
+
+        handleEdit(row) {
+            if (this.config.onEdit) {
+                this.config.onEdit(row);
+            }
+        },
+
+        handleDelete(row) {
+            if (this.config.onDelete) {
+                this.config.onDelete(row);
+            }
+        },
+
+        handleBatchDelete() {
+            if (this.config.onBatchDelete) {
+                this.config.onBatchDelete(this.selectedRows);
+                this.selectedRows = [];
+            }
+        },
+
+        focusNextRow(event, index) {
+            event.preventDefault();
+            const rows = event.target.closest('tbody').querySelectorAll('tr');
+            if (rows[index + 1]) {
+                rows[index + 1].focus();
+            }
+        },
+
+        focusPrevRow(event, index) {
+            event.preventDefault();
+            const rows = event.target.closest('tbody').querySelectorAll('tr');
+            if (rows[index - 1]) {
+                rows[index - 1].focus();
+            }
+        },
+
+        exportToExcel() {
+            // Simple CSV export (can be enhanced with a library)
+            const headers = this.config.columns.map(col => col.label).join(',');
+            const rows = this.filteredData.map(row => {
+                return this.config.columns.map(col => {
+                    const value = this.getNestedValue(row, col.key);
+                    return `"${value || ''}"`;
+                }).join(',');
+            }).join('\n');
+
+            const csv = headers + '\n' + rows;
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'export.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+    };
+}
+</script>

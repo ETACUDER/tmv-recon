@@ -1,0 +1,430 @@
+<!-- Outstanding Bills Table Component -->
+<div x-data="outstandingBillsTable()" class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">Outstanding Bills</h2>
+            <p class="text-gray-600 mt-1">Track receivables and payables</p>
+        </div>
+        <button
+            @click="allocatePayment"
+            class="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center gap-2"
+        >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Allocate Payment
+        </button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <p class="text-sm font-medium text-gray-600">Total Outstanding</p>
+            <p class="text-2xl font-bold text-gray-900 mt-2" x-text="formatCurrency(totalOutstanding)"></p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-green-200 p-4">
+            <p class="text-sm font-medium text-green-600">Receivables</p>
+            <p class="text-2xl font-bold text-green-700 mt-2" x-text="formatCurrency(totalReceivables)"></p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-red-200 p-4">
+            <p class="text-sm font-medium text-red-600">Payables</p>
+            <p class="text-2xl font-bold text-red-700 mt-2" x-text="formatCurrency(totalPayables)"></p>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border border-orange-200 p-4">
+            <p class="text-sm font-medium text-orange-600">Overdue</p>
+            <p class="text-2xl font-bold text-orange-700 mt-2" x-text="formatCurrency(totalOverdue)"></p>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <!-- Table Header -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center gap-4 flex-wrap">
+                <!-- Search -->
+                <div class="flex-1 min-w-[250px]">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            x-model="searchQuery"
+                            @input="handleSearch"
+                            placeholder="Search by party or bill number..."
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        />
+                        <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Bill Type Filter -->
+                <select
+                    x-model="activeFilters.type"
+                    @change="applyFilters"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                    <option value="">All Bills</option>
+                    <option value="Receivable">Receivables</option>
+                    <option value="Payable">Payables</option>
+                </select>
+
+                <!-- Aging Bucket Filter -->
+                <select
+                    x-model="activeFilters.aging"
+                    @change="applyFilters"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                    <option value="">All Aging</option>
+                    <option value="current">Current (0-30 days)</option>
+                    <option value="30-60">30-60 days</option>
+                    <option value="60-90">60-90 days</option>
+                    <option value="90+">90+ days</option>
+                    <option value="overdue">Overdue Only</option>
+                </select>
+
+                <!-- Party Filter -->
+                <select
+                    x-model="activeFilters.party"
+                    @change="applyFilters"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                    <option value="">All Parties</option>
+                    <template x-for="party in uniqueParties" :key="party">
+                        <option :value="party" x-text="party"></option>
+                    </template>
+                </select>
+
+                <!-- Export -->
+                <button
+                    @click="exportToExcel"
+                    class="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium flex items-center gap-2"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Export
+                </button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th @click="sortBy('party')" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                            <div class="flex items-center gap-2">
+                                <span>Party</span>
+                                <svg x-show="sortColumn === 'party'" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </div>
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Bill Number</th>
+                        <th @click="sortBy('bill_date')" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                            <div class="flex items-center gap-2">
+                                <span>Bill Date</span>
+                                <svg x-show="sortColumn === 'bill_date'" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </div>
+                        </th>
+                        <th @click="sortBy('due_date')" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                            <div class="flex items-center gap-2">
+                                <span>Due Date</span>
+                                <svg x-show="sortColumn === 'due_date'" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </div>
+                        </th>
+                        <th @click="sortBy('amount')" class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                            <div class="flex items-center justify-end gap-2">
+                                <span>Amount</span>
+                                <svg x-show="sortColumn === 'amount'" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </div>
+                        </th>
+                        <th @click="sortBy('pending')" class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                            <div class="flex items-center justify-end gap-2">
+                                <span>Pending</span>
+                                <svg x-show="sortColumn === 'pending'" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </div>
+                        </th>
+                        <th @click="sortBy('overdue_days')" class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                            <div class="flex items-center justify-center gap-2">
+                                <span>Overdue Days</span>
+                                <svg x-show="sortColumn === 'overdue_days'" class="w-4 h-4" :class="sortDirection === 'asc' ? '' : 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </div>
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <template x-for="(bill, index) in paginatedData" :key="bill.id">
+                        <tr
+                            @click="viewBill(bill)"
+                            @keydown.enter="viewBill(bill)"
+                            @keydown.arrow-down="focusNextRow($event, index)"
+                            @keydown.arrow-up="focusPrevRow($event, index)"
+                            tabindex="0"
+                            class="hover:bg-blue-50 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                            :class="bill.overdue_days > 0 ? 'bg-red-50' : ''"
+                        >
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900" x-text="bill.party"></td>
+                            <td class="px-6 py-4 text-sm text-gray-600" x-text="bill.bill_number"></td>
+                            <td class="px-6 py-4 text-sm text-gray-600" x-text="formatDate(bill.bill_date)"></td>
+                            <td class="px-6 py-4 text-sm text-gray-600" x-text="formatDate(bill.due_date)"></td>
+                            <td class="px-6 py-4 text-sm text-right text-gray-900" x-text="formatCurrency(bill.amount)"></td>
+                            <td class="px-6 py-4 text-sm text-right font-semibold"
+                                :class="bill.type === 'Receivable' ? 'text-green-600' : 'text-red-600'"
+                                x-text="formatCurrency(bill.pending)">
+                            </td>
+                            <td class="px-6 py-4 text-sm text-center">
+                                <span x-show="bill.overdue_days > 0" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                                    :class="{
+                                        'bg-yellow-100 text-yellow-800': bill.overdue_days <= 30,
+                                        'bg-orange-100 text-orange-800': bill.overdue_days > 30 && bill.overdue_days <= 60,
+                                        'bg-red-100 text-red-800': bill.overdue_days > 60
+                                    }"
+                                    x-text="bill.overdue_days + ' days'">
+                                </span>
+                                <span x-show="bill.overdue_days === 0" class="text-gray-400">-</span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-center">
+                                <span
+                                    class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                                    :class="bill.type === 'Receivable' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                    x-text="bill.type"
+                                ></span>
+                            </td>
+                        </tr>
+                    </template>
+
+                    <!-- Empty State -->
+                    <tr x-show="filteredData.length === 0">
+                        <td colspan="8" class="px-6 py-12 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <p class="mt-4 text-sm text-gray-600">No outstanding bills found</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div x-show="filteredData.length > 15" class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div class="text-sm text-gray-600">
+                Showing <span x-text="((currentPage - 1) * 15) + 1"></span> to
+                <span x-text="Math.min(currentPage * 15, filteredData.length)"></span> of
+                <span x-text="filteredData.length"></span> bills
+            </div>
+            <div class="flex gap-2">
+                <button
+                    @click="currentPage--"
+                    :disabled="currentPage === 1"
+                    class="px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                    Previous
+                </button>
+                <button
+                    @click="currentPage++"
+                    :disabled="currentPage === totalPages"
+                    class="px-3 py-1 border border-gray-300 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function outstandingBillsTable() {
+    const today = new Date('2026-04-30');
+
+    return {
+        // Sample data
+        bills: [
+            { id: 1, party: 'ABC Customer Ltd', bill_number: 'INV-2026-001', bill_date: '2026-03-15', due_date: '2026-04-15', amount: 45000, pending: 45000, type: 'Receivable' },
+            { id: 2, party: 'XYZ Traders', bill_number: 'INV-2026-015', bill_date: '2026-04-10', due_date: '2026-05-10', amount: 28000, pending: 28000, type: 'Receivable' },
+            { id: 3, party: 'PQR Suppliers', bill_number: 'BILL-890', bill_date: '2026-02-20', due_date: '2026-03-22', amount: 35000, pending: 35000, type: 'Payable' },
+            { id: 4, party: 'MNO Enterprises', bill_number: 'INV-2026-020', bill_date: '2026-04-25', due_date: '2026-05-25', amount: 52000, pending: 52000, type: 'Receivable' },
+            { id: 5, party: 'LMN Services', bill_number: 'BILL-456', bill_date: '2026-03-05', due_date: '2026-04-05', amount: 18500, pending: 18500, type: 'Payable' },
+            { id: 6, party: 'DEF Corporation', bill_number: 'INV-2026-008', bill_date: '2026-04-20', due_date: '2026-05-20', amount: 67000, pending: 30000, type: 'Receivable' },
+            { id: 7, party: 'GHI Suppliers', bill_number: 'BILL-789', bill_date: '2026-01-15', due_date: '2026-02-15', amount: 42000, pending: 42000, type: 'Payable' },
+            { id: 8, party: 'JKL Industries', bill_number: 'INV-2026-025', bill_date: '2026-04-28', due_date: '2026-05-28', amount: 31000, pending: 31000, type: 'Receivable' },
+        ],
+
+        searchQuery: '',
+        sortColumn: 'due_date',
+        sortDirection: 'asc',
+        activeFilters: { type: '', aging: '', party: '' },
+        currentPage: 1,
+
+        init() {
+            // Calculate overdue days for each bill
+            this.bills.forEach(bill => {
+                const dueDate = new Date(bill.due_date);
+                const diffTime = today - dueDate;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                bill.overdue_days = diffDays > 0 ? diffDays : 0;
+            });
+        },
+
+        get uniqueParties() {
+            return [...new Set(this.bills.map(b => b.party))];
+        },
+
+        get totalOutstanding() {
+            return this.bills.reduce((sum, b) => sum + b.pending, 0);
+        },
+
+        get totalReceivables() {
+            return this.bills.filter(b => b.type === 'Receivable').reduce((sum, b) => sum + b.pending, 0);
+        },
+
+        get totalPayables() {
+            return this.bills.filter(b => b.type === 'Payable').reduce((sum, b) => sum + b.pending, 0);
+        },
+
+        get totalOverdue() {
+            return this.bills.filter(b => b.overdue_days > 0).reduce((sum, b) => sum + b.pending, 0);
+        },
+
+        get filteredData() {
+            let data = this.bills;
+
+            // Search
+            if (this.searchQuery) {
+                const query = this.searchQuery.toLowerCase();
+                data = data.filter(b =>
+                    b.party.toLowerCase().includes(query) ||
+                    b.bill_number.toLowerCase().includes(query)
+                );
+            }
+
+            // Filters
+            if (this.activeFilters.type) {
+                data = data.filter(b => b.type === this.activeFilters.type);
+            }
+
+            if (this.activeFilters.party) {
+                data = data.filter(b => b.party === this.activeFilters.party);
+            }
+
+            // Aging filter
+            if (this.activeFilters.aging) {
+                switch (this.activeFilters.aging) {
+                    case 'current':
+                        data = data.filter(b => b.overdue_days >= 0 && b.overdue_days <= 30);
+                        break;
+                    case '30-60':
+                        data = data.filter(b => b.overdue_days > 30 && b.overdue_days <= 60);
+                        break;
+                    case '60-90':
+                        data = data.filter(b => b.overdue_days > 60 && b.overdue_days <= 90);
+                        break;
+                    case '90+':
+                        data = data.filter(b => b.overdue_days > 90);
+                        break;
+                    case 'overdue':
+                        data = data.filter(b => b.overdue_days > 0);
+                        break;
+                }
+            }
+
+            // Sort
+            if (this.sortColumn) {
+                data = [...data].sort((a, b) => {
+                    const aVal = a[this.sortColumn];
+                    const bVal = b[this.sortColumn];
+                    const comparison = typeof aVal === 'number'
+                        ? aVal - bVal
+                        : String(aVal).localeCompare(String(bVal));
+                    return this.sortDirection === 'asc' ? comparison : -comparison;
+                });
+            }
+
+            return data;
+        },
+
+        get paginatedData() {
+            const start = (this.currentPage - 1) * 15;
+            return this.filteredData.slice(start, start + 15);
+        },
+
+        get totalPages() {
+            return Math.ceil(this.filteredData.length / 15);
+        },
+
+        handleSearch() {
+            this.currentPage = 1;
+        },
+
+        applyFilters() {
+            this.currentPage = 1;
+        },
+
+        sortBy(column) {
+            if (this.sortColumn === column) {
+                this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.sortColumn = column;
+                this.sortDirection = 'asc';
+            }
+        },
+
+        formatDate(date) {
+            return new Date(date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        },
+
+        formatCurrency(value) {
+            return '₹' + value.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+        },
+
+        viewBill(bill) {
+            alert('Allocate payment for: ' + bill.bill_number + ' - ' + bill.party);
+            // Open payment allocation modal
+        },
+
+        allocatePayment() {
+            alert('Open Payment Allocation Form');
+            // Implement payment allocation modal
+        },
+
+        focusNextRow(event, index) {
+            event.preventDefault();
+            const rows = event.target.closest('tbody').querySelectorAll('tr');
+            if (rows[index + 1]) rows[index + 1].focus();
+        },
+
+        focusPrevRow(event, index) {
+            event.preventDefault();
+            const rows = event.target.closest('tbody').querySelectorAll('tr');
+            if (rows[index - 1]) rows[index - 1].focus();
+        },
+
+        exportToExcel() {
+            const headers = 'Party,Bill Number,Bill Date,Due Date,Amount,Pending,Overdue Days,Type';
+            const rows = this.filteredData.map(b =>
+                `"${b.party}","${b.bill_number}","${b.bill_date}","${b.due_date}",${b.amount},${b.pending},${b.overdue_days},"${b.type}"`
+            ).join('\n');
+            const csv = headers + '\n' + rows;
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'outstanding-bills.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+    };
+}
+</script>

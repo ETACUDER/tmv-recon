@@ -579,6 +579,168 @@ class Database:
                 ).scalars().all()
             )
 
+    # Report functions
+    def get_day_book(
+        self, company_id: int, from_date: date, to_date: date
+    ) -> list[dict]:
+        """Generate day book report (chronological voucher listing).
+
+        Returns: List of vouchers with entries in date order.
+        """
+        with self.session() as session:
+            vouchers = session.execute(
+                select(Voucher)
+                .where(
+                    Voucher.company_id == company_id,
+                    Voucher.date >= from_date,
+                    Voucher.date <= to_date,
+                )
+                .order_by(Voucher.date.asc(), Voucher.id.asc())
+            ).scalars().all()
+
+            result = []
+            for voucher in vouchers:
+                entries = []
+                for entry in voucher.entries:
+                    entries.append({
+                        "ledger_name": entry.ledger.name,
+                        "debit": entry.amount if entry.is_debit else 0.0,
+                        "credit": entry.amount if not entry.is_debit else 0.0,
+                    })
+
+                result.append({
+                    "voucher_id": voucher.id,
+                    "voucher_number": voucher.voucher_number,
+                    "voucher_type": voucher.voucher_type.name,
+                    "date": voucher.date.isoformat(),
+                    "narration": voucher.narration,
+                    "entries": entries,
+                })
+
+            return result
+
+    def get_balance_sheet(self, company_id: int, as_of_date: date) -> dict:
+        """Generate balance sheet (assets vs liabilities).
+
+        Returns: Balance sheet with assets, liabilities, and capital.
+        """
+        with self.session() as session:
+            # Get all ledgers
+            ledgers = session.execute(select(Ledger)).scalars().all()
+
+            assets = []
+            liabilities = []
+            total_assets = 0.0
+            total_liabilities = 0.0
+
+            for ledger in ledgers:
+                # Calculate balance up to as_of_date
+                entries = session.execute(
+                    select(LedgerEntry)
+                    .join(Voucher)
+                    .where(
+                        LedgerEntry.ledger_id == ledger.id,
+                        Voucher.company_id == company_id,
+                        Voucher.date <= as_of_date,
+                    )
+                ).scalars().all()
+
+                debit_total = sum(e.amount for e in entries if e.is_debit)
+                credit_total = sum(e.amount for e in entries if not e.is_debit)
+                balance = ledger.opening_balance + debit_total - credit_total
+
+                if abs(balance) < 0.01:
+                    continue
+
+                ledger_data = {
+                    "ledger_name": ledger.name,
+                    "group": ledger.group.name,
+                    "amount": abs(balance),
+                }
+
+                if ledger.group.is_asset or (balance > 0 and not ledger.group.is_liability):
+                    assets.append(ledger_data)
+                    total_assets += abs(balance)
+                else:
+                    liabilities.append(ledger_data)
+                    total_liabilities += abs(balance)
+
+            return {
+                "as_of_date": as_of_date.isoformat(),
+                "assets": assets,
+                "liabilities": liabilities,
+                "total_assets": total_assets,
+                "total_liabilities": total_liabilities,
+                "difference": total_assets - total_liabilities,
+            }
+
+    def get_profit_loss(
+        self, company_id: int, from_date: date, to_date: date
+    ) -> dict:
+        """Generate profit & loss statement (income vs expenses).
+
+        Returns: P&L with income, expenses, and net profit/loss.
+        """
+        with self.session() as session:
+            ledgers = session.execute(select(Ledger)).scalars().all()
+
+            income = []
+            expenses = []
+            total_income = 0.0
+            total_expenses = 0.0
+
+            for ledger in ledgers:
+                # Skip non-P&L ledgers
+                if not (ledger.group.is_revenue or ledger.group.is_expense):
+                    continue
+
+                # Calculate for period
+                entries = session.execute(
+                    select(LedgerEntry)
+                    .join(Voucher)
+                    .where(
+                        LedgerEntry.ledger_id == ledger.id,
+                        Voucher.company_id == company_id,
+                        Voucher.date >= from_date,
+                        Voucher.date <= to_date,
+                    )
+                ).scalars().all()
+
+                debit_total = sum(e.amount for e in entries if e.is_debit)
+                credit_total = sum(e.amount for e in entries if not e.is_debit)
+
+                # Revenue: credit balance, Expense: debit balance
+                if ledger.group.is_revenue:
+                    amount = credit_total - debit_total
+                    if amount > 0.01:
+                        income.append({
+                            "ledger_name": ledger.name,
+                            "group": ledger.group.name,
+                            "amount": amount,
+                        })
+                        total_income += amount
+                elif ledger.group.is_expense:
+                    amount = debit_total - credit_total
+                    if amount > 0.01:
+                        expenses.append({
+                            "ledger_name": ledger.name,
+                            "group": ledger.group.name,
+                            "amount": amount,
+                        })
+                        total_expenses += amount
+
+            net_profit = total_income - total_expenses
+
+            return {
+                "from_date": from_date.isoformat(),
+                "to_date": to_date.isoformat(),
+                "income": income,
+                "expenses": expenses,
+                "total_income": total_income,
+                "total_expenses": total_expenses,
+                "net_profit": net_profit,
+            }
+
     # Seed data
     def seed_default_data(self):
         """Create default groups and voucher types."""

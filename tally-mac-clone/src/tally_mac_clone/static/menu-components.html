@@ -1,0 +1,275 @@
+<!-- Gateway Menu Components -->
+<!-- To be included in main index.html -->
+
+<!-- Top Menu Bar -->
+<div class="bg-white border-b border-gray-300 shadow-sm" x-data>
+    <div class="flex items-center px-4 py-0">
+        <!-- Gateway Menu Button -->
+        <div class="relative" data-menu>
+            <button
+                @click="$store.menu.openMenu('gateway')"
+                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors flex items-center gap-1"
+                :class="$store.menu.activeMenu === 'gateway' ? 'bg-gray-100' : ''">
+                Gateway
+                <span class="text-xs text-gray-500">(Alt+G)</span>
+            </button>
+
+            <!-- Gateway Dropdown -->
+            <div
+                x-show="$store.menu.activeMenu === 'gateway'"
+                x-transition:enter="transition ease-out duration-100"
+                x-transition:enter-start="transform opacity-0 scale-95"
+                x-transition:enter-end="transform opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-75"
+                x-transition:leave-start="transform opacity-100 scale-100"
+                x-transition:leave-end="transform opacity-0 scale-95"
+                class="absolute left-0 mt-0 w-72 bg-white border border-gray-300 shadow-lg z-50"
+                @click.away="$store.menu.closeMenus()">
+
+                <template x-for="item in $store.menu.getMenuItems()" :key="item.id">
+                    <div class="border-b border-gray-200 last:border-b-0">
+                        <!-- Menu Item with Submenu -->
+                        <div
+                            x-data="{ open: false }"
+                            class="relative">
+
+                            <!-- Main Menu Item -->
+                            <button
+                                @click="open = !open"
+                                class="w-full px-4 py-2.5 text-left text-sm hover:bg-blue-50 transition-colors flex items-center justify-between group">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium text-gray-900" x-text="item.label"></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        x-show="item.shortcut"
+                                        x-text="item.shortcut"
+                                        class="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded"></span>
+                                    <svg
+                                        class="w-4 h-4 text-gray-400 transition-transform"
+                                        :class="open ? 'rotate-90' : ''"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </div>
+                            </button>
+
+                            <!-- Submenu -->
+                            <div
+                                x-show="open"
+                                x-collapse
+                                class="bg-gray-50">
+                                <template x-for="subitem in item.submenu" :key="subitem.id">
+                                    <button
+                                        @click="$store.nav.navigateTo(subitem.view, subitem.label)"
+                                        class="w-full px-8 py-2 text-left text-sm hover:bg-blue-100 transition-colors flex items-center justify-between group">
+                                        <span class="text-gray-700 group-hover:text-blue-700" x-text="subitem.label"></span>
+                                        <span
+                                            x-show="subitem.shortcut"
+                                            x-text="subitem.shortcut"
+                                            class="text-xs text-gray-500 bg-white px-1.5 py-0.5 rounded border border-gray-300"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Additional Menu Buttons -->
+        <div class="relative" data-menu>
+            <button
+                @click="$store.menu.openMenu('masters')"
+                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors"
+                :class="$store.menu.activeMenu === 'masters' ? 'bg-gray-100' : ''">
+                Masters
+                <span class="text-xs text-gray-500">(Alt+K)</span>
+            </button>
+
+            <!-- Masters Dropdown -->
+            <div
+                x-show="$store.menu.activeMenu === 'masters'"
+                x-transition
+                class="absolute left-0 mt-0 w-64 bg-white border border-gray-300 shadow-lg z-50"
+                @click.away="$store.menu.closeMenus()">
+                <template x-for="subitem in $store.menu.structure.gateway.items.find(i => i.id === 'masters').submenu" :key="subitem.id">
+                    <button
+                        @click="$store.nav.navigateTo(subitem.view, subitem.label)"
+                        class="w-full px-4 py-2.5 text-left text-sm hover:bg-blue-50 transition-colors border-b border-gray-200 last:border-b-0">
+                        <span class="text-gray-700" x-text="subitem.label"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+
+        <div class="relative" data-menu>
+            <button
+                @click="$store.menu.openMenu('reports')"
+                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors"
+                :class="$store.menu.activeMenu === 'reports' ? 'bg-gray-100' : ''">
+                Reports
+                <span class="text-xs text-gray-500">(Alt+R)</span>
+            </button>
+
+            <!-- Reports Dropdown -->
+            <div
+                x-show="$store.menu.activeMenu === 'reports'"
+                x-transition
+                class="absolute left-0 mt-0 w-64 bg-white border border-gray-300 shadow-lg z-50"
+                @click.away="$store.menu.closeMenus()">
+                <template x-for="subitem in $store.menu.structure.gateway.items.find(i => i.id === 'reports').submenu" :key="subitem.id">
+                    <button
+                        @click="$store.nav.navigateTo(subitem.view, subitem.label)"
+                        class="w-full px-4 py-2.5 text-left text-sm hover:bg-blue-50 transition-colors border-b border-gray-200 last:border-b-0">
+                        <span class="text-gray-700" x-text="subitem.label"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+
+        <div class="relative" data-menu>
+            <button
+                @click="$store.menu.openMenu('import-export')"
+                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors"
+                :class="$store.menu.activeMenu === 'import-export' ? 'bg-gray-100' : ''">
+                Import/Export
+                <span class="text-xs text-gray-500">(Alt+X)</span>
+            </button>
+
+            <!-- Import/Export Dropdown -->
+            <div
+                x-show="$store.menu.activeMenu === 'import-export'"
+                x-transition
+                class="absolute left-0 mt-0 w-64 bg-white border border-gray-300 shadow-lg z-50"
+                @click.away="$store.menu.closeMenus()">
+                <template x-for="subitem in $store.menu.structure.gateway.items.find(i => i.id === 'import-export').submenu" :key="subitem.id">
+                    <button
+                        @click="$store.nav.navigateTo(subitem.view, subitem.label)"
+                        class="w-full px-4 py-2.5 text-left text-sm hover:bg-blue-50 transition-colors border-b border-gray-200 last:border-b-0">
+                        <span class="text-gray-700" x-text="subitem.label"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+
+        <div class="relative" data-menu>
+            <button
+                @click="$store.menu.openMenu('utilities')"
+                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors"
+                :class="$store.menu.activeMenu === 'utilities' ? 'bg-gray-100' : ''">
+                Utilities
+                <span class="text-xs text-gray-500">(Alt+U)</span>
+            </button>
+
+            <!-- Utilities Dropdown -->
+            <div
+                x-show="$store.menu.activeMenu === 'utilities'"
+                x-transition
+                class="absolute left-0 mt-0 w-64 bg-white border border-gray-300 shadow-lg z-50"
+                @click.away="$store.menu.closeMenus()">
+                <template x-for="subitem in $store.menu.structure.gateway.items.find(i => i.id === 'utilities').submenu" :key="subitem.id">
+                    <button
+                        @click="$store.nav.navigateTo(subitem.view, subitem.label)"
+                        class="w-full px-4 py-2.5 text-left text-sm hover:bg-blue-50 transition-colors border-b border-gray-200 last:border-b-0 flex items-center justify-between">
+                        <span class="text-gray-700" x-text="subitem.label"></span>
+                        <span
+                            x-show="subitem.shortcut"
+                            x-text="subitem.shortcut"
+                            class="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Breadcrumb Navigation -->
+<div class="bg-gray-50 border-b border-gray-200 px-4 py-2" x-data>
+    <div class="flex items-center gap-2 text-sm">
+        <template x-for="(crumb, index) in $store.nav.breadcrumbs" :key="index">
+            <div class="flex items-center gap-2">
+                <!-- Breadcrumb Item -->
+                <button
+                    @click="$store.nav.navigateBack(index)"
+                    class="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                    :class="index === $store.nav.breadcrumbs.length - 1 ? 'font-semibold text-gray-900 cursor-default hover:no-underline' : ''"
+                    x-text="crumb.label"></button>
+
+                <!-- Separator -->
+                <svg
+                    x-show="index < $store.nav.breadcrumbs.length - 1"
+                    class="w-4 h-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </div>
+        </template>
+
+        <!-- ESC hint -->
+        <div class="ml-auto flex items-center gap-2 text-xs text-gray-500">
+            <kbd class="px-2 py-1 bg-white border border-gray-300 rounded shadow-sm font-mono">ESC</kbd>
+            <span>to go back</span>
+        </div>
+    </div>
+</div>
+
+<!-- Status Bar / Shortcut Bar (Bottom) -->
+<div class="bg-gray-800 text-gray-200 px-4 py-2 text-xs" x-data>
+    <div class="flex items-center justify-between">
+        <!-- Left: Company & Year -->
+        <div class="flex items-center gap-4">
+            <span class="font-medium">RecordX.Finance</span>
+            <span class="text-gray-400">|</span>
+            <span>FY 2025-26</span>
+        </div>
+
+        <!-- Right: Function Key Shortcuts -->
+        <div class="flex items-center gap-3">
+            <button
+                @click="$store.nav.navigateTo('voucher-contra', 'Contra')"
+                class="hover:text-white transition-colors">
+                <kbd class="px-1.5 py-0.5 bg-gray-700 rounded">F4</kbd> Contra
+            </button>
+            <button
+                @click="$store.nav.navigateTo('voucher-payment', 'Payment')"
+                class="hover:text-white transition-colors">
+                <kbd class="px-1.5 py-0.5 bg-gray-700 rounded">F5</kbd> Payment
+            </button>
+            <button
+                @click="$store.nav.navigateTo('voucher-receipt', 'Receipt')"
+                class="hover:text-white transition-colors">
+                <kbd class="px-1.5 py-0.5 bg-gray-700 rounded">F6</kbd> Receipt
+            </button>
+            <button
+                @click="$store.nav.navigateTo('voucher-journal', 'Journal')"
+                class="hover:text-white transition-colors">
+                <kbd class="px-1.5 py-0.5 bg-gray-700 rounded">F7</kbd> Journal
+            </button>
+            <button
+                @click="$store.nav.navigateTo('voucher-sales', 'Sales')"
+                class="hover:text-white transition-colors">
+                <kbd class="px-1.5 py-0.5 bg-gray-700 rounded">F8</kbd> Sales
+            </button>
+            <button
+                @click="$store.nav.navigateTo('voucher-purchase', 'Purchase')"
+                class="hover:text-white transition-colors">
+                <kbd class="px-1.5 py-0.5 bg-gray-700 rounded">F9</kbd> Purchase
+            </button>
+            <button
+                @click="$store.nav.navigateTo('utilities-settings', 'Settings')"
+                class="hover:text-white transition-colors">
+                <kbd class="px-1.5 py-0.5 bg-gray-700 rounded">F12</kbd> Settings
+            </button>
+            <button
+                @click="$store.nav.goBack()"
+                class="hover:text-white transition-colors">
+                <kbd class="px-1.5 py-0.5 bg-gray-700 rounded">ESC</kbd> Back
+            </button>
+        </div>
+    </div>
+</div>

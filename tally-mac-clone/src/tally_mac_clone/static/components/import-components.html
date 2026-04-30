@@ -1,0 +1,423 @@
+<!-- Import/Export Components for RecordX.Finance -->
+
+<!-- Import Excel Main View -->
+<template x-if="$store.nav.currentView === 'import-excel'">
+    <div class="view-container">
+        <div class="view-header">
+            <h2>Import from Excel</h2>
+            <p class="view-description">Import ledgers, vouchers, groups, or stock items from Excel templates</p>
+        </div>
+
+        <div x-data="importExcel()" class="import-container">
+            <!-- Import Type Selection -->
+            <div class="form-section">
+                <label class="form-label">Import Type</label>
+                <select x-model="importType" class="form-input" @change="resetForm()">
+                    <option value="ledgers">Ledgers</option>
+                    <option value="groups">Groups</option>
+                    <option value="vouchers">Vouchers</option>
+                    <option value="stock-items">Stock Items</option>
+                </select>
+            </div>
+
+            <!-- Voucher Type (only for vouchers) -->
+            <div x-show="importType === 'vouchers'" class="form-section">
+                <label class="form-label">Voucher Type</label>
+                <select x-model="voucherType" class="form-input">
+                    <option value="Payment">Payment</option>
+                    <option value="Receipt">Receipt</option>
+                    <option value="Journal">Journal</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Purchase">Purchase</option>
+                    <option value="Contra">Contra</option>
+                </select>
+            </div>
+
+            <!-- Download Template -->
+            <div class="form-section">
+                <button @click="downloadTemplate()" class="btn btn-secondary" :disabled="loading">
+                    <span x-show="!downloading">📥 Download Template</span>
+                    <span x-show="downloading">Downloading...</span>
+                </button>
+            </div>
+
+            <!-- File Upload -->
+            <div class="form-section">
+                <label class="form-label">Select Excel File</label>
+                <input type="file" @change="handleFileSelect($event)" accept=".xlsx,.xls" class="form-input">
+            </div>
+
+            <!-- Preview/Validation -->
+            <div x-show="selectedFile" class="form-section">
+                <div class="file-preview">
+                    <strong>Selected File:</strong> <span x-text="selectedFile?.name"></span>
+                    <span x-text="`(${(selectedFile?.size / 1024).toFixed(2)} KB)`"></span>
+                </div>
+            </div>
+
+            <!-- Import Button -->
+            <div x-show="selectedFile" class="form-section">
+                <button @click="importFile()" class="btn btn-primary" :disabled="loading">
+                    <span x-show="!loading">📤 Import Data</span>
+                    <span x-show="loading">Importing...</span>
+                </button>
+            </div>
+
+            <!-- Progress -->
+            <div x-show="loading" class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" :style="`width: ${progress}%`"></div>
+                </div>
+                <p class="progress-text" x-text="progressText"></p>
+            </div>
+
+            <!-- Results -->
+            <div x-show="results" class="results-container">
+                <h3 class="results-title">Import Results</h3>
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Records:</span>
+                        <span class="stat-value" x-text="results?.total_records || results?.total_vouchers || 0"></span>
+                    </div>
+                    <div class="stat-item success">
+                        <span class="stat-label">Success:</span>
+                        <span class="stat-value" x-text="results?.success_count || 0"></span>
+                    </div>
+                    <div class="stat-item error">
+                        <span class="stat-label">Errors:</span>
+                        <span class="stat-value" x-text="results?.error_count || 0"></span>
+                    </div>
+                </div>
+
+                <!-- Error Details -->
+                <div x-show="results?.errors?.length > 0" class="error-list">
+                    <h4>Errors:</h4>
+                    <template x-for="error in results.errors" :key="error.row || error.voucher">
+                        <div class="error-item">
+                            <strong>Row/Voucher:</strong> <span x-text="error.row || error.voucher"></span>
+                            <br>
+                            <strong>Error:</strong> <span x-text="error.error"></span>
+                        </div>
+                    </template>
+                </div>
+
+                <button @click="resetForm()" class="btn btn-secondary">Import Another File</button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Bank Statement Import -->
+<template x-if="$store.nav.currentView === 'bank-statement'">
+    <div class="view-container">
+        <div class="view-header">
+            <h2>Import Bank Statement</h2>
+            <p class="view-description">Import and reconcile bank statements from CSV or Excel</p>
+        </div>
+
+        <div x-data="importBankStatement()" class="import-container">
+            <!-- Bank Ledger Selection -->
+            <div class="form-section">
+                <label class="form-label">Bank Ledger</label>
+                <select x-model="ledgerId" class="form-input" @change="loadLedgerDetails()">
+                    <option value="">Select Bank Ledger...</option>
+                    <template x-for="ledger in bankLedgers" :key="ledger.id">
+                        <option :value="ledger.id" x-text="ledger.name"></option>
+                    </template>
+                </select>
+            </div>
+
+            <!-- File Format -->
+            <div class="form-section">
+                <label class="form-label">File Format</label>
+                <select x-model="fileFormat" class="form-input">
+                    <option value="excel">Excel (.xlsx)</option>
+                    <option value="csv">CSV (.csv)</option>
+                </select>
+            </div>
+
+            <!-- File Upload -->
+            <div class="form-section">
+                <label class="form-label">Select Statement File</label>
+                <input type="file" @change="handleFileSelect($event)" :accept="fileFormat === 'csv' ? '.csv' : '.xlsx,.xls'" class="form-input">
+            </div>
+
+            <!-- Import Button -->
+            <div x-show="selectedFile && ledgerId" class="form-section">
+                <button @click="importStatement()" class="btn btn-primary" :disabled="loading">
+                    <span x-show="!loading">📤 Import & Reconcile</span>
+                    <span x-show="loading">Processing...</span>
+                </button>
+            </div>
+
+            <!-- Results -->
+            <div x-show="results" class="results-container">
+                <h3 class="results-title">Import Results</h3>
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Records:</span>
+                        <span class="stat-value" x-text="results?.total_records || 0"></span>
+                    </div>
+                    <div class="stat-item success">
+                        <span class="stat-label">Imported:</span>
+                        <span class="stat-value" x-text="results?.imported_count || 0"></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Auto-Matched:</span>
+                        <span class="stat-value" x-text="results?.matched_count || 0"></span>
+                    </div>
+                    <div class="stat-item warning">
+                        <span class="stat-label">Unmatched:</span>
+                        <span class="stat-value" x-text="results?.unmatched_count || 0"></span>
+                    </div>
+                </div>
+
+                <!-- Suggestions -->
+                <div x-show="results?.suggestions?.length > 0" class="suggestions-list">
+                    <h4>Ledger Suggestions for Unmatched Transactions:</h4>
+                    <template x-for="suggestion in results.suggestions" :key="suggestion.statement_id">
+                        <div class="suggestion-item">
+                            <div><strong>Description:</strong> <span x-text="suggestion.description"></span></div>
+                            <div><strong>Amount:</strong> <span x-text="suggestion.amount"></span></div>
+                            <div><strong>Suggested Ledger:</strong> <span x-text="suggestion.suggested_ledger"></span></div>
+                        </div>
+                    </template>
+                </div>
+
+                <button @click="resetForm()" class="btn btn-secondary">Import Another Statement</button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- XML Import (Tally Format) -->
+<template x-if="$store.nav.currentView === 'import-xml'">
+    <div class="view-container">
+        <div class="view-header">
+            <h2>Import Tally XML</h2>
+            <p class="view-description">Import vouchers from Tally XML format</p>
+        </div>
+
+        <div x-data="importXML()" class="import-container">
+            <!-- File Upload -->
+            <div class="form-section">
+                <label class="form-label">Select Tally XML File</label>
+                <input type="file" @change="handleFileSelect($event)" accept=".xml" class="form-input">
+            </div>
+
+            <!-- Company Selection -->
+            <div class="form-section">
+                <label class="form-label">Import to Company</label>
+                <select x-model="companyId" class="form-input">
+                    <template x-for="company in companies" :key="company.id">
+                        <option :value="company.id" x-text="company.name"></option>
+                    </template>
+                </select>
+            </div>
+
+            <!-- Import Button -->
+            <div x-show="selectedFile" class="form-section">
+                <button @click="importXML()" class="btn btn-primary" :disabled="loading">
+                    <span x-show="!loading">📤 Import Vouchers</span>
+                    <span x-show="loading">Processing...</span>
+                </button>
+            </div>
+
+            <!-- Results -->
+            <div x-show="results" class="results-container">
+                <h3 class="results-title">Import Results</h3>
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Vouchers:</span>
+                        <span class="stat-value" x-text="results?.total_vouchers || 0"></span>
+                    </div>
+                    <div class="stat-item success">
+                        <span class="stat-label">Success:</span>
+                        <span class="stat-value" x-text="results?.success_count || 0"></span>
+                    </div>
+                    <div class="stat-item error">
+                        <span class="stat-label">Errors:</span>
+                        <span class="stat-value" x-text="results?.error_count || 0"></span>
+                    </div>
+                </div>
+
+                <!-- Error Details -->
+                <div x-show="results?.errors?.length > 0" class="error-list">
+                    <h4>Errors:</h4>
+                    <template x-for="error in results.errors" :key="error.voucher">
+                        <div class="error-item">
+                            <strong>Voucher:</strong> <span x-text="error.voucher"></span>
+                            <br>
+                            <strong>Error:</strong> <span x-text="error.error"></span>
+                        </div>
+                    </template>
+                </div>
+
+                <button @click="resetForm()" class="btn btn-secondary">Import Another File</button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style>
+.import-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-section {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.file-preview {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.progress-container {
+    margin: 20px 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 30px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+.results-container {
+    margin-top: 30px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.results-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.results-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #007bff;
+}
+
+.stat-item.success {
+    border-left-color: #28a745;
+}
+
+.stat-item.error {
+    border-left-color: #dc3545;
+}
+
+.stat-item.warning {
+    border-left-color: #ffc107;
+}
+
+.stat-label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+.error-list, .suggestions-list {
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 6px;
+}
+
+.error-item, .suggestion-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    background: white;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #0056b3;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #545b62;
+}
+</style>
