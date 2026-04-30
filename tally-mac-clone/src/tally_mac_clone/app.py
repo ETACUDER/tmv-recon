@@ -121,6 +121,28 @@ class ExchangeRateCreate(BaseModel):
     rate: float
 
 
+class BillCreate(BaseModel):
+    ledger_id: int
+    bill_number: str
+    bill_date: str
+    due_date: str
+    amount: float
+    bill_type: str
+    voucher_id: int
+
+
+class BillAllocationCreate(BaseModel):
+    voucher_id: int
+    allocations: List[dict]
+
+
+class AgingReportRequest(BaseModel):
+    ledger_id: Optional[int] = None
+    group_name: Optional[str] = None
+    as_of_date: Optional[str] = None
+    buckets: Optional[str] = None
+
+
 # Initialize database on startup
 @app.on_event("startup")
 async def startup_event():
@@ -383,6 +405,87 @@ async def list_companies():
             }
             for c in companies
         ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/companies/{company_id}")
+async def get_company(company_id: int):
+    """Get company details."""
+    try:
+        company = db.get_company(company_id)
+        if not company:
+            raise HTTPException(status_code=404, detail="Company not found")
+
+        return {
+            "id": company.id,
+            "name": company.name,
+            "financial_year_start": company.financial_year_start.isoformat(),
+            "books_beginning_from": company.books_beginning_from.isoformat() if company.books_beginning_from else None,
+            "maintain_accounts_only": company.maintain_accounts_only,
+            "mailing_name": company.mailing_name,
+            "address": company.address,
+            "state": company.state,
+            "country": company.country,
+            "pincode": company.pincode,
+            "phone": company.phone,
+            "email": company.email,
+            "website": company.website,
+            "pan": company.pan,
+            "gstin": company.gstin,
+            "gst_registration_type": company.gst_registration_type,
+            "tan": company.tan,
+            "cin": company.cin,
+            "maintain_bill_wise": company.maintain_bill_wise,
+            "use_cost_centers": company.use_cost_centers,
+            "enable_multi_currency": company.enable_multi_currency,
+            "maintain_payroll": company.maintain_payroll,
+            "maintain_inventory": company.maintain_inventory,
+            "enable_gst": company.enable_gst,
+            "base_currency_id": company.base_currency_id,
+            "base_currency": {
+                "id": company.base_currency.id,
+                "code": company.base_currency.code,
+                "symbol": company.base_currency.symbol,
+                "name": company.base_currency.name,
+            } if company.base_currency else None,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.patch("/api/companies/{company_id}")
+async def update_company(company_id: int, request: Request):
+    """Update company details."""
+    try:
+        data = await request.json()
+        updated = db.update_company(company_id, **data)
+        if not updated:
+            raise HTTPException(status_code=404, detail="Company not found")
+
+        return {
+            "id": updated.id,
+            "name": updated.name,
+            "message": f"Company '{updated.name}' updated successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/companies/{company_id}/settings")
+async def get_company_settings(company_id: int):
+    """Get company configuration."""
+    try:
+        settings = db.get_company_settings(company_id)
+        if not settings:
+            raise HTTPException(status_code=404, detail="Company not found")
+        return settings
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -793,6 +896,130 @@ async def get_exchange_rate(currency: str, date: str):
         }
     except HTTPException:
         raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Bill-wise details endpoints
+@app.post("/api/bills")
+async def create_bill(bill: BillCreate):
+    """Create bill for receivable/payable tracking."""
+    try:
+        bill_date = datetime.strptime(bill.bill_date, "%Y-%m-%d").date()
+        due_date = datetime.strptime(bill.due_date, "%Y-%m-%d").date()
+
+        created = db.create_bill(
+            ledger_id=bill.ledger_id,
+            bill_number=bill.bill_number,
+            bill_date=bill_date,
+            due_date=due_date,
+            amount=bill.amount,
+            bill_type=bill.bill_type,
+            voucher_id=bill.voucher_id,
+        )
+        return {
+            "id": created.id,
+            "bill_number": created.bill_number,
+            "bill_date": created.bill_date.isoformat(),
+            "due_date": created.due_date.isoformat(),
+            "original_amount": created.original_amount,
+            "pending_amount": created.pending_amount,
+            "bill_type": created.bill_type,
+            "message": f"Bill {created.bill_number} created successfully"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/bills/outstanding")
+async def get_outstanding_bills(ledger_id: int, as_of_date: Optional[str] = None):
+    """Get outstanding bills for a ledger."""
+    try:
+        as_of = None
+        if as_of_date:
+            as_of = datetime.strptime(as_of_date, "%Y-%m-%d").date()
+
+        bills = db.get_outstanding_bills(ledger_id, as_of)
+        return {
+            "ledger_id": ledger_id,
+            "as_of_date": as_of.isoformat() if as_of else date.today().isoformat(),
+            "total_bills": len(bills),
+            "total_pending": sum(b["pending_amount"] for b in bills),
+            "bills": bills,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/bills/allocate")
+async def allocate_payment(allocation: BillAllocationCreate):
+    """Allocate payment/receipt to bills."""
+    try:
+        created = db.allocate_payment_to_bills(
+            voucher_id=allocation.voucher_id,
+            allocations=allocation.allocations,
+        )
+        return {
+            "voucher_id": allocation.voucher_id,
+            "allocated_count": len(created),
+            "allocations": [
+                {
+                    "id": alloc.id,
+                    "bill_id": alloc.bill_id,
+                    "allocated_amount": alloc.allocated_amount,
+                    "allocation_date": alloc.allocation_date.isoformat(),
+                }
+                for alloc in created
+            ],
+            "message": f"Allocated payment to {len(created)} bills"
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/bills/aging")
+async def get_aging_report(
+    ledger_id: Optional[int] = None,
+    group: Optional[str] = None,
+    as_of_date: Optional[str] = None,
+    buckets: Optional[str] = None,
+):
+    """Generate aging report for receivables/payables.
+
+    Query params:
+    - ledger_id: Specific ledger ID (optional)
+    - group: Group name like 'Sundry Debtors' (optional)
+    - as_of_date: Calculate aging as of date (default: today)
+    - buckets: Comma-separated ranges like '0-30,31-60,61-90,91-180,181+' (default)
+    """
+    try:
+        as_of = None
+        if as_of_date:
+            as_of = datetime.strptime(as_of_date, "%Y-%m-%d").date()
+
+        aging_buckets = None
+        if buckets:
+            # Parse buckets like "0-30,31-60,61-90,91+"
+            aging_buckets = []
+            for bucket in buckets.split(","):
+                if "+" in bucket:
+                    start = int(bucket.replace("+", ""))
+                    aging_buckets.append((start, 9999))
+                else:
+                    parts = bucket.split("-")
+                    aging_buckets.append((int(parts[0]), int(parts[1])))
+
+        report = db.get_aging_report(
+            ledger_id=ledger_id,
+            group_name=group,
+            as_of_date=as_of,
+            aging_buckets=aging_buckets,
+        )
+        return report
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

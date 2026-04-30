@@ -7,9 +7,9 @@ from sqlalchemy import create_engine, select, func
 from sqlalchemy.orm import Session, sessionmaker
 
 from .models import (
-    Base, Company, Group, Ledger, VoucherType, Voucher, LedgerEntry,
+    Base, Company, Group, Ledger, VoucherType, VoucherTypeConfig, Voucher, LedgerEntry,
     CostCenter, CostCenterAllocation, BankReconciliation, Cheque, BankStatement,
-    Currency, ExchangeRate
+    Currency, ExchangeRate, Bill, BillAllocation
 )
 
 
@@ -36,9 +36,62 @@ class Database:
             session.close()
 
     # Company CRUD
-    def create_company(self, name: str, financial_year_start: date) -> Company:
+    def create_company(
+        self,
+        name: str,
+        financial_year_start: date,
+        books_beginning_from: Optional[date] = None,
+        tally_vault_password: Optional[str] = None,
+        maintain_accounts_only: bool = False,
+        mailing_name: Optional[str] = None,
+        address: Optional[str] = None,
+        state: Optional[str] = None,
+        country: str = "India",
+        pincode: Optional[str] = None,
+        phone: Optional[str] = None,
+        email: Optional[str] = None,
+        website: Optional[str] = None,
+        pan: Optional[str] = None,
+        gstin: Optional[str] = None,
+        gst_registration_type: Optional[str] = None,
+        tan: Optional[str] = None,
+        cin: Optional[str] = None,
+        maintain_bill_wise: bool = True,
+        use_cost_centers: bool = False,
+        enable_multi_currency: bool = False,
+        maintain_payroll: bool = False,
+        maintain_inventory: bool = False,
+        enable_gst: bool = True,
+        base_currency_id: Optional[int] = None,
+    ) -> Company:
         with self.session() as session:
-            company = Company(name=name, financial_year_start=financial_year_start)
+            company = Company(
+                name=name,
+                financial_year_start=financial_year_start,
+                books_beginning_from=books_beginning_from or financial_year_start,
+                tally_vault_password=tally_vault_password,
+                maintain_accounts_only=maintain_accounts_only,
+                mailing_name=mailing_name,
+                address=address,
+                state=state,
+                country=country,
+                pincode=pincode,
+                phone=phone,
+                email=email,
+                website=website,
+                pan=pan,
+                gstin=gstin,
+                gst_registration_type=gst_registration_type,
+                tan=tan,
+                cin=cin,
+                maintain_bill_wise=maintain_bill_wise,
+                use_cost_centers=use_cost_centers,
+                enable_multi_currency=enable_multi_currency,
+                maintain_payroll=maintain_payroll,
+                maintain_inventory=maintain_inventory,
+                enable_gst=enable_gst,
+                base_currency_id=base_currency_id,
+            )
             session.add(company)
             session.flush()
             session.refresh(company)
@@ -46,11 +99,79 @@ class Database:
 
     def get_company(self, company_id: int) -> Optional[Company]:
         with self.session() as session:
-            return session.get(Company, company_id)
+            from sqlalchemy.orm import joinedload
+            company = session.execute(
+                select(Company)
+                .options(joinedload(Company.base_currency))
+                .where(Company.id == company_id)
+            ).unique().scalar_one_or_none()
+            return company
 
     def list_companies(self) -> list[Company]:
         with self.session() as session:
             return list(session.execute(select(Company)).scalars().all())
+
+    def update_company(self, company_id: int, **kwargs) -> Optional[Company]:
+        """Update company details with provided kwargs."""
+        with self.session() as session:
+            company = session.get(Company, company_id)
+            if not company:
+                return None
+
+            for key, value in kwargs.items():
+                if hasattr(company, key):
+                    setattr(company, key, value)
+
+            session.flush()
+            session.refresh(company)
+            return company
+
+    def get_company_settings(self, company_id: int) -> Optional[dict]:
+        """Get company configuration as dict."""
+        with self.session() as session:
+            from sqlalchemy.orm import joinedload
+            company = session.execute(
+                select(Company)
+                .options(joinedload(Company.base_currency))
+                .where(Company.id == company_id)
+            ).unique().scalar_one_or_none()
+
+            if not company:
+                return None
+
+            return {
+                "id": company.id,
+                "name": company.name,
+                "financial_year_start": company.financial_year_start.isoformat(),
+                "books_beginning_from": company.books_beginning_from.isoformat() if company.books_beginning_from else None,
+                "maintain_accounts_only": company.maintain_accounts_only,
+                "mailing_name": company.mailing_name,
+                "address": company.address,
+                "state": company.state,
+                "country": company.country,
+                "pincode": company.pincode,
+                "phone": company.phone,
+                "email": company.email,
+                "website": company.website,
+                "pan": company.pan,
+                "gstin": company.gstin,
+                "gst_registration_type": company.gst_registration_type,
+                "tan": company.tan,
+                "cin": company.cin,
+                "maintain_bill_wise": company.maintain_bill_wise,
+                "use_cost_centers": company.use_cost_centers,
+                "enable_multi_currency": company.enable_multi_currency,
+                "maintain_payroll": company.maintain_payroll,
+                "maintain_inventory": company.maintain_inventory,
+                "enable_gst": company.enable_gst,
+                "base_currency_id": company.base_currency_id,
+                "base_currency": {
+                    "id": company.base_currency.id,
+                    "code": company.base_currency.code,
+                    "symbol": company.base_currency.symbol,
+                    "name": company.base_currency.name,
+                } if company.base_currency else None,
+            }
 
     # Group CRUD
     def create_group(
@@ -461,11 +582,46 @@ class Database:
     # Seed data
     def seed_default_data(self):
         """Create default groups and voucher types."""
-        # Default voucher types
-        voucher_types = ["Sales", "Purchase", "Receipt", "Payment", "Journal", "Contra"]
-        for vtype_name in voucher_types:
-            if not self.get_voucher_type_by_name(vtype_name):
-                self.create_voucher_type(vtype_name)
+        # All 16 Tally voucher types with their configurations
+        voucher_type_configs = [
+            {"name": "Sales", "method": "Invoice", "inventory": True, "banking": False, "prefix": "S"},
+            {"name": "Purchase", "method": "Invoice", "inventory": True, "banking": False, "prefix": "P"},
+            {"name": "Payment", "method": "Banking", "inventory": False, "banking": True, "prefix": "PAY"},
+            {"name": "Receipt", "method": "Banking", "inventory": False, "banking": True, "prefix": "RCP"},
+            {"name": "Journal", "method": "Regular", "inventory": False, "banking": False, "prefix": "JV"},
+            {"name": "Contra", "method": "Banking", "inventory": False, "banking": True, "prefix": "CON"},
+            {"name": "Credit Note", "method": "Invoice", "inventory": True, "banking": False, "prefix": "CN"},
+            {"name": "Debit Note", "method": "Invoice", "inventory": True, "banking": False, "prefix": "DN"},
+            {"name": "Delivery Note", "method": "Inventory", "inventory": True, "banking": False, "prefix": "DEL"},
+            {"name": "Receipt Note", "method": "Inventory", "inventory": True, "banking": False, "prefix": "RN"},
+            {"name": "Rejection In", "method": "Inventory", "inventory": True, "banking": False, "prefix": "REJ-IN"},
+            {"name": "Rejection Out", "method": "Inventory", "inventory": True, "banking": False, "prefix": "REJ-OUT"},
+            {"name": "Stock Journal", "method": "Inventory", "inventory": True, "banking": False, "prefix": "STK"},
+            {"name": "Physical Stock", "method": "Inventory", "inventory": True, "banking": False, "prefix": "PS"},
+            {"name": "Memorandum", "method": "Inventory", "inventory": True, "banking": False, "prefix": "MEM"},
+            {"name": "Reversing Journal", "method": "Regular", "inventory": False, "banking": False, "prefix": "RJ"},
+        ]
+
+        for vtype_config in voucher_type_configs:
+            vtype = self.get_voucher_type_by_name(vtype_config["name"])
+            if not vtype:
+                vtype = self.create_voucher_type(vtype_config["name"])
+
+            # Create config if not exists
+            with self.session() as session:
+                existing_config = session.execute(
+                    select(VoucherTypeConfig).where(VoucherTypeConfig.voucher_type_id == vtype.id)
+                ).scalar_one_or_none()
+
+                if not existing_config:
+                    config = VoucherTypeConfig(
+                        voucher_type_id=vtype.id,
+                        method_of_voucher=vtype_config["method"],
+                        requires_inventory=vtype_config["inventory"],
+                        requires_banking=vtype_config["banking"],
+                        numbering_series_prefix=vtype_config["prefix"],
+                    )
+                    session.add(config)
 
         # Default groups (Tally standard)
         default_groups = [
@@ -485,6 +641,241 @@ class Database:
         for group_data in default_groups:
             if not self.get_group_by_name(group_data["name"]):
                 self.create_group(**group_data)
+
+    # Bill CRUD
+    def create_bill(
+        self,
+        ledger_id: int,
+        bill_number: str,
+        bill_date: date,
+        due_date: date,
+        amount: float,
+        bill_type: str,
+        voucher_id: int,
+    ) -> Bill:
+        """Create bill for receivable/payable tracking.
+
+        Args:
+            ledger_id: Party ledger (debtor/creditor)
+            bill_number: Invoice/bill reference number
+            bill_date: Bill date
+            due_date: Payment due date
+            amount: Bill amount
+            bill_type: 'Receivable' or 'Payable'
+            voucher_id: Source voucher (Sales/Purchase)
+        """
+        with self.session() as session:
+            bill = Bill(
+                ledger_id=ledger_id,
+                bill_number=bill_number,
+                bill_date=bill_date,
+                due_date=due_date,
+                original_amount=amount,
+                pending_amount=amount,
+                bill_type=bill_type,
+                created_from_voucher_id=voucher_id,
+            )
+            session.add(bill)
+            session.flush()
+            session.refresh(bill)
+            return bill
+
+    def allocate_payment_to_bills(
+        self, voucher_id: int, allocations: list[dict]
+    ) -> list[BillAllocation]:
+        """Allocate payment/receipt to outstanding bills.
+
+        Args:
+            voucher_id: Payment/Receipt voucher
+            allocations: [{"bill_id": int, "amount": float}, ...]
+
+        Returns:
+            List of created allocations
+        """
+        with self.session() as session:
+            voucher = session.get(Voucher, voucher_id)
+            if not voucher:
+                raise ValueError(f"Voucher {voucher_id} not found")
+
+            created_allocations = []
+            for alloc_data in allocations:
+                bill = session.get(Bill, alloc_data["bill_id"])
+                if not bill:
+                    raise ValueError(f"Bill {alloc_data['bill_id']} not found")
+
+                amount = alloc_data["amount"]
+                if amount > bill.pending_amount:
+                    raise ValueError(
+                        f"Allocation amount {amount} exceeds pending amount {bill.pending_amount} for bill {bill.bill_number}"
+                    )
+
+                # Create allocation
+                allocation = BillAllocation(
+                    bill_id=bill.id,
+                    voucher_id=voucher_id,
+                    allocated_amount=amount,
+                    allocation_date=voucher.date,
+                )
+                session.add(allocation)
+
+                # Update pending amount
+                bill.pending_amount -= amount
+
+                created_allocations.append(allocation)
+
+            session.flush()
+            for alloc in created_allocations:
+                session.refresh(alloc)
+
+            return created_allocations
+
+    def get_outstanding_bills(
+        self, ledger_id: int, as_of_date: Optional[date] = None
+    ) -> list[dict]:
+        """Get outstanding bills for a ledger.
+
+        Args:
+            ledger_id: Party ledger ID
+            as_of_date: Calculate outstanding as of this date (default: today)
+
+        Returns:
+            List of outstanding bills with aging info
+        """
+        if as_of_date is None:
+            as_of_date = date.today()
+
+        with self.session() as session:
+            bills = session.execute(
+                select(Bill)
+                .where(
+                    Bill.ledger_id == ledger_id,
+                    Bill.pending_amount > 0.01,
+                    Bill.bill_date <= as_of_date,
+                )
+                .order_by(Bill.bill_date.asc())
+            ).scalars().all()
+
+            result = []
+            for bill in bills:
+                days_outstanding = (as_of_date - bill.bill_date).days
+                days_overdue = (as_of_date - bill.due_date).days if as_of_date > bill.due_date else 0
+
+                result.append({
+                    "bill_id": bill.id,
+                    "bill_number": bill.bill_number,
+                    "bill_date": bill.bill_date.isoformat(),
+                    "due_date": bill.due_date.isoformat(),
+                    "bill_type": bill.bill_type,
+                    "original_amount": bill.original_amount,
+                    "pending_amount": bill.pending_amount,
+                    "days_outstanding": days_outstanding,
+                    "days_overdue": max(0, days_overdue),
+                    "status": "overdue" if days_overdue > 0 else "current",
+                })
+
+            return result
+
+    def get_aging_report(
+        self,
+        ledger_id: Optional[int] = None,
+        group_name: Optional[str] = None,
+        as_of_date: Optional[date] = None,
+        aging_buckets: list[tuple[int, int]] = None,
+    ) -> dict:
+        """Generate aging report for receivables/payables.
+
+        Args:
+            ledger_id: Specific ledger (optional)
+            group_name: Group name like 'Sundry Debtors' (optional)
+            as_of_date: Calculate aging as of this date (default: today)
+            aging_buckets: [(0, 30), (31, 60), (61, 90), (91, 180), (181, 9999)]
+
+        Returns:
+            Aging summary with buckets
+        """
+        if as_of_date is None:
+            as_of_date = date.today()
+
+        if aging_buckets is None:
+            aging_buckets = [
+                (0, 30),
+                (31, 60),
+                (61, 90),
+                (91, 180),
+                (181, 9999),
+            ]
+
+        with self.session() as session:
+            # Build query
+            query = select(Bill).where(
+                Bill.pending_amount > 0.01,
+                Bill.bill_date <= as_of_date,
+            )
+
+            if ledger_id:
+                query = query.where(Bill.ledger_id == ledger_id)
+            elif group_name:
+                query = (
+                    query.join(Ledger)
+                    .join(Group)
+                    .where(Group.name == group_name)
+                )
+
+            bills = session.execute(query).scalars().all()
+
+            # Initialize buckets
+            bucket_labels = []
+            for start, end in aging_buckets:
+                if end >= 9999:
+                    bucket_labels.append(f"{start}+")
+                else:
+                    bucket_labels.append(f"{start}-{end}")
+
+            buckets = {label: {"count": 0, "amount": 0.0} for label in bucket_labels}
+            total_outstanding = 0.0
+            bill_details = []
+
+            # Categorize bills
+            for bill in bills:
+                days_outstanding = (as_of_date - bill.bill_date).days
+                total_outstanding += bill.pending_amount
+
+                # Find bucket
+                bucket_label = None
+                for i, (start, end) in enumerate(aging_buckets):
+                    if start <= days_outstanding <= end:
+                        bucket_label = bucket_labels[i]
+                        break
+
+                if bucket_label:
+                    buckets[bucket_label]["count"] += 1
+                    buckets[bucket_label]["amount"] += bill.pending_amount
+
+                bill_details.append({
+                    "ledger_name": bill.ledger.name,
+                    "bill_number": bill.bill_number,
+                    "bill_date": bill.bill_date.isoformat(),
+                    "due_date": bill.due_date.isoformat(),
+                    "pending_amount": bill.pending_amount,
+                    "days_outstanding": days_outstanding,
+                    "bucket": bucket_label,
+                })
+
+            return {
+                "as_of_date": as_of_date.isoformat(),
+                "total_outstanding": total_outstanding,
+                "total_bills": len(bills),
+                "buckets": [
+                    {
+                        "range": label,
+                        "count": buckets[label]["count"],
+                        "amount": buckets[label]["amount"],
+                        "percentage": (buckets[label]["amount"] / total_outstanding * 100) if total_outstanding > 0 else 0,
+                    }
+                    for label in bucket_labels
+                ],
+                "bills": bill_details,
+            }
 
 
 # Global database instance

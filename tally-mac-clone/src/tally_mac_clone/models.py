@@ -40,6 +40,40 @@ class Company(Base):
         DateTime, nullable=False, default=datetime.utcnow
     )
 
+    # Financial settings
+    books_beginning_from: Mapped[Optional[Date]] = mapped_column(Date, nullable=True)
+    tally_vault_password: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    maintain_accounts_only: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    # Company details
+    mailing_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    address: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    state: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    country: Mapped[str] = mapped_column(String(100), default="India", nullable=False)
+    pincode: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    phone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    website: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    # Tax registration
+    pan: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    gstin: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    gst_registration_type: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    tan: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    cin: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
+
+    # Feature flags
+    maintain_bill_wise: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    use_cost_centers: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    enable_multi_currency: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    maintain_payroll: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    maintain_inventory: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    enable_gst: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+    # Base currency
+    base_currency_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("currencies.id"), nullable=True)
+    base_currency: Mapped[Optional["Currency"]] = relationship("Currency", foreign_keys=[base_currency_id])
+
     # Relationships
     vouchers: Mapped[list["Voucher"]] = relationship(
         "Voucher", back_populates="company", cascade="all, delete-orphan"
@@ -94,7 +128,7 @@ class Ledger(Base):
 
 
 class VoucherType(Base):
-    """Voucher types: Sales, Purchase, Receipt, Payment, Journal, Contra."""
+    """Voucher types: all 16 Tally voucher types."""
 
     __tablename__ = "voucher_types"
 
@@ -105,10 +139,36 @@ class VoucherType(Base):
     vouchers: Mapped[list["Voucher"]] = relationship(
         "Voucher", back_populates="voucher_type", cascade="all, delete-orphan"
     )
+    config: Mapped[Optional["VoucherTypeConfig"]] = relationship(
+        "VoucherTypeConfig", back_populates="voucher_type", uselist=False, cascade="all, delete-orphan"
+    )
+
+
+class VoucherTypeConfig(Base):
+    """Configuration for voucher types (method, numbering, requirements)."""
+
+    __tablename__ = "voucher_type_configs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    voucher_type_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("voucher_types.id"), nullable=False, unique=True
+    )
+    method_of_voucher: Mapped[str] = mapped_column(
+        String(50), default="Regular", nullable=False
+    )  # Regular, Invoice, Inventory, Banking
+    requires_inventory: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    requires_banking: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    numbering_series_prefix: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow
+    )
+
+    # Relationships
+    voucher_type: Mapped["VoucherType"] = relationship("VoucherType", back_populates="config")
 
 
 class Voucher(Base):
-    """Tally voucher (transaction document)."""
+    """Tally voucher (transaction document) supporting all 16 voucher types."""
 
     __tablename__ = "vouchers"
 
@@ -131,10 +191,49 @@ class Voucher(Base):
         DateTime, nullable=False, default=datetime.utcnow
     )
 
+    # Inventory fields (Sales, Purchase, Delivery Notes, Receipt Notes, Rejection In/Out)
+    affects_inventory: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    # Banking fields (Payment, Receipt, Contra)
+    affects_bank: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    bank_ledger_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("ledgers.id"), nullable=True
+    )
+
+    # Transport fields (Delivery Note, Receipt Note)
+    transport_mode: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    vehicle_number: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    carrier_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    dispatch_date: Mapped[Optional[Date]] = mapped_column(Date, nullable=True)
+
+    # Due date (Sales on credit)
+    due_date: Mapped[Optional[Date]] = mapped_column(Date, nullable=True)
+
+    # Reference fields (Credit Note, Debit Note, Reversing Journal)
+    original_voucher_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("vouchers.id"), nullable=True
+    )
+    reversal_date: Mapped[Optional[Date]] = mapped_column(Date, nullable=True)
+    adjustment_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Stock transfer (Stock Journal)
+    from_godown: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    to_godown: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    # Job work (Memorandum vouchers)
+    is_job_work: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    job_work_out: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)  # True=out, False=in
+
     # Relationships
     voucher_type: Mapped["VoucherType"] = relationship("VoucherType", back_populates="vouchers")
     company: Mapped["Company"] = relationship("Company", back_populates="vouchers")
     currency: Mapped[Optional["Currency"]] = relationship("Currency")
+    bank_ledger: Mapped[Optional["Ledger"]] = relationship(
+        "Ledger", foreign_keys=[bank_ledger_id]
+    )
+    original_voucher: Mapped[Optional["Voucher"]] = relationship(
+        "Voucher", remote_side=[id], foreign_keys=[original_voucher_id]
+    )
     entries: Mapped[list["LedgerEntry"]] = relationship(
         "LedgerEntry", back_populates="voucher", cascade="all, delete-orphan"
     )
@@ -337,3 +436,46 @@ class BankStatement(Base):
     # Relationships
     bank_ledger: Mapped["Ledger"] = relationship("Ledger", backref="bank_statements")
     matched_voucher: Mapped[Optional["Voucher"]] = relationship("Voucher", backref="bank_statement_matches")
+
+
+class Bill(Base):
+    """Bill details for party ledgers (receivable/payable tracking)."""
+
+    __tablename__ = "bills"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    ledger_id: Mapped[int] = mapped_column(Integer, ForeignKey("ledgers.id"), nullable=False)
+    bill_number: Mapped[str] = mapped_column(String(100), nullable=False)
+    bill_date: Mapped[Date] = mapped_column(Date, nullable=False)
+    due_date: Mapped[Date] = mapped_column(Date, nullable=False)
+    original_amount: Mapped[float] = mapped_column(Float, nullable=False)
+    pending_amount: Mapped[float] = mapped_column(Float, nullable=False)
+    bill_type: Mapped[str] = mapped_column(String(20), nullable=False)  # Receivable, Payable
+    created_from_voucher_id: Mapped[int] = mapped_column(Integer, ForeignKey("vouchers.id"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow
+    )
+
+    # Relationships
+    ledger: Mapped["Ledger"] = relationship("Ledger", backref="bills")
+    source_voucher: Mapped["Voucher"] = relationship("Voucher", foreign_keys=[created_from_voucher_id], backref="created_bills")
+    allocations: Mapped[list["BillAllocation"]] = relationship("BillAllocation", back_populates="bill", cascade="all, delete-orphan")
+
+
+class BillAllocation(Base):
+    """Allocation of payment/receipt against bills."""
+
+    __tablename__ = "bill_allocations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    bill_id: Mapped[int] = mapped_column(Integer, ForeignKey("bills.id"), nullable=False)
+    voucher_id: Mapped[int] = mapped_column(Integer, ForeignKey("vouchers.id"), nullable=False)
+    allocated_amount: Mapped[float] = mapped_column(Float, nullable=False)
+    allocation_date: Mapped[Date] = mapped_column(Date, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow
+    )
+
+    # Relationships
+    bill: Mapped["Bill"] = relationship("Bill", back_populates="allocations")
+    voucher: Mapped["Voucher"] = relationship("Voucher", backref="bill_allocations")
