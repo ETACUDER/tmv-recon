@@ -52,11 +52,36 @@ def main() -> int:
     sub = sub[sub["Invoice #"].notna()]
 
     for col in [
-        "Net Amount", "Tax Amount", "Tax Amount.1", "Gross Amount",
-        "Settlement Amount", "Discount Amount",
+        "Net Amount", "Gross Amount", "Settlement Amount", "Discount Amount",
         "Adjustment(Room Charge/Extra Charges)",
     ]:
         sub[col] = pd.to_numeric(sub.get(col), errors="coerce").fillna(0.0)
+
+    # EZee exports up to 4 (Tax Name, Tax %, Tax Amount) triples per row.
+    # When invoices are edited, the tax can move from .0/.1 to .2/.3.
+    # Sum per-row tax amounts into row-level CGST/SGST/IGST buckets using
+    # the Tax Name label to allocate.
+    tax_pairs = []
+    for suf in ("", ".1", ".2", ".3"):
+        name_col, amt_col = f"Tax Name{suf}", f"Tax Amount{suf}"
+        if name_col in sub.columns and amt_col in sub.columns:
+            tax_pairs.append((name_col, amt_col))
+
+    def _bucket(row: pd.Series) -> tuple[float, float, float]:
+        cgst = sgst = igst = 0.0
+        for name_col, amt_col in tax_pairs:
+            label = str(row.get(name_col) or "").upper()
+            amt = pd.to_numeric(row.get(amt_col), errors="coerce")
+            if pd.isna(amt) or amt == 0:
+                continue
+            if "CGST" in label: cgst += float(amt)
+            elif "SGST" in label: sgst += float(amt)
+            elif "IGST" in label: igst += float(amt)
+        return cgst, sgst, igst
+
+    tax_rows = sub.apply(_bucket, axis=1, result_type="expand")
+    tax_rows.columns = ["_cgst", "_sgst", "_igst"]
+    sub = pd.concat([sub, tax_rows], axis=1)
 
     def first_non_null(s: pd.Series) -> str:
         for v in s:
@@ -80,38 +105,29 @@ def main() -> int:
         travel_agent=("Travel Agent", first_non_null),
         business_source=("Business Source", first_non_null),
         net_amount=("Net Amount", "sum"),
-        cgst=("Tax Amount", "sum"),
-        sgst=("Tax Amount.1", "sum"),
+        # Sum the LABEL-categorised tax buckets across all 4 EZee tax columns,
+        # not just Tax Amount / Tax Amount.1.
+        cgst=("_cgst", "sum"),
+        sgst=("_sgst", "sum"),
+        igst=("_igst", "sum"),
         gross_amount=("Gross Amount", "sum"),
         discount=("Discount Amount", "sum"),
         adjustment=("Adjustment(Room Charge/Extra Charges)", "sum"),
         settlement_amount=("Settlement Amount", lambda s: float(s[s < 0].abs().sum())),
         settlement_mode=("Settlement/Particular", first_non_null),
     ).reset_index()
+    if grouped["igst"].sum() > 0.5:
+        print(f"  ! IGST detected on {(grouped['igst']>0.5).sum()} invoices "
+              f"(₹{grouped['igst'].sum():,.2f}) — emitter currently only "
+              f"handles CGST+SGST; review before importing.")
     grouped["earliest_pay_date"] = grouped["Invoice #"].map(earliest_pay)
     # bill_opens_with: "journal" if any payment Txn Date < Invoice date, else "sales"
     has_advance = grouped["earliest_pay_date"].notna() & (grouped["earliest_pay_date"] < grouped["invoice_date"])
     grouped["bill_opens_with"] = has_advance.map({True: "journal", False: "sales"})
     grouped["earliest_event_date"] = grouped[["invoice_date", "earliest_pay_date"]].min(axis=1)
 
-    grouped["calc_gross"] = grouped["net_amount"] + grouped["cgst"] + grouped["sgst"]
+    grouped["calc_gross"] = grouped["net_amount"] + grouped["cgst"] + grouped["sgst"] + grouped["igst"]
     grouped["diff"] = (grouped["calc_gross"] - grouped["gross_amount"]).round(2)
-
-    # EZee export quirk fix: some invoices have labelled CGST/SGST rates but
-    # zero amounts, while Gross still includes the tax inline (e.g. invoices
-    # 87/88/89 in Apr 2026: net 6666.66 + gross 6999.98, but tax columns 0).
-    # When net+cgst+sgst < gross by >0.5, redistribute the missing tax as
-    # cgst = sgst = (gross - net) / 2. Otherwise voucher won't balance.
-    missing = (grouped["calc_gross"] - grouped["gross_amount"]).abs() > 0.5
-    needs_fix = missing & (grouped["cgst"] + grouped["sgst"] < 0.5) & (grouped["gross_amount"] > grouped["net_amount"])
-    if needs_fix.any():
-        n = int(needs_fix.sum())
-        half_tax = (grouped.loc[needs_fix, "gross_amount"] - grouped.loc[needs_fix, "net_amount"]) / 2
-        grouped.loc[needs_fix, "cgst"] = half_tax.round(2)
-        grouped.loc[needs_fix, "sgst"] = half_tax.round(2)
-        grouped["calc_gross"] = grouped["net_amount"] + grouped["cgst"] + grouped["sgst"]
-        grouped["diff"] = (grouped["calc_gross"] - grouped["gross_amount"]).round(2)
-        print(f"  ! derived CGST/SGST from Gross-Net for {n} invoice(s) (EZee tax-amount zero quirk)")
     # Total Payable: what the customer actually owes after discount/adjustment.
     # Drives Sundry Debtors AMOUNT and bill-allocation face value on Sales voucher.
     grouped["total_payable"] = (
