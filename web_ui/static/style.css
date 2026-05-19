@@ -124,6 +124,19 @@ code { background: var(--panel-2); padding: 1px 4px; border-radius: 3px; font-si
 
 .flow-step { display:flex; gap:12px; align-items:flex-start; background: var(--panel); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
 .flow-step-num { width:24px; height:24px; border-radius:50%; background: var(--accent); color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex:0 0 24px; }
+
+/* simplified wizard layout */
+.card-section { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; margin-bottom: 18px; }
+.card-section h2 { margin: 0 0 10px; display: flex; align-items: center; gap: 10px; }
+.step-pill { display:inline-flex; align-items:center; justify-content:center; width: 26px; height: 26px; border-radius:50%; background: var(--accent); color:#fff; font-size: 13px; font-weight: 700; }
+.details-block { margin-bottom: 8px; }
+.details-block summary { color: var(--accent); font-size: 13px; padding: 6px 0; }
+.progress-list { list-style: none; padding-left: 4px; margin-top: 14px; }
+.progress-list li { padding: 6px 0 6px 28px; position: relative; }
+.progress-list li::before { content: "○"; position: absolute; left: 4px; color: var(--muted); }
+.progress-list li.active::before { content: "◐"; color: var(--accent); }
+.progress-list li.done::before   { content: "✓"; color: var(--good); }
+.progress-list li.fail::before   { content: "✗"; color: var(--bad); }
 .flow-step p { margin: 4px 0 0; font-size: 12.5px; }
 .flow-arrow { text-align:center; color: var(--muted); font-size: 14px; }
 

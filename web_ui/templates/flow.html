@@ -10,29 +10,27 @@
 
 <main class="flow-page">
   <h2>How the monthly run works</h2>
-  <p class="muted">EZee Transaction Detail Report comes in. Two canonical CSVs and two verbose Tally XMLs come out. Every run is preserved per-month so you can re-import any prior month at any time.</p>
+  <p class="muted">One EZee Transaction Detail Report comes in. Two canonical CSVs and three Tally XMLs come out. The <strong>combined XML</strong> is the one you import into Tally — it interleaves Sales + Journal vouchers per invoice in the correct chronological order so every bill reference resolves on first import.</p>
 
   <div class="flow-grid">
     <!-- INPUT -->
     <div class="flow-col">
       <h3 class="flow-h">INPUT</h3>
-
       <div class="flow-card">
         <div class="flow-card-tag">.xlsx</div>
         <div class="flow-card-title">EZee Transaction Detail Report</div>
         <div class="flow-card-desc">
-          One file covering one month of stays.
-          ~1,500–2,000 rows of mixed Charge / Tax / Settlement lines per ~500 invoices.
+          One file covering one month of stays. ~1,500–2,000 line-item rows per ~500 invoices.
+          Each invoice has multiple rows: room charges, taxes, settlements.
         </div>
         <details class="flow-details">
-          <summary>56 columns expected</summary>
+          <summary>56 columns expected (key ones)</summary>
           <div class="flow-cols">
             <code>Invoice #</code>
             <code>Invoice date</code>
             <code>Transaction Date</code>
             <code>Guest Name</code>
             <code>Business Source</code>
-            <code>Transaction</code>
             <code>Net Amount</code>
             <code>Tax Amount</code>
             <code>Tax Amount.1</code>
@@ -41,8 +39,7 @@
             <code>Adjustment(Room Charge/Extra Charges)</code>
             <code>Settlement/Particular</code>
             <code>Settlement Amount</code>
-            <code>Reference #</code>
-            <code>+ 41 more</code>
+            <code>+ 43 more</code>
           </div>
         </details>
       </div>
@@ -56,34 +53,39 @@
         <div class="flow-step-num">1</div>
         <div>
           <strong>Aggregate</strong>
-          <p class="muted">Group raw line-items by <code>Invoice #</code>. Sum Net + CGST + SGST + Gross. Compute <code>Total Payable = Gross − Discount − Adjustment</code>. Pre-pass writes <code>bill_opens_with</code> (sales|journal) per invoice based on whether any payment predates the invoice date.</p>
+          <p class="muted">Group raw rows by <code>Invoice #</code>, sum Net + CGST + SGST + Gross. Compute <code>Total Payable = Gross − Discount − Adjustment</code>. Pre-pass writes <code>bill_opens_with</code> ∈ {<em>sales</em>, <em>journal</em>} per invoice — <em>journal</em> if any payment <code>Transaction Date</code> &lt; <code>Invoice date</code> (advance receipt scenario).</p>
         </div>
       </div>
-      <div class="flow-arrow">↓</div>
 
       <div class="flow-step">
         <div class="flow-step-num">2</div>
         <div>
-          <strong>Render Sales voucher</strong>
-          <p class="muted">One verbose Tally Sales voucher per invoice. Dr <code>Sundry Debtors</code> at Total Payable (New Ref if Sales is the earliest event, Agst Ref if an advance opened the bill). Cr SALE ACCOMODATION GST @ X% + CGST + SGST. ROUND OFF Dr absorbs Discount/Adjustment.</p>
+          <strong>Extract payments</strong>
+          <p class="muted">Walk rows where <code>Settlement Amount ≠ 0</code>. One canonical row per payment line (split payments produce multiple rows). Captures the actual <code>Transaction Date</code> the money moved.</p>
         </div>
       </div>
-      <div class="flow-arrow">↓</div>
 
       <div class="flow-step">
         <div class="flow-step-num">3</div>
         <div>
-          <strong>Extract payments</strong>
-          <p class="muted">Walk raw rows where <code>Settlement Amount ≠ 0</code>. One canonical row per payment line (split payments allowed). Captures the actual <code>Transaction Date</code> the money moved.</p>
+          <strong>Render Sales voucher</strong> (per invoice)
+          <p class="muted">Dr <code>Sundry Debtors</code> at <em>Total Payable</em>. Cr <code>SALE ACCOMODATION GST @ X%</code> + <code>CGST</code> + <code>SGST</code>. <code>ROUND OFF</code> Dr absorbs Discount/Adjustment. <strong>Bill type on Sundry Debtors depends on bill_opens_with</strong>: New Ref if Sales is the earliest event, Agst Ref if a Journal opened the bill first.</p>
         </div>
       </div>
-      <div class="flow-arrow">↓</div>
 
       <div class="flow-step">
         <div class="flow-step-num">4</div>
         <div>
-          <strong>Render Journal voucher</strong>
-          <p class="muted">One Journal per payment split, dated by Transaction Date. Dr payment ledger (per mode map), Cr <code>Sundry Debtors</code> via Agst Ref (or New Ref if this is the earliest event on the invoice — advance receipt). ROUND OFF Cr/Dr absorbs <code>Settlement − Total Payable</code> on the last split.</p>
+          <strong>Render Journal voucher</strong> (per payment split)
+          <p class="muted">Dated by <code>Transaction Date</code> (not Invoice date). Dr payment ledger (per mode map). Cr <code>Sundry Debtors</code> at the bill's outstanding balance (or remaining-payable on splits). Earliest split for an <em>advance-receipt</em> invoice opens with <strong>New Ref</strong>; all other Sundry Debtors entries are <strong>Agst Ref</strong>. <code>ROUND OFF</code> Cr/Dr on the last split absorbs <code>Settlement − Total Payable</code>.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-step-num">5</div>
+        <div>
+          <strong>★ Combined XML</strong>
+          <p class="muted">All Sales + Journal vouchers in ONE envelope, ordered per-invoice chronologically. For advance-receipt invoices: Journal-opener fires first, then Sales consumes, then any subsequent Journal splits settle. Tally processes in document order — no "missing reference" warnings. <strong>This is the file to import.</strong></p>
         </div>
       </div>
     </div>
@@ -95,7 +97,7 @@
       <div class="flow-card">
         <div class="flow-card-tag">canonical</div>
         <div class="flow-card-title">invoice.csv</div>
-        <div class="flow-card-desc">One row per invoice. ~17 columns including Total Payable + bill_opens_with.</div>
+        <div class="flow-card-desc">One row per invoice. Columns include Total Payable, earliest_event_date, bill_opens_with.</div>
       </div>
 
       <div class="flow-card">
@@ -104,25 +106,37 @@
         <div class="flow-card-desc">One row per payment split. Invoice #, mode, settlement amount, Transaction Date.</div>
       </div>
 
-      <div class="flow-card flow-emit">
-        <div class="flow-card-tag">Tally XML</div>
-        <div class="flow-card-title">sales.xml.gz</div>
-        <div class="flow-card-desc">UTF-16 LE+BOM. ~50 KB / voucher. Native Tally export schema (~200 fields per voucher).</div>
+      <div class="flow-card flow-emit" style="border-width:2px;">
+        <div class="flow-card-tag">★ import this</div>
+        <div class="flow-card-title">combined.xml.gz</div>
+        <div class="flow-card-desc">UTF-16 LE+BOM. Sales + Journal interleaved per invoice in chronological order. ~3-4 MB gzipped (~50 MB uncompressed).</div>
       </div>
 
       <div class="flow-card flow-emit">
         <div class="flow-card-tag">Tally XML</div>
-        <div class="flow-card-title">journal.xml.gz</div>
-        <div class="flow-card-desc">UTF-16 LE+BOM. ~37 KB / voucher. With full bill-allocation chain.</div>
+        <div class="flow-card-title">sales.xml.gz / journal.xml.gz</div>
+        <div class="flow-card-desc">Separate emissions if you prefer importing in two passes. Sales must go first; Journal must go second. The combined version exists because both-orderings break for the 95% advance-receipt cases.</div>
       </div>
 
       <div class="flow-card flow-emit">
         <div class="flow-card-tag">archive</div>
         <div class="flow-card-title">bundle.zip</div>
-        <div class="flow-card-desc">All of the above for one-click download.</div>
+        <div class="flow-card-desc">All artifacts of the run + run.json (totals, sha256s, operator, status). Per-month versioned.</div>
       </div>
     </div>
   </div>
+
+  <h2 class="mt-lg">Bill-allocation rule (dynamic, per invoice)</h2>
+  <div class="ledger-grid">
+    <table class="data">
+      <thead><tr><th>Scenario</th><th>bill_opens_with</th><th>Sales SD</th><th>Earliest Journal SD</th><th>Other Journal SDs</th></tr></thead>
+      <tbody>
+        <tr><td>All payments on/after Invoice date</td><td><code>sales</code></td><td><strong>New Ref</strong></td><td>Agst Ref</td><td>Agst Ref</td></tr>
+        <tr><td>Any payment before Invoice date (advance)</td><td><code>journal</code></td><td>Agst Ref</td><td><strong>New Ref</strong></td><td>Agst Ref</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="muted" style="margin-top:8px;">April 2026 reference: 12 invoices opened by Sales, 494 by Journal advance receipt.</p>
 
   <h2 class="mt-lg">Ledger map</h2>
   <div class="ledger-grid">
@@ -134,13 +148,14 @@
         <tr><td>12%</td><td><code>SALE ACCOMODATION GST @ 12%</code></td></tr>
         <tr><td>18%</td><td><code>SALE ACCOMODATION GST @ 18%</code></td></tr>
       </table>
+      <p class="muted" style="font-size:12px;margin-top:4px;">Note the 5% variant has spaces both sides of <code>%</code>; the 12% and 18% variants don't. Byte-exact match required.</p>
     </div>
     <div>
-      <h3 class="flow-h">Payment mode → ledger</h3>
+      <h3 class="flow-h">Payment mode → ledger + Dr bill alloc</h3>
       <table class="data">
-        <tr><th>Settlement</th><th>Tally ledger</th><th>Bill alloc</th></tr>
-        <tr><td>Cash</td><td><code>SANDEEP SHARMA IMP A/C.</code></td><td>none</td></tr>
-        <tr><td>UPI / Card</td><td><code>CARD / UPI / PAYTM / G PAY</code></td><td>New Ref</td></tr>
+        <tr><th>Settlement</th><th>Tally ledger</th><th>Dr side bill</th></tr>
+        <tr><td>Cash</td><td><code>SANDEEP SHARMA IMP A/C.</code></td><td>none (bill-wise off)</td></tr>
+        <tr><td>UPI / Credit / Debit</td><td><code>CARD / UPI / PAYTM / G PAY</code></td><td>New Ref</td></tr>
         <tr><td>Agoda</td><td><code>AGODA SDR</code></td><td>New Ref</td></tr>
         <tr><td>Booking.com</td><td><code>BOOKING.COM SDR</code></td><td>New Ref</td></tr>
         <tr><td>Goibibo</td><td><code>GOIBIBO / MAKE MY TRIP</code></td><td>New Ref</td></tr>
@@ -148,14 +163,24 @@
     </div>
   </div>
 
-  <h2 class="mt-lg">Settlement guarantee</h2>
-  <p class="muted">After both XMLs import (in order: Sales → Journal), <strong>Sundry Debtors closes to ₹0 per invoice</strong>. Any paid-vs-billed micro-rounding (typically a few paise per month) lands in the <code>ROUND OFF</code> ledger as a clean income/expense entry. Source of truth for full accounting logic: <a href="https://github.com/ETACUDER/tmv-recon/blob/main/docs/monthly-voucher-flow.md" target="_blank">docs/monthly-voucher-flow.md</a>.</p>
+  <h2 class="mt-lg">Round Off ledger semantics</h2>
+  <p class="muted">Two distinct ROUND OFF entries exist per invoice (only when non-zero):</p>
+  <ul class="muted">
+    <li><strong>Sales voucher:</strong> Dr <code>ROUND OFF</code> = Gross − Total Payable (absorbs EZee Discount/Adjustment, treated as loss).</li>
+    <li><strong>Journal voucher</strong> (last split): Cr <code>ROUND OFF</code> if Settlement &gt; Total Payable (we got paid more — gain), or Dr if less (loss).</li>
+  </ul>
+  <p class="muted">For April 2026: Dr Round Off 0.22 (Sales-side losses) + Cr Round Off 0.44 (Journal-side gains) = net <strong>+₹0.22 income</strong> for the month.</p>
 
-  <h2 class="mt-lg">Import order into Tally</h2>
+  <h2 class="mt-lg">Settlement guarantee</h2>
+  <p class="muted">After the combined XML imports, <strong>Sundry Debtors closes to ₹0 per invoice</strong>. Any paid-vs-billed micro-rounding is captured in <code>ROUND OFF</code> as a clean income/expense entry. Source of truth: <a href="https://github.com/ETACUDER/tmv-recon/blob/main/docs/monthly-voucher-flow.md" target="_blank">docs/monthly-voucher-flow.md</a>.</p>
+
+  <h2 class="mt-lg">Import recipe</h2>
   <ol class="muted">
-    <li>Gateway → Import → Vouchers → select <strong>sales.xml</strong> (decompress the .gz first).</li>
-    <li>Gateway → Import → Vouchers → select <strong>journal.xml</strong>.</li>
-    <li>Verify Sundry Debtors net to ₹0; any rounding gain/loss visible on ROUND OFF.</li>
+    <li>Decompress <code>combined.xml.gz</code> on your laptop.</li>
+    <li>Tally → Gateway → Import → Vouchers → select <code>combined.xml</code>.</li>
+    <li>Verify in Day Book: 1,083 vouchers (506 Sales + 577 Journal for April 2026).</li>
+    <li>Run Sundry Debtors outstanding report — should show ₹0 against every imported bill name.</li>
+    <li>Check ROUND OFF ledger balance — small income/expense per month.</li>
   </ol>
 </main>
 </body>
