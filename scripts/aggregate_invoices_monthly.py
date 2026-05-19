@@ -96,6 +96,22 @@ def main() -> int:
 
     grouped["calc_gross"] = grouped["net_amount"] + grouped["cgst"] + grouped["sgst"]
     grouped["diff"] = (grouped["calc_gross"] - grouped["gross_amount"]).round(2)
+
+    # EZee export quirk fix: some invoices have labelled CGST/SGST rates but
+    # zero amounts, while Gross still includes the tax inline (e.g. invoices
+    # 87/88/89 in Apr 2026: net 6666.66 + gross 6999.98, but tax columns 0).
+    # When net+cgst+sgst < gross by >0.5, redistribute the missing tax as
+    # cgst = sgst = (gross - net) / 2. Otherwise voucher won't balance.
+    missing = (grouped["calc_gross"] - grouped["gross_amount"]).abs() > 0.5
+    needs_fix = missing & (grouped["cgst"] + grouped["sgst"] < 0.5) & (grouped["gross_amount"] > grouped["net_amount"])
+    if needs_fix.any():
+        n = int(needs_fix.sum())
+        half_tax = (grouped.loc[needs_fix, "gross_amount"] - grouped.loc[needs_fix, "net_amount"]) / 2
+        grouped.loc[needs_fix, "cgst"] = half_tax.round(2)
+        grouped.loc[needs_fix, "sgst"] = half_tax.round(2)
+        grouped["calc_gross"] = grouped["net_amount"] + grouped["cgst"] + grouped["sgst"]
+        grouped["diff"] = (grouped["calc_gross"] - grouped["gross_amount"]).round(2)
+        print(f"  ! derived CGST/SGST from Gross-Net for {n} invoice(s) (EZee tax-amount zero quirk)")
     # Total Payable: what the customer actually owes after discount/adjustment.
     # Drives Sundry Debtors AMOUNT and bill-allocation face value on Sales voucher.
     grouped["total_payable"] = (
