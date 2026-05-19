@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TMV Recon · Monthly Sales Voucher Wizard</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>TMV Recon · Monthly Sales Voucher Generator</h1>
+  <p class="muted">Upload EZee Transaction Detail Report → aggregate → generate verbose Tally XML</p>
+</header>
+
+<nav class="steps">
+  <ol>
+    <li id="step-tab-1" class="active"><span>1</span> Upload</li>
+    <li id="step-tab-2"><span>2</span> Aggregate</li>
+    <li id="step-tab-3"><span>3</span> Generate XML</li>
+  </ol>
+</nav>
+
+<main>
+  <!-- STEP 1 -->
+  <section id="step-1" class="step active">
+    <h2>Step 1 — Upload raw EZee xlsx</h2>
+    <p class="muted">Pick the Transaction Detail Report exported from EZee. We'll detect which months it covers.</p>
+    <form id="upload-form">
+      <input type="file" id="file-input" name="file" accept=".xlsx,.xls" required>
+      <button type="submit">Upload</button>
+    </form>
+    <div id="upload-result" class="result"></div>
+    <div id="month-picker" class="hidden">
+      <h3>Pick the month to process</h3>
+      <table class="data" id="month-table">
+        <thead><tr><th></th><th>Month</th><th>Invoices</th><th>Rows</th><th>Sum Gross (₹)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="actions">
+        <button id="next-1" disabled>Next: Aggregate →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section id="step-2" class="step">
+    <h2>Step 2 — Aggregate to canonical CSV</h2>
+    <p class="muted">Groups raw line items per Invoice #. Sums Net / CGST / SGST / Gross. Result is the input to the voucher emitter.</p>
+    <div id="agg-summary" class="summary"></div>
+    <div id="agg-by-source"></div>
+    <h3 class="mt">Canonical CSV preview (first 25 rows)</h3>
+    <div class="tablewrap"><table class="data" id="canon-preview"></table></div>
+    <div class="actions">
+      <a id="download-csv" class="btn-link hidden" target="_blank">Download canonical CSV</a>
+      <button id="next-2" disabled>Next: Generate XML →</button>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section id="step-3" class="step">
+    <h2>Step 3 — Generate verbose Tally XML</h2>
+    <p class="muted">Emits UTF-16 LE + BOM XML matching Tally's native export schema. Party ledger routed by Business Source.</p>
+    <div class="actions" id="gen-actions">
+      <label class="inline">Alter ID base:
+        <input type="number" id="alter-id" value="70000" step="1000">
+      </label>
+      <button id="run-generate">Generate XML</button>
+    </div>
+    <div id="gen-summary" class="summary"></div>
+    <h3 class="mt hidden" id="bd-h">Party ledger breakdown</h3>
+    <table class="data" id="ledger-breakdown"></table>
+    <div class="actions">
+      <a id="download-xml" class="btn-link hidden" target="_blank">Download Tally XML</a>
+    </div>
+  </section>
+</main>
+
+<script src="/static/wizard.js"></script>
+</body>
+</html>
