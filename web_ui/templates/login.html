@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TMV Recon · Sign in</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<main style="max-width:380px;margin:80px auto;">
+  <h2 style="margin-bottom:6px;">TMV Recon</h2>
+  <p class="muted">Monthly voucher generator · sign in to continue</p>
+  <form method="post" style="display:flex;flex-direction:column;gap:10px;margin-top:18px;">
+    <input name="u" placeholder="username" required autofocus>
+    <input name="p" type="password" placeholder="password" required>
+    <button type="submit" style="width:100%;">Sign in</button>
+  </form>
+  {% if error %}
+  <div class="result error" style="margin-top:14px;">{{ error }}</div>
+  {% endif %}
+</main>
+</body>
+</html>

@@ -2,20 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>TMV Recon · Monthly Sales Voucher Wizard</title>
+<title>TMV Recon · Monthly Voucher Wizard</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<header>
-  <h1>TMV Recon · Monthly Sales Voucher Generator</h1>
-  <p class="muted">Upload EZee Transaction Detail Report → aggregate → generate verbose Tally XML</p>
-</header>
+{% include "_nav.html" %}
 
 <nav class="steps">
   <ol>
     <li id="step-tab-1" class="active"><span>1</span> Upload</li>
     <li id="step-tab-2"><span>2</span> Aggregate</li>
-    <li id="step-tab-3"><span>3</span> Generate XML</li>
+    <li id="step-tab-3"><span>3</span> Sales XML</li>
+    <li id="step-tab-4"><span>4</span> Payments</li>
+    <li id="step-tab-5"><span>5</span> Journal XML</li>
   </ol>
 </nav>
 
@@ -23,7 +22,7 @@
   <!-- STEP 1 -->
   <section id="step-1" class="step active">
     <h2>Step 1 — Upload raw EZee xlsx</h2>
-    <p class="muted">Pick the Transaction Detail Report exported from EZee. We'll detect which months it covers.</p>
+    <p class="muted">Pick the Transaction Detail Report. We'll detect the months covered.</p>
     <form id="upload-form">
       <input type="file" id="file-input" name="file" accept=".xlsx,.xls" required>
       <button type="submit">Upload</button>
@@ -43,34 +42,68 @@
 
   <!-- STEP 2 -->
   <section id="step-2" class="step">
-    <h2>Step 2 — Aggregate to canonical CSV</h2>
-    <p class="muted">Groups raw line items per Invoice #. Sums Net / CGST / SGST / Gross. Result is the input to the voucher emitter.</p>
+    <h2>Step 2 — Aggregate to canonical invoice CSV</h2>
+    <p class="muted">Groups raw line items per Invoice #. Sums Net / CGST / SGST / Gross / Discount / Adjustment → Total Payable.</p>
     <div id="agg-summary" class="summary"></div>
     <div id="agg-by-source"></div>
-    <h3 class="mt">Canonical CSV preview (first 25 rows)</h3>
+    <h3 class="mt">Canonical invoice CSV preview (first 25 rows)</h3>
     <div class="tablewrap"><table class="data" id="canon-preview"></table></div>
     <div class="actions">
       <a id="download-csv" class="btn-link hidden" target="_blank">Download canonical CSV</a>
-      <button id="next-2" disabled>Next: Generate XML →</button>
+      <button id="next-2" disabled>Next: Generate Sales XML →</button>
     </div>
   </section>
 
   <!-- STEP 3 -->
   <section id="step-3" class="step">
-    <h2>Step 3 — Generate verbose Tally XML</h2>
-    <p class="muted">Emits UTF-16 LE + BOM XML matching Tally's native export schema. Party ledger routed by Business Source.</p>
-    <div class="actions" id="gen-actions">
-      <label class="inline">Alter ID base:
-        <input type="number" id="alter-id" value="70000" step="1000">
-      </label>
-      <button id="run-generate">Generate XML</button>
+    <h2>Step 3 — Generate Sales XML</h2>
+    <p class="muted">Verbose Tally Sales vouchers. Sundry Debtors debited at Total Payable; Round Off Dr balances any Discount/Adjustment.</p>
+    <div class="actions" id="sales-actions">
+      <label class="inline">Alter ID base: <input type="number" id="sales-alter-id" value="70000" step="1000"></label>
+      <button id="run-sales">Generate Sales XML</button>
     </div>
-    <div id="gen-summary" class="summary"></div>
-    <h3 class="mt hidden" id="bd-h">Party ledger breakdown</h3>
-    <table class="data" id="ledger-breakdown"></table>
+    <div id="sales-summary" class="summary"></div>
+    <h3 class="mt hidden" id="sales-bd-h">Sundry Debtors bill-allocation breakdown</h3>
+    <table class="data" id="sales-breakdown"></table>
     <div class="actions">
-      <a id="download-xml" class="btn-link hidden" target="_blank">Download Tally XML</a>
+      <a id="download-sales-xml" class="btn-link hidden" target="_blank">Download Sales XML</a>
+      <button id="next-3" disabled>Next: Extract Payments →</button>
     </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section id="step-4" class="step">
+    <h2>Step 4 — Extract payments</h2>
+    <p class="muted">Per-payment-row canonical CSV. One row per settlement line (split payments allowed).</p>
+    <div class="actions">
+      <button id="run-payments">Extract payments</button>
+    </div>
+    <div id="pay-summary" class="summary"></div>
+    <h3 class="mt hidden" id="pay-bd-h">By settlement mode</h3>
+    <table class="data" id="pay-by-mode"></table>
+    <div class="actions">
+      <a id="download-pay-csv" class="btn-link hidden" target="_blank">Download payment CSV</a>
+      <button id="next-4" disabled>Next: Generate Journal XML →</button>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section id="step-5" class="step">
+    <h2>Step 5 — Generate Journal XML</h2>
+    <p class="muted">Verbose Tally Journal vouchers. Bill-allocation chain with dynamic New Ref / Agst Ref (advance receipt adjustment). Round Off Cr/Dr absorbs paid-vs-billed gap.</p>
+    <div class="actions" id="journal-actions">
+      <label class="inline">Alter ID base: <input type="number" id="journal-alter-id" value="80000" step="1000"></label>
+      <button id="run-journal">Generate Journal XML</button>
+    </div>
+    <div id="journal-summary" class="summary"></div>
+    <h3 class="mt hidden" id="journal-bd-h">Payment ledger breakdown</h3>
+    <table class="data" id="journal-breakdown"></table>
+    <div class="actions">
+      <a id="download-journal-xml" class="btn-link hidden" target="_blank">Download Journal XML</a>
+    </div>
+
+    <h3 class="mt hidden" id="closeout-h">Month close-out check</h3>
+    <div id="closeout" class="summary"></div>
   </section>
 </main>
 

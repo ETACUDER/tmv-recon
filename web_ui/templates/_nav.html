@@ -1,0 +1,14 @@
+<header>
+  <div class="head-row">
+    <div>
+      <h1>TMV Recon · Monthly Voucher Generator</h1>
+      <p class="muted">EZee Transaction Detail Report → Tally Sales + Journal XML (UTF-16 LE+BOM)</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a class="btn-link {% if nav=='wizard' %}active{% endif %}" href="/">Wizard</a>
+      <a class="btn-link {% if nav=='flow' %}active{% endif %}" href="/flow">Flow</a>
+      <a class="btn-link {% if nav=='history' %}active{% endif %}" href="/history">History</a>
+      {% if auth_enabled %}<a class="btn-link" href="/logout">Logout</a>{% endif %}
+    </div>
+  </div>
+</header>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TMV Recon · History</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+{% include "_nav.html" %}
+
+<main>
+  <h2>Run history</h2>
+  <p class="muted">Every wizard run is preserved with its raw input, canonical CSVs, gzipped XMLs and a bundle.zip. Click any month to expand.</p>
+
+  <div id="history"></div>
+</main>
+
+<script>
+const fmtINR = n => "₹" + Number(n||0).toLocaleString("en-IN", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+const fmtInt = n => Number(n||0).toLocaleString("en-IN");
+
+(async () => {
+  const r = await fetch("/api/runs");
+  const j = await r.json();
+  const root = document.getElementById("history");
+  if (!j.months || !j.months.length) {
+    root.innerHTML = `<p class="muted">No runs yet. Head to the <a href="/">Wizard</a> to make your first run.</p>`;
+    return;
+  }
+  for (const m of j.months) {
+    const det = document.createElement("details");
+    det.open = m === j.months[0];
+    det.innerHTML = `<summary><strong>${m.month}</strong> <span class="muted">— ${m.run_count} run(s)${m.latest_run_id ? ', latest: ' + m.latest_run_id : ''}</span></summary>`;
+    const tbl = document.createElement("table");
+    tbl.className = "data";
+    tbl.innerHTML = `<thead><tr>
+      <th>Run</th><th>Status</th><th>Operator</th><th class="num">Invoices</th><th class="num">Sum Gross</th>
+      <th class="num">Payments</th><th class="num">Settled</th><th class="num">Round Off</th><th>Files</th>
+    </tr></thead>`;
+    const tbody = document.createElement("tbody");
+    const rr = await fetch("/api/runs?month=" + encodeURIComponent(m.month));
+    const rj = await rr.json();
+    for (const run of rj.runs) {
+      const t = run.totals || {};
+      const roTotal = (t.sales_round_off || 0) + (t.journal_round_off || 0);
+      tbody.insertAdjacentHTML("beforeend", `<tr>
+        <td>${run.run_id}${run.is_latest ? ' <span style="color:var(--good)">★</span>' : ''}</td>
+        <td><span class="${run.status==='complete'?'pill good':'pill'}">${run.status||'-'}</span></td>
+        <td>${run.operator||'-'}</td>
+        <td class="num">${fmtInt(t.invoice_count)}</td>
+        <td class="num">${fmtINR(t.gross_total)}</td>
+        <td class="num">${fmtInt(t.payment_rows)}</td>
+        <td class="num">${fmtINR(t.settlement_total)}</td>
+        <td class="num">${fmtINR(roTotal)}</td>
+        <td>
+          <a class="btn-link sm" target="_blank" href="/api/runs/${m.month}/${run.run_id}/file/sales.xml.gz">Sales</a>
+          <a class="btn-link sm" target="_blank" href="/api/runs/${m.month}/${run.run_id}/file/journal.xml.gz">Journal</a>
+          <a class="btn-link sm" target="_blank" href="/api/runs/${m.month}/${run.run_id}/file/bundle.zip">Bundle</a>
+        </td>
+      </tr>`);
+    }
+    tbl.appendChild(tbody);
+    det.appendChild(tbl);
+    root.appendChild(det);
+  }
+})();
+</script>
+</body>
+</html>

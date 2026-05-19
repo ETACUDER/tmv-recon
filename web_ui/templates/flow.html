@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TMV Recon · Flow</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+{% include "_nav.html" %}
+
+<main class="flow-page">
+  <h2>How the monthly run works</h2>
+  <p class="muted">EZee Transaction Detail Report comes in. Two canonical CSVs and two verbose Tally XMLs come out. Every run is preserved per-month so you can re-import any prior month at any time.</p>
+
+  <div class="flow-grid">
+    <!-- INPUT -->
+    <div class="flow-col">
+      <h3 class="flow-h">INPUT</h3>
+
+      <div class="flow-card">
+        <div class="flow-card-tag">.xlsx</div>
+        <div class="flow-card-title">EZee Transaction Detail Report</div>
+        <div class="flow-card-desc">
+          One file covering one month of stays.
+          ~1,500–2,000 rows of mixed Charge / Tax / Settlement lines per ~500 invoices.
+        </div>
+        <details class="flow-details">
+          <summary>56 columns expected</summary>
+          <div class="flow-cols">
+            <code>Invoice #</code>
+            <code>Invoice date</code>
+            <code>Transaction Date</code>
+            <code>Guest Name</code>
+            <code>Business Source</code>
+            <code>Transaction</code>
+            <code>Net Amount</code>
+            <code>Tax Amount</code>
+            <code>Tax Amount.1</code>
+            <code>Gross Amount</code>
+            <code>Discount Amount</code>
+            <code>Adjustment(Room Charge/Extra Charges)</code>
+            <code>Settlement/Particular</code>
+            <code>Settlement Amount</code>
+            <code>Reference #</code>
+            <code>+ 41 more</code>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- PROCESS -->
+    <div class="flow-col">
+      <h3 class="flow-h">PROCESS</h3>
+
+      <div class="flow-step">
+        <div class="flow-step-num">1</div>
+        <div>
+          <strong>Aggregate</strong>
+          <p class="muted">Group raw line-items by <code>Invoice #</code>. Sum Net + CGST + SGST + Gross. Compute <code>Total Payable = Gross − Discount − Adjustment</code>. Pre-pass writes <code>bill_opens_with</code> (sales|journal) per invoice based on whether any payment predates the invoice date.</p>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num">2</div>
+        <div>
+          <strong>Render Sales voucher</strong>
+          <p class="muted">One verbose Tally Sales voucher per invoice. Dr <code>Sundry Debtors</code> at Total Payable (New Ref if Sales is the earliest event, Agst Ref if an advance opened the bill). Cr SALE ACCOMODATION GST @ X% + CGST + SGST. ROUND OFF Dr absorbs Discount/Adjustment.</p>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num">3</div>
+        <div>
+          <strong>Extract payments</strong>
+          <p class="muted">Walk raw rows where <code>Settlement Amount ≠ 0</code>. One canonical row per payment line (split payments allowed). Captures the actual <code>Transaction Date</code> the money moved.</p>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num">4</div>
+        <div>
+          <strong>Render Journal voucher</strong>
+          <p class="muted">One Journal per payment split, dated by Transaction Date. Dr payment ledger (per mode map), Cr <code>Sundry Debtors</code> via Agst Ref (or New Ref if this is the earliest event on the invoice — advance receipt). ROUND OFF Cr/Dr absorbs <code>Settlement − Total Payable</code> on the last split.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="flow-col">
+      <h3 class="flow-h">OUTPUT</h3>
+
+      <div class="flow-card">
+        <div class="flow-card-tag">canonical</div>
+        <div class="flow-card-title">invoice.csv</div>
+        <div class="flow-card-desc">One row per invoice. ~17 columns including Total Payable + bill_opens_with.</div>
+      </div>
+
+      <div class="flow-card">
+        <div class="flow-card-tag">canonical</div>
+        <div class="flow-card-title">payment.csv</div>
+        <div class="flow-card-desc">One row per payment split. Invoice #, mode, settlement amount, Transaction Date.</div>
+      </div>
+
+      <div class="flow-card flow-emit">
+        <div class="flow-card-tag">Tally XML</div>
+        <div class="flow-card-title">sales.xml.gz</div>
+        <div class="flow-card-desc">UTF-16 LE+BOM. ~50 KB / voucher. Native Tally export schema (~200 fields per voucher).</div>
+      </div>
+
+      <div class="flow-card flow-emit">
+        <div class="flow-card-tag">Tally XML</div>
+        <div class="flow-card-title">journal.xml.gz</div>
+        <div class="flow-card-desc">UTF-16 LE+BOM. ~37 KB / voucher. With full bill-allocation chain.</div>
+      </div>
+
+      <div class="flow-card flow-emit">
+        <div class="flow-card-tag">archive</div>
+        <div class="flow-card-title">bundle.zip</div>
+        <div class="flow-card-desc">All of the above for one-click download.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="mt-lg">Ledger map</h2>
+  <div class="ledger-grid">
+    <div>
+      <h3 class="flow-h">Sales income (by GST rate)</h3>
+      <table class="data">
+        <tr><th>GST rate</th><th>Ledger</th></tr>
+        <tr><td>5%</td><td><code>SALE ACCOMODATION GST @ 5 %</code></td></tr>
+        <tr><td>12%</td><td><code>SALE ACCOMODATION GST @ 12%</code></td></tr>
+        <tr><td>18%</td><td><code>SALE ACCOMODATION GST @ 18%</code></td></tr>
+      </table>
+    </div>
+    <div>
+      <h3 class="flow-h">Payment mode → ledger</h3>
+      <table class="data">
+        <tr><th>Settlement</th><th>Tally ledger</th><th>Bill alloc</th></tr>
+        <tr><td>Cash</td><td><code>SANDEEP SHARMA IMP A/C.</code></td><td>none</td></tr>
+        <tr><td>UPI / Card</td><td><code>CARD / UPI / PAYTM / G PAY</code></td><td>New Ref</td></tr>
+        <tr><td>Agoda</td><td><code>AGODA SDR</code></td><td>New Ref</td></tr>
+        <tr><td>Booking.com</td><td><code>BOOKING.COM SDR</code></td><td>New Ref</td></tr>
+        <tr><td>Goibibo</td><td><code>GOIBIBO / MAKE MY TRIP</code></td><td>New Ref</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h2 class="mt-lg">Settlement guarantee</h2>
+  <p class="muted">After both XMLs import (in order: Sales → Journal), <strong>Sundry Debtors closes to ₹0 per invoice</strong>. Any paid-vs-billed micro-rounding (typically a few paise per month) lands in the <code>ROUND OFF</code> ledger as a clean income/expense entry. Source of truth for full accounting logic: <a href="https://github.com/ETACUDER/tmv-recon/blob/main/docs/monthly-voucher-flow.md" target="_blank">docs/monthly-voucher-flow.md</a>.</p>
+
+  <h2 class="mt-lg">Import order into Tally</h2>
+  <ol class="muted">
+    <li>Gateway → Import → Vouchers → select <strong>sales.xml</strong> (decompress the .gz first).</li>
+    <li>Gateway → Import → Vouchers → select <strong>journal.xml</strong>.</li>
+    <li>Verify Sundry Debtors net to ₹0; any rounding gain/loss visible on ROUND OFF.</li>
+  </ol>
+</main>
+</body>
+</html>

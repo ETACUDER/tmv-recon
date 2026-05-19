@@ -7,14 +7,35 @@ Sales + Journal vouchers (UTF-16 LE+BOM XML, matches native Tally export
 schema) → manual import into Tally.
 
 **Status:** Live for FY 2026 monthly runs. Most recent: **April 2026**
-(506 sales / 577 journal vouchers, ₹23.4L, Sundry Debtors closes to ₹0
-per invoice).
+(1,083 vouchers — 506 Sales + 577 Journal, ₹23.4L, Sundry Debtors closes
+to ₹0 per invoice).
 
 **Single source of truth for flow + logic:** [`docs/monthly-voucher-flow.md`](docs/monthly-voucher-flow.md).
 
----
+## Wizard UI (recommended for monthly runs)
 
-## Quick start
+```bash
+.venv/bin/python web_ui/app.py --port 5005
+# open http://127.0.0.1:5005/
+```
+
+Flask 5-step wizard:
+1. Upload raw EZee xlsx → pick month → opens a versioned **run folder**
+2. Aggregate → canonical invoice CSV + by-source breakdown
+3. Generate **Sales XML** → bill-allocation breakdown + download
+4. Extract payments → canonical payment CSV + by-mode breakdown
+5. Generate **Journal XML** → payment-ledger breakdown + close-out check
+   + auto-generates **`combined.xml`** (single import, vouchers ordered per-invoice)
+
+All artifacts (raw.xlsx, invoice.csv, payment.csv, sales.xml.gz,
+journal.xml.gz, combined.xml.gz, bundle.zip, run.json) are saved to
+`data/recon/runs/<YYYY-MM>/runs/<timestamp>/`. Every run preserved
+indefinitely. Browse via **`/history`**, see the flow via **`/flow`**.
+
+Optional single-user login: set env vars `TMV_USER`, `TMV_PASS`,
+`TMV_SECRET_KEY` before starting.
+
+## CLI alternative
 
 ```bash
 .venv/bin/python -m pip install -e .
@@ -43,24 +64,19 @@ per invoice).
   --invoices data/recon/canonical/invoice_<mon><yr>.csv \
   --output   data/recon/output/journal_vouchers_<mon><yr>_verbose.xml \
   --alter-id-base 80000
+
+# 5. (Recommended) Render a single Combined XML — vouchers ordered per-invoice
+#    so Tally imports the bill-opener before any settler in one operation.
+.venv/bin/python scripts/generate_combined_vouchers_verbose.py \
+  --invoices data/recon/canonical/invoice_<mon><yr>.csv \
+  --payments data/recon/canonical/payment_<mon><yr>.csv \
+  --output   data/recon/output/combined_<mon><yr>_verbose.xml \
+  --sales-alter-id-base 70000 \
+  --journal-alter-id-base 80000
 ```
 
-Import into Tally **in order**: Sales XML → Journal XML.
-
-Pick a different `--alter-id-base` per month (Oct=60000, Apr=70000, …) so
-VCHKEYs stay distinct across imports.
-
-## Wizard UI (alternative to CLI)
-
-```bash
-.venv/bin/python web_ui/app.py --port 5005
-# open http://127.0.0.1:5005/
-```
-
-Flask 3-step wizard: upload xlsx → aggregate (with by-source preview) →
-generate XML (with party-ledger breakdown + download).
-
-Currently covers Sales-side end-to-end; Journal step is on the roadmap.
+Import **`combined.xml`** in one shot, or import Sales then Journal separately.
+Pick a different `--alter-id-base` per month so VCHKEYs stay distinct across imports.
 
 ## Layout
 
