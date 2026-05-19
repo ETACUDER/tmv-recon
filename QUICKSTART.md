@@ -1,157 +1,82 @@
-# Sales Voucher Generator - Quick Start
+# Quick start — monthly run
 
-**5-minute setup guide**
+5-minute recipe to take a fresh EZee Transaction Detail Report and
+produce Tally-importable XML for one month.
 
----
-
-## Generate Vouchers (Single Command)
-
-```bash
-cd /Volumes/CRESCENT/dev/project-sonnet/tmv-recon
-python3 scripts/generate_sales_vouchers.py
-```
-
-**Output:** `data/recon/output/sales_vouchers_2026-04-29.xml`
-
----
-
-## Validate Output
+## 0. One-time setup
 
 ```bash
-python3 scripts/validate_against_ground_truth.py
+.venv/bin/python -m pip install -e .
 ```
 
-**Expected:** `SUCCESS RATE: 100.0%`
+Requires Python 3.14+. Deps: `pandas`, `openpyxl`, `flask` (for wizard).
 
----
+## 1. Drop the raw EZee report
 
-## Run Tests
+Place the freshest `Transaction Detail Report_*.xlsx` from EZee in:
+
+```
+data/recon/2026/
+```
+
+Filename doesn't matter — the scripts accept a glob.
+
+## 2. Run the pipeline (4 commands)
+
+Pick `MON=apr2026` style; use the corresponding `YYYY-MM` for filters.
+Pick a unique `--alter-id-base` per month (Oct=60000, Apr=70000, May=90000…).
 
 ```bash
-python3 tests/test_integration_sales.py
+MONTH=2026-04
+MON=apr2026
+BASE=70000
+
+# Aggregate raw → canonical invoice CSV
+.venv/bin/python scripts/aggregate_invoices_monthly.py \
+  --raw "data/recon/2026/Transaction Detail Report_*.xlsx" \
+  --month "$MONTH" \
+  --out  "data/recon/canonical/invoice_${MON}.csv"
+
+# Extract payments → canonical payment CSV
+.venv/bin/python scripts/extract_payments_monthly.py \
+  --raw "data/recon/2026/Transaction Detail Report_*.xlsx" \
+  --month "$MONTH" \
+  --out  "data/recon/canonical/payment_${MON}.csv"
+
+# Sales XML
+.venv/bin/python scripts/generate_sales_vouchers_verbose.py \
+  --input  "data/recon/canonical/invoice_${MON}.csv" \
+  --output "data/recon/output/sales_vouchers_${MON}_verbose.xml" \
+  --alter-id-base "$BASE"
+
+# Journal XML
+.venv/bin/python scripts/generate_journal_vouchers_verbose.py \
+  --input    "data/recon/canonical/payment_${MON}.csv" \
+  --invoices "data/recon/canonical/invoice_${MON}.csv" \
+  --output   "data/recon/output/journal_vouchers_${MON}_verbose.xml" \
+  --alter-id-base $((BASE + 10000))
 ```
 
-**Expected:** `✓✓✓ ALL INTEGRATION TESTS COMPLETED SUCCESSFULLY ✓✓✓`
+## 3. Import into Tally
 
----
+**Order matters:** Sales XML first, then Journal XML.
 
-## Programmatic Usage
+Gateway → Import → Vouchers → select XML.
 
-```python
-import sys
-sys.path.insert(0, 'src')
+Expected outcome (April 2026 reference): Sundry Debtors closes to ₹0
+per invoice; any rounding gain/loss lands in `ROUND OFF` ledger.
 
-from datetime import date
-from tmv_recon.tally.voucher_generators import (
-    Invoice,
-    generate_sales_voucher,
-    vouchers_envelope,
-)
+## Wizard UI (alternative)
 
-# Create invoice
-invoice = Invoice(
-    invoice_no="25-26/6453",
-    invoice_date=date(2026, 3, 31),
-    guest_name="MRS. MADHUR PIPARSANIA",
-    net_amount=2984.19,
-    cgst=74.60,
-    sgst=74.60,
-    gross_amount=3133.39,
-    gst_rate=5.0,
-)
-
-# Generate voucher
-voucher = generate_sales_voucher(invoice)
-
-# Create envelope
-xml = vouchers_envelope([voucher])
-
-# Save
-with open("output.xml", "w") as f:
-    f.write(xml)
+```bash
+.venv/bin/python web_ui/app.py --port 5005
+# open http://127.0.0.1:5005/
 ```
 
----
-
-## Calculate GST from Gross Amount
-
-```python
-from tmv_recon.tally.voucher_generators import calculate_gst_split
-
-# 5% GST
-net, cgst, sgst = calculate_gst_split(5250.00, gst_rate=5.0)
-# Returns: (5000.00, 125.00, 125.00)
-
-# 18% GST
-net, cgst, sgst = calculate_gst_split(59000.00, gst_rate=18.0)
-# Returns: (50000.00, 4500.00, 4500.00)
-```
+Drag-drop the xlsx, pick month, download Sales XML. (Journal step pending.)
 
 ---
 
-## Key Files
-
-**Input:**
-- `data/recon/canonical/invoice.csv` (Invoice data)
-
-**Output:**
-- `data/recon/output/sales_vouchers_YYYY-MM-DD.xml` (Generated vouchers)
-
-**Code:**
-- `src/tmv_recon/tally/voucher_generators.py` (Main implementation)
-
-**Tests:**
-- `tests/test_sales_voucher.py` (Unit tests)
-- `tests/test_integration_sales.py` (Integration tests)
-
-**Scripts:**
-- `scripts/generate_sales_vouchers.py` (CSV → XML generator)
-- `scripts/validate_against_ground_truth.py` (Validator)
-
-**Docs:**
-- `docs/sales_voucher_generator.md` (Full documentation)
-- `DELIVERY_SUMMARY.md` (Delivery summary)
-- `QUICKSTART.md` (This file)
-
----
-
-## Validation Checklist
-
-- [x] Uses LEDGERENTRIES.LIST (not ALLLEDGERENTRIES.LIST)
-- [x] Sign convention: ISDEEMEDPOSITIVE=No/Yes + amount sign
-- [x] Narration: INVOICE NO:-{{invoice_no}} {{GUEST_NAME}}
-- [x] GST validation: net + cgst + sgst = gross (±₹1)
-- [x] Ledgers: Sundry Debtors, Income, CGST, SGST
-- [x] XML escaping for special characters
-- [x] Party ledger configuration
-- [x] 100% pass rate against ground truth
-
----
-
-## Troubleshooting
-
-**Issue:** `No module named tmv_recon`  
-**Fix:** Ensure `sys.path.insert(0, 'src')` before imports
-
-**Issue:** `File not found: invoice.csv`  
-**Fix:** Check path: `data/recon/canonical/invoice.csv`
-
-**Issue:** `GST validation failed`  
-**Fix:** Verify net + cgst + sgst = gross (within ₹1)
-
-**Issue:** `Missing invoice_no`  
-**Fix:** Invoice will be skipped, check CSV data quality
-
----
-
-## Support
-
-**Documentation:** `docs/sales_voucher_generator.md`  
-**Requirements:** `docs/discovery-2026-04-29-requirements.md` §1.1  
-**Ground Truth:** `data/tally/raw_xml/daybook_FY25-26.xml`
-
----
-
-**Status:** ✓ Production Ready  
-**Validation:** 100% pass rate  
-**Last Updated:** 2026-04-29
+For the *why* of every step (bill-allocation chain, Total Payable, the
+paise rounding, advance-receipt rule) see
+[`docs/monthly-voucher-flow.md`](docs/monthly-voucher-flow.md).

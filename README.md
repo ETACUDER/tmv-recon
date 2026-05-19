@@ -1,157 +1,122 @@
 # tmv-recon
 
-**Production-Ready Hotel Reconciliation System** for **The Mangal View Residency**
+**Monthly EZee → Tally voucher pipeline** for **The Mangal View Residency**.
 
-Excel/PDF ingestion → Automated extraction (17 format variants) → Canonical fact tables → 3-stage matcher → Tally-importable XML vouchers + CSV reports
+EZee Transaction Detail Report (.xlsx) → canonical CSVs → verbose Tally
+Sales + Journal vouchers (UTF-16 LE+BOM XML, matches native Tally export
+schema) → manual import into Tally.
 
-**Status:** ✅ Production Ready (Phase 2 Complete)  
-**Version:** 2.0  
-**Last Updated:** 2026-04-29
+**Status:** Live for FY 2026 monthly runs. Most recent: **April 2026**
+(506 sales / 577 journal vouchers, ₹23.4L, Sundry Debtors closes to ₹0
+per invoice).
 
-### Project Phases
+**Single source of truth for flow + logic:** [`docs/monthly-voucher-flow.md`](docs/monthly-voucher-flow.md).
 
-**Phase 1 - Discovery (Complete)**
-- 4 parallel agents analyzed: meeting recordings, Tally vouchers, Excel structures, transaction reports
-- Reverse-engineered: voucher templates, join keys, business rules, edge cases
-- Output: 5 discovery documents (2.5MB total) in `docs/discovery-2026-04-29-*.md`
+---
 
-**Phase 2 - Implementation (Complete)**
-- Built: parsers (17 AGODA variants, bank row-21, UPI aggregation), 3-stage matcher, voucher generators
-- Validated: 100% match against 60 actual Tally vouchers
-- Generated: sales/journal XML vouchers, CSV reports, web UI
-- Output: Production pipeline processing 3,476 bookings, 551 payments, 304 invoices
-
-## Quick Start
+## Quick start
 
 ```bash
-# 1. Extract data (monthly)
-.venv/bin/python -m tmv_recon.etl.extract.booking   # 3,476 bookings
-.venv/bin/python -m tmv_recon.etl.extract.payment   # 551 payments (aggregated)
+.venv/bin/python -m pip install -e .
 
-# 2. Generate vouchers
-.venv/bin/python scripts/generate_sales_vouchers.py    # Sales vouchers
-.venv/bin/python scripts/generate_journal_samples.py   # Journal vouchers
+# 1. Aggregate raw EZee → canonical invoice CSV
+.venv/bin/python scripts/aggregate_invoices_monthly.py \
+  --raw "data/recon/2026/Transaction Detail Report_*.xlsx" \
+  --month YYYY-MM \
+  --out data/recon/canonical/invoice_<mon><yr>.csv
 
-# 3. Validate & Review
-.venv/bin/python -m pytest tests/test_validator.py -v
-cat data/recon/reports/match_summary.txt
+# 2. Extract payment lines → canonical payment CSV
+.venv/bin/python scripts/extract_payments_monthly.py \
+  --raw "data/recon/2026/Transaction Detail Report_*.xlsx" \
+  --month YYYY-MM \
+  --out data/recon/canonical/payment_<mon><yr>.csv
 
-# 4. Import to Tally
-# Gateway → Import → Vouchers → Select XML files
+# 3. Render Sales XML
+.venv/bin/python scripts/generate_sales_vouchers_verbose.py \
+  --input  data/recon/canonical/invoice_<mon><yr>.csv \
+  --output data/recon/output/sales_vouchers_<mon><yr>_verbose.xml \
+  --alter-id-base 70000
 
-# 5. Web Dashboard
-.venv/bin/uvicorn tmv_recon.web.app:app --reload
-# Open http://127.0.0.1:8000
+# 4. Render Journal XML
+.venv/bin/python scripts/generate_journal_vouchers_verbose.py \
+  --input    data/recon/canonical/payment_<mon><yr>.csv \
+  --invoices data/recon/canonical/invoice_<mon><yr>.csv \
+  --output   data/recon/output/journal_vouchers_<mon><yr>_verbose.xml \
+  --alter-id-base 80000
 ```
 
-## Production Pipeline
+Import into Tally **in order**: Sales XML → Journal XML.
 
-| Step | Command | Output |
-|------|---------|--------|
-| **Extract Agoda** | `.venv/bin/python -m tmv_recon.etl.extract.booking` | `bookings.csv` (3,476 rows) |
-| **Extract UPI** | `.venv/bin/python -m tmv_recon.etl.extract.payment` | `upi_payments.csv` (551 aggregated) |
-| **Match Streams** | `.venv/bin/python -m tmv_recon.etl.recon` | `exact_matches.csv`, `fuzzy_matches.csv` |
-| **Generate XML** | `.venv/bin/python scripts/generate_sales_vouchers.py` | `sales_vouchers_*.xml` |
-| **Validate** | `.venv/bin/python -m pytest tests/test_validator.py` | Pass/Fail report |
-| **Web UI** | `.venv/bin/uvicorn tmv_recon.web.app:app` | `http://127.0.0.1:8000` |
+Pick a different `--alter-id-base` per month (Oct=60000, Apr=70000, …) so
+VCHKEYs stay distinct across imports.
+
+## Wizard UI (alternative to CLI)
+
+```bash
+.venv/bin/python web_ui/app.py --port 5005
+# open http://127.0.0.1:5005/
+```
+
+Flask 3-step wizard: upload xlsx → aggregate (with by-source preview) →
+generate XML (with party-ledger breakdown + download).
+
+Currently covers Sales-side end-to-end; Journal step is on the roadmap.
 
 ## Layout
 
 ```
-tmv-recon/
-├── src/tmv_recon/
-│   ├── config.py                env + paths
-│   ├── llm/{gemini,claude}.py
-│   ├── parsers/{pdf,excel}.py
-│   ├── etl/                     ETL pipeline (NEW)
-│   │   ├── bucket.py            file classifier → data/{stream}/{raw,processed}/
-│   │   ├── models.py            Booking/Invoice/Payment/Match dataclasses
-│   │   ├── extract/             per-source extractors → data/recon/canonical/
-│   │   │   ├── booking.py       Agoda, 12 header-typo variants, (rate*nights), CN pairs
-│   │   │   ├── invoice.py       EZ folio→invoice rollup, GST split
-│   │   │   ├── payment.py       PTM raw 123-col + Indian Bank statements
-│   │   │   └── _common.py       shared header normalizer + transforms
-│   │   ├── recon.py             matcher: PTM↔Bank, PTM↔Invoice, Booking↔Invoice
-│   │   ├── tally_signal.py      file-presence proxy → booked-vs-pending counts
-│   │   ├── README.md            iterative ETL spec
-│   │   ├── _flow.md             recon flow + ER diagram
-│   │   └── _discovery_*.md      schema-discovery agent reports
-│   ├── tally/
-│   │   ├── models.py            Voucher / LedgerEntry / Ledger
-│   │   ├── xml.py               vouchers_envelope, masters_envelope (Import)
-│   │   ├── csv_export.py
-│   │   ├── http.py              POST to running Tally :9000
-│   │   ├── connectors.py        Tally → DataFrame (Day Book, Pending Bills, …)  (NEW)
-│   │   ├── round_trip.py        Mac→Tally→Mac end-to-end test                    (NEW)
-│   │   └── cli_pull.py          CLI wrapper for connectors                       (NEW)
-│   ├── integration/             Excel → Tally column-mapping + push
-│   │   ├── mapping.py / transforms.py / pipeline.py / validators.py
-│   │   ├── cli.py
-│   │   └── presets/             bank_statement, sales/purchase, journal, ptm_payment
-│   └── web/                     FastAPI + Tailwind/Alpine recon UI
-│       ├── app.py               /api/{config,sources,file,presets,preview,export,recon,tally-ping}
-│       ├── buckets.py           UI sidebar bucket classifier
-│       └── static/index.html    SPA: dashboard + per-file preview/mapping/export
-├── tests/                       21 tests: live keys + XML + transforms + pipeline + integration
-├── data/
-│   ├── booking/{raw,processed}/
-│   ├── invoices/{raw,processed}/
-│   ├── payments/{raw,processed}/
-│   ├── tally/raw/               Tally-handoff signal (no real export — see ETL README)
-│   ├── recon/{canonical,matches,reports}/
-│   ├── input/, output/          legacy CLI work area
-│   └── _quarantine/             LIC PDFs that were misbundled
-├── docs/
-│   ├── tally-integration.md     XML import schema, sign convention, BRS notes
-│   ├── excel-integration.md     ColumnMap schema, modes, prior art
-│   ├── tally-on-mac.md          running Tally on macOS
-│   └── status-2026-04-28.md     this iteration's work log
-├── meet-recording/              meeting artifacts + raw data zips
-├── pyproject.toml
-└── .env                         GEMINI/ANTHROPIC keys, TALLY_HOST/PORT/COMPANY
+src/tmv_recon/vouchers/      ← business logic (single source of truth)
+├── config.py                  company, GSTIN, GUID seed, tolerances
+├── ledgers.py                 all Tally ledger names + mappings
+├── ezee_columns.py            EZee column-name constants
+├── flags.py                   voucher/ledger flag sets + empty container lists
+├── primitives.py              XML rendering (no business logic)
+├── sales.py                   render_sales_voucher(row, alter_id)
+└── journal.py                 render_journal_voucher(row, alter_id, ...)
+
+scripts/                       thin CLI wrappers (~50-100 lines each)
+├── aggregate_invoices_monthly.py
+├── extract_payments_monthly.py
+├── generate_sales_vouchers_verbose.py
+└── generate_journal_vouchers_verbose.py
+
+web_ui/                        Flask wizard
+docs/monthly-voucher-flow.md   end-to-end flow + accounting logic
+data/recon/canonical/          per-month canonical CSVs (input to emitters)
+data/recon/output/             generated XMLs (input to Tally)
+data/recon/newTally/           reference: Master.xml + Transactions.xml from Tally
 ```
 
-## End-to-end flow
+## Key concepts
 
-```
-SOURCES                  CANONICAL                MATCH                 TALLY (live)
-─────────                ──────────────           ──────────────        ──────────────
-EZ ────────────────► fct_invoice (304) ────────────────────────────► Sales voucher
-                          │   Net+CGST+SGST=Gross ✓                    "INVOICE NO -..."
-                          ▼
-Agoda ─────────────► fct_booking (3,476) ─ invoice_no exact ───────► (Credit Note for rate-change)
-                          │   715 rate*nights, 119 CN
-                          ▼
-GoMT (TBD) ──┘
-                          ▼
-PTM raw ───────────► fct_payment (316) ─ amt+date+guest fuzzy ─────► Journal voucher
-                          │   146/316 ↔ Bank UTR                     Dr CARD/UPI/PAYTM
-                          ▼                                          Cr Sundry Debtors
-Bank ──────────────► fct_bank (1,363) ─ ONE 97 COM + amt+date ─────► (New Ref = invoice_no)
-                          │   792 rows w/ extracted UTR
-                          ▼
-                     tally/raw signal: 36.5% booked, 63.5% pending
-```
+- **Total Payable** = `Gross − Discount − Adjustment`. Sundry Debtors is
+  debited at Total Payable; ROUND OFF Dr balances the voucher when EZee
+  applied a small adjustment.
+- **Advance Receipt Adjustment:** per invoice, whichever event (Sales or
+  Journal payment) is *earliest* opens the bill with **`New Ref`**; all
+  later events settle with **`Agst Ref`**. Computed from a pre-pass in
+  the aggregator (`bill_opens_with` column).
+- **Journal date:** comes from each payment row's `Transaction Date`
+  (not the Invoice date) — captures pre-arrival OTA advances correctly.
+- **Bill allocation on Journal Dr side:** OTAs (AGODA SDR / BOOKING.COM
+  SDR / GOIBIBO / MAKE MY TRIP) + `CARD / UPI / PAYTM / G PAY` get
+  `New Ref`. `SANDEEP SHARMA IMP A/C.` (Cash) skips bill alloc — its
+  master has bill-wise off.
+
+Full details in [`docs/monthly-voucher-flow.md`](docs/monthly-voucher-flow.md).
 
 ## Setup
 
+Requires Python 3.14+ and a venv at `.venv`. See `pyproject.toml` /
+`requirements.txt` for the minimal dep list (`pandas`, `openpyxl`,
+`flask` for the wizard).
+
+## Historical phases (archived)
+
+Phase 1/2 (April 2026, 3-stage matcher + ground-truth validator) lives
+in `src/tmv_recon/{etl,parsers,integration,llm}/` and tests. Not used by
+the monthly pipeline; revive by running:
 ```bash
-.venv/bin/pip install -e .
-.venv/bin/python tests/test_keys.py        # smoke-test API keys
-.venv/bin/python -m pytest -q              # unit tests (21 passing)
+.venv/bin/python -m pytest tests/test_validator.py tests/test_ground_truth.py
 ```
-
-`.env` keys: `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, `TALLY_HOST` (Azure VM `20.219.50.8`), `TALLY_PORT` (9000), `TALLY_COMPANY`.
-
-## Pointers
-
-- `src/tmv_recon/etl/README.md` — ETL pipeline spec, status, open questions
-- `src/tmv_recon/etl/_flow.md` — recon flow + ER diagram with join-key priorities
-- `docs/status-2026-04-28.md` — what's built today, what's blocked
-- `docs/tally-protocols.md` — every Tally XML request type, verified against live endpoint
-- `docs/tally-integration.md` — XML import schema, sign convention, BRS notes
-- `docs/excel-integration.md` — ColumnMap schema, modes, prior art
-- `docs/prior-art-repos.md` — GitHub repos surveyed during design + what we adopted from each
-- `docs/tally-on-mac.md` — running Tally on macOS for local dev
-- `TODO.md` — actions queued for when the real Tally backup lands
-- `services/windows-test/scripts/README.md` — Tally-on-VM setup runbook
+Discovery docs at `docs/discovery-2026-04-29-*.md`.
