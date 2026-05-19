@@ -293,7 +293,32 @@ collide across months (e.g. Oct=60000, Apr=70000, May=90000, …).
 
 ---
 
-## 8. Known Quirks & Gotchas
+## 8. Code Organisation
+
+The voucher pipeline lives in `src/tmv_recon/vouchers/` as a small
+package. **Single source of truth — edit these files first, never the
+script wrappers.**
+
+| File | What lives here |
+|---|---|
+| `config.py` | Company, GSTIN, state, GUID seed, ROUND_OFF_TOLERANCE |
+| `ledgers.py` | All Tally ledger name strings + mappings (GST rate → ledger, mode → ledger, NEW_REF_LEDGERS set) |
+| `ezee_columns.py` | EZee Transaction Detail column names |
+| `flags.py` | VOUCHER_FLAGS_{SALES,JOURNAL}, LEDGER_FLAGS_*, empty container lists |
+| `primitives.py` | XML rendering primitives (no business logic): GUID, BILLALLOCATIONS, ledger entry, envelope, UTF-16 LE+BOM write |
+| `sales.py` | `render_sales_voucher(row, alter_id) -> str` |
+| `journal.py` | `render_journal_voucher(row, alter_id, cr_to_debtor, round_off, cr_bill_type) -> str` |
+
+CLI scripts in `scripts/` are thin orchestration wrappers (~30–80 lines
+each) that handle I/O, per-invoice walk for splits, and call into the
+package.
+
+To rename `BOOKING.COM SDR` → something else: one edit in `ledgers.py`.
+To add a new GST rate: add one entry to `SALES_LEDGER_BY_GST_RATE` +
+maybe tweak `pick_sales_ledger()` thresholds. To add a new payment mode:
+one line in `PAYMENT_LEDGER_BY_MODE`.
+
+## 9. Known Quirks & Gotchas
 
 - **`SALE ACCOMODATION GST @ 5 %`** has spaces both sides of `%` — the
   12% and 18% variants do **not**. Mis-emit and Tally rejects the row.
