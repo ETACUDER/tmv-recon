@@ -94,12 +94,28 @@ One row per `Settlement Amount != 0` line.
 ## 3. Bill-Allocation Chain (the settlement engine)
 
 Tally settles outstanding balances per-invoice via **bill references**.
-A receivable is opened by `BILLTYPE=New Ref` and closed by `BILLTYPE=Agst Ref`.
+A receivable is opened by `BILLTYPE=New Ref` and closed by
+`BILLTYPE=Agst Ref`.
+
+### The Dynamic Rule — Advance-Receipt Adjustment
+
+> Per invoice, sort all events (Sales voucher + every Journal split) by
+> date. The **earliest** event opens the bill with **`New Ref`**. All
+> later events (Sales or Journal) settle with **`Agst Ref`**.
+
+This is standard Indian-accounting / GST advance-receipt treatment. The
+aggregator pre-computes the flag `bill_opens_with` ∈ {`sales`, `journal`}
+per invoice into the canonical CSV, and both emitters consume it.
+
+| Scenario (April 2026 count) | bill_opens_with | Sales Dr SD | Earliest Journal Cr SD | Later Journal Cr SD |
+|---|---|---|---|---|
+| All payments on/after Invoice date (12) | `sales` | **New Ref** | Agst Ref | Agst Ref |
+| Any payment before Invoice date (494) | `journal` | **Agst Ref** | **New Ref** | Agst Ref |
 
 ### Sales voucher (per invoice)
 
 ```
-Dr  Sundry Debtors          Total Payable    ← New Ref: invoice#
+Dr  Sundry Debtors          Total Payable    ← New Ref OR Agst Ref (per bill_opens_with)
    Cr  SALE ACCOMODATION GST @ X%   Net
    Cr  CGST                          CGST
    Cr  SGST                          SGST
@@ -113,8 +129,13 @@ is less than `Gross` (see §4).
 
 ```
 Dr  <payment ledger>        Settlement Amount   ← bill-ref rule below
-   Cr  Sundry Debtors                Settlement Amount   ← Agst Ref: invoice#
+   Cr  Sundry Debtors        Total Payable       ← Agst Ref: invoice# (settles bill exactly)
+   Cr  ROUND OFF             (Settlement − Total Payable)   if Settlement > Payable (gain)
+                             OR
+   Dr  ROUND OFF             (Total Payable − Settlement)   if Settlement < Payable (loss)
 ```
+
+If `Settlement == Total Payable`, no ROUND OFF entry is emitted (clean 2-line voucher).
 
 | Payment mode (EZee) | Tally ledger | Dr bill-ref |
 |---|---|---|
@@ -124,16 +145,36 @@ Dr  <payment ledger>        Settlement Amount   ← bill-ref rule below
 | Booking.com | `BOOKING.COM SDR` | **New Ref** |
 | Goibibo | `GOIBIBO / MAKE MY TRIP` | **New Ref** |
 
-**Why Sundry Debtors uses `Agst Ref`:** the Sales voucher already created
-that bill via `New Ref`. The Journal closes it.
+**Sundry Debtors bill type now depends on which event came first** (see
+"Dynamic Rule" above): if a payment predates the invoice it opens the
+bill with `New Ref`, and the Sales voucher's Sundry Debtors becomes
+`Agst Ref` (which consumes the advance and posts any remainder).
 
-**Why OTA platforms use `New Ref`:** the moment a guest pays via Agoda,
-Agoda holds our money and a *new* receivable opens against the OTA. That
-bill gets settled later when Agoda actually transfers cash — handled by a
-separate OTA-settlement journal we don't generate here.
+**Why OTA + CARD/UPI/PAYTM/G PAY use `New Ref`:** these are bill-wise
+tracked ledgers. The moment a guest pays, a *new* receivable opens
+against the platform (Agoda still has our money / Card-machine bank
+holds it pending settlement). Each `New Ref` is squared later by a
+separate settlement journal we don't generate here.
+
+**Why Cash (`SANDEEP SHARMA IMP A/C.`) gets no bill alloc:** the master
+has bill-wise tracking off on this ledger. Cash receipts go straight to
+ledger balance.
 
 **Import order is mandatory:** Sales first → Journal second. Otherwise
 `Agst Ref` finds no bill and Tally posts "On Account".
+
+### Dates on the Journal voucher
+
+`<DATE>` / `<REFERENCEDATE>` / `<VCHSTATUSDATE>` / `<EFFECTIVEDATE>` all
+come from the payment row's **`Transaction Date`** column (the date EZee
+recorded the actual money movement), falling back to `Invoice date` if
+empty.
+
+This means OTA / Card / UPI Journal vouchers can be dated **before** the
+Sales voucher's Invoice date — e.g. an Agoda settlement from
+`2026-01-24` posts against a `2026-04-05` invoice. Tally's `Agst Ref`
+resolves by bill *name*, not date, so this still squares correctly after
+both XMLs import.
 
 ---
 
@@ -169,20 +210,31 @@ vouchers in your export include `ROUND OFF` lines at paise values).
 
 `abs(round_off) < ₹0.005` ⇒ skipped (no ROUND OFF entry needed).
 
-### Result after both imports
+### Result after both imports (closing logic, current behaviour)
 
-| Side | Total (₹) |
+The Journal voucher now closes Sundry Debtors **exactly per invoice**.
+The gap between Settlement Amount and Total Payable lands in the
+`ROUND OFF` ledger instead of leaking into Sundry Debtors.
+
+For each Journal voucher:
+- `Cr Sundry Debtors` is sized to `Total Payable` (or the bill's
+  remaining balance for multi-split invoices), **not** to the raw
+  Settlement Amount.
+- The residue `(Settlement − Total Payable)` is posted to `ROUND OFF`
+  on the **last split** of that invoice:
+  - Positive residue (we got paid more) → `Cr ROUND OFF` (gain).
+  - Negative residue (we got paid less) → `Dr ROUND OFF` (loss).
+
+| April scoreboard | ₹ |
 |---|---:|
 | Sales: Dr Sundry Debtors (sum of Total Payable) | 23,38,992.39 |
-| Journal: Cr Sundry Debtors (sum of Settlement Amount) | 23,38,992.83 |
-| **Net Sundry Debtors balance after month** | **−₹0.44** |
+| Journal: Cr Sundry Debtors (sum of Total Payable) | 23,38,992.39 |
+| Journal: Dr payment ledgers (sum of Settlement) | 23,38,992.83 |
+| Journal: Cr ROUND OFF (realised gain) | 0.44 |
+| **Net Sundry Debtors balance after month** | **₹0.00** |
+| **Net ROUND OFF balance** | **₹0.44 (income)** |
 
-The remaining ₹0.44 is the gap between what we collected (Settlement)
-and what we billed-net-of-adjustment (Total Payable). That's typically a
-mix of mode-specific micro-rounding (e.g. UPI gateways rounding to
-whole-rupee amounts on a few transactions). **We do not auto-clear this**
-— it's small enough to clear with a single manual journal at month-end
-if desired.
+78 of 506 invoices carry a Journal-side ROUND OFF entry (paid != billed).
 
 ---
 
@@ -230,8 +282,9 @@ data is updated.
   --alter-id-base 70000
 
 .venv/bin/python scripts/generate_journal_vouchers_verbose.py \
-  --input  data/recon/canonical/payment_<mon><yr>.csv \
-  --output data/recon/output/journal_vouchers_<mon><yr>_verbose.xml \
+  --input    data/recon/canonical/payment_<mon><yr>.csv \
+  --invoices data/recon/canonical/invoice_<mon><yr>.csv \
+  --output   data/recon/output/journal_vouchers_<mon><yr>_verbose.xml \
   --alter-id-base 80000
 ```
 

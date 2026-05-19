@@ -197,11 +197,11 @@ LEDGER_FLAGS_INCOME = [
 ]
 
 
-def _bill_allocation_block(invoice_no: str, amount: float) -> str:
+def _bill_allocation_block(invoice_no: str, amount: float, bill_type: str = "New Ref") -> str:
     return (
         "              <BILLALLOCATIONS.LIST>\n"
         f"                <NAME>{xml_escape(invoice_no)}</NAME>\n"
-        "                <BILLTYPE>New Ref</BILLTYPE>\n"
+        f"                <BILLTYPE>{bill_type}</BILLTYPE>\n"
         "                <TDSDEDUCTEEISSPECIALRATE>No</TDSDEDUCTEEISSPECIALRATE>\n"
         f"                <AMOUNT>{amount:.2f}</AMOUNT>\n"
         "                <INTERESTCOLLECTION.LIST>              </INTERESTCOLLECTION.LIST>\n"
@@ -218,7 +218,7 @@ def _round_off_flags(dr: bool) -> list[tuple[str, str]]:
 
 
 def emit_ledger_entry(name: str, amount: float, flags: list[tuple[str, str]],
-                      bill_ref: str | None = None) -> str:
+                      bill_ref: str | None = None, bill_type: str = "New Ref") -> str:
     lines = [
         "            <LEDGERENTRIES.LIST>",
         '              <OLDAUDITENTRYIDS.LIST TYPE="Number">',
@@ -232,7 +232,7 @@ def emit_ledger_entry(name: str, amount: float, flags: list[tuple[str, str]],
     lines.append(f"              <AMOUNT>{amount:.2f}</AMOUNT>")
     for lst in LEDGER_EMPTY_LISTS:
         if lst == "BILLALLOCATIONS.LIST" and bill_ref:
-            lines.append(_bill_allocation_block(bill_ref, amount))
+            lines.append(_bill_allocation_block(bill_ref, amount, bill_type))
         else:
             lines.append(f"              <{lst}>              </{lst}>")
     lines.append("            </LEDGERENTRIES.LIST>")
@@ -329,8 +329,14 @@ def emit_voucher(row: dict, alter_id: int) -> str:
     empty_lists = [f"            <{lst}>            </{lst}>" for lst in VOUCHER_EMPTY_LISTS]
     trailing_lists = [f"            <{lst}>            </{lst}>" for lst in VOUCHER_TRAILING_LISTS]
 
+    # bill_opens_with comes from the canonical CSV (aggregator's pre-pass):
+    #   "sales"   → Sales is the earliest event on this invoice → New Ref
+    #   "journal" → an advance payment opened the bill earlier  → Agst Ref
+    bill_opens_with = (row.get("bill_opens_with") or "sales").strip().lower()
+    sd_bill_type = "New Ref" if bill_opens_with == "sales" else "Agst Ref"
     party_entry = emit_ledger_entry(
-        party_name, -total_payable, LEDGER_FLAGS_PARTY, bill_ref=invoice_no
+        party_name, -total_payable, LEDGER_FLAGS_PARTY,
+        bill_ref=invoice_no, bill_type=sd_bill_type,
     )
     income_entry = emit_ledger_entry(income, net, LEDGER_FLAGS_INCOME)
     cgst_entry = emit_ledger_entry("CGST", cgst, LEDGER_FLAGS_INCOME)

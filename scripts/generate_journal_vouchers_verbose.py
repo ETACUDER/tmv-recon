@@ -37,6 +37,8 @@ CMP_STATE = "Rajasthan"
 GUID_NAMESPACE = uuid.UUID("029dfefd-5996-4e71-8914-ec5a8528c655")
 
 PARTY_DEBTOR = "Sundry Debtors"
+ROUND_OFF_LEDGER = "ROUND OFF"
+ROUND_OFF_TOLERANCE = 0.005  # below this, skip emitting a Round Off entry
 
 MODE_TO_LEDGER = {
     "CASH": "SANDEEP SHARMA IMP A/C.",
@@ -48,9 +50,17 @@ MODE_TO_LEDGER = {
     "GOIBIBO": "GOIBIBO / MAKE MY TRIP",
 }
 
-# OTA receivable ledgers — these get a fresh "New Ref" bill on the Dr side
-# (we are now owed by the OTA platform).
-OTA_LEDGERS = {"AGODA SDR", "BOOKING.COM SDR", "GOIBIBO / MAKE MY TRIP"}
+# Dr-side ledgers that get a fresh "New Ref" bill against the invoice #.
+# OTAs: receivable now owed by the platform.
+# CARD/UPI/PAYTM/G PAY: bill-wise tracked control ledger; tag each payment
+# with its invoice so Tally doesn't book "On Account".
+# SANDEEP SHARMA IMP A/C. is intentionally excluded (bill-wise off).
+NEW_REF_LEDGERS = {
+    "AGODA SDR",
+    "BOOKING.COM SDR",
+    "GOIBIBO / MAKE MY TRIP",
+    "CARD / UPI / PAYTM / G PAY",
+}
 
 
 def pick_payment_ledger(mode: str) -> str | None:
@@ -249,9 +259,26 @@ def emit_ledger_entry(name: str, amount: float, flags: list[tuple[str, str]],
     return "\n".join(lines)
 
 
-def emit_voucher(row: dict, alter_id: int) -> str | None:
+def emit_voucher(row: dict, alter_id: int, cr_to_debtor: float, round_off: float,
+                 cr_bill_type: str = "Agst Ref") -> str | None:
+    """Emit one Journal voucher.
+
+    Args:
+        row: payment CSV row.
+        alter_id: unique sequence id for VCHKEY/ALTERID/MASTERID + GUID seed.
+        cr_to_debtor: amount Cr Sundry Debtors at (settles this much of the bill).
+        round_off: residual on this split (Settlement - cr_to_debtor). Positive = gain (Cr), negative = loss (Dr).
+        cr_bill_type: "New Ref" if this Journal is the earliest event for the invoice
+                      (advance receipt opens the bill); else "Agst Ref" (settles bill).
+    """
     invoice_no = row["Invoice #"].strip()
     invoice_date = fdate(row["Invoice date"])
+    # Use Transaction Date (when payment actually moved) for all voucher-level date fields;
+    # fall back to Invoice date if missing.
+    raw_txn = (row.get("Transaction Date") or "").strip()
+    voucher_date = fdate(raw_txn) if raw_txn else invoice_date
+    if not voucher_date:
+        voucher_date = invoice_date
     mode = row["Settlement/Particular"].strip()
     amount = ffloat(row["Settlement Amount"])
     guest = (row.get("Guest Name") or "").strip()
@@ -278,9 +305,9 @@ def emit_voucher(row: dict, alter_id: int) -> str | None:
         '            <OLDAUDITENTRYIDS.LIST TYPE="Number">',
         "              <OLDAUDITENTRYIDS>-1</OLDAUDITENTRYIDS>",
         "            </OLDAUDITENTRYIDS.LIST>",
-        f"            <DATE>{invoice_date}</DATE>",
-        f"            <REFERENCEDATE>{invoice_date}</REFERENCEDATE>",
-        f"            <VCHSTATUSDATE>{invoice_date}</VCHSTATUSDATE>",
+        f"            <DATE>{voucher_date}</DATE>",
+        f"            <REFERENCEDATE>{voucher_date}</REFERENCEDATE>",
+        f"            <VCHSTATUSDATE>{voucher_date}</VCHSTATUSDATE>",
         f"            <GUID>{guid}</GUID>",
         f"            <NARRATION>{xml_escape(narration)}</NARRATION>",
         "            <VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>",
@@ -304,7 +331,7 @@ def emit_voucher(row: dict, alter_id: int) -> str | None:
     ]
     flags = [f"            <{k}>{v}</{k}>" for k, v in VOUCHER_FLAGS]
     ids = [
-        f"            <EFFECTIVEDATE>{invoice_date}</EFFECTIVEDATE>",
+        f"            <EFFECTIVEDATE>{voucher_date}</EFFECTIVEDATE>",
         f"            <ALTERID> {alter_id}</ALTERID>",
         f"            <MASTERID> {alter_id}</MASTERID>",
         f"            <VOUCHERKEY>{19687271091500000 + alter_id}</VOUCHERKEY>",
@@ -314,34 +341,75 @@ def emit_voucher(row: dict, alter_id: int) -> str | None:
     empty = [f"            <{lst}>            </{lst}>" for lst in VOUCHER_EMPTY_LISTS]
     trailing = [f"            <{lst}>            </{lst}>" for lst in VOUCHER_TRAILING_LISTS]
 
-    # Dr side: OTA platform gets New Ref (we now owe-from-OTA), others skip bill alloc.
-    dr_bill_type = "New Ref" if payment_ledger in OTA_LEDGERS else None
-    # Cr side: always Agst Ref to settle the Sundry Debtors bill created by Sales.
+    # Dr side: OTAs + CARD/UPI/PAYTM/G PAY get New Ref. Cash (Sandeep Sharma Imp) skips.
+    dr_bill_type = "New Ref" if payment_ledger in NEW_REF_LEDGERS else None
+    # Cr side: Agst Ref settles the Sundry Debtors bill created by Sales.
+    # cr_to_debtor may be less than `amount` when this split overflows the bill —
+    # the remainder lands in ROUND OFF below.
     dr_entry = emit_ledger_entry(payment_ledger, -amount, LEDGER_FLAGS_DR, invoice_no, dr_bill_type)
-    cr_entry = emit_ledger_entry(PARTY_DEBTOR, amount, LEDGER_FLAGS_CR, invoice_no, "Agst Ref")
+    entries = [dr_entry]
+    if cr_to_debtor > ROUND_OFF_TOLERANCE:
+        entries.append(emit_ledger_entry(PARTY_DEBTOR, cr_to_debtor, LEDGER_FLAGS_CR, invoice_no, cr_bill_type))
+    if abs(round_off) >= ROUND_OFF_TOLERANCE:
+        # round_off > 0  => we received MORE than bill needed   -> Cr ROUND OFF (gain)
+        # round_off < 0  => we received LESS than bill needed    -> Dr ROUND OFF (loss)
+        if round_off > 0:
+            ro_flags = list(LEDGER_FLAGS_CR)
+        else:
+            ro_flags = list(LEDGER_FLAGS_DR)
+        # ROUND OFF is not a party ledger.
+        ro_flags = [(k, "No" if k == "ISPARTYLEDGER" else v) for k, v in ro_flags]
+        entries.append(emit_ledger_entry(ROUND_OFF_LEDGER, round_off, ro_flags, invoice_no, None))
 
-    return "\n".join(head + flags + ids + empty + [dr_entry, cr_entry] + trailing + ["          </VOUCHER>"])
+    return "\n".join(head + flags + ids + empty + entries + trailing + ["          </VOUCHER>"])
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--input", default=str(DEFAULT_SRC))
+    ap.add_argument("--input", default=str(DEFAULT_SRC), help="payment canonical CSV")
+    ap.add_argument("--invoices", required=True,
+                    help="invoice canonical CSV (needed for Total Payable per invoice)")
     ap.add_argument("--output", default=str(DEFAULT_OUT))
     ap.add_argument("--alter-id-base", type=int, default=80000)
     args = ap.parse_args()
     src = Path(args.input)
+    inv_csv = Path(args.invoices)
     out = Path(args.output)
     if not src.exists():
         print(f"ERROR: source CSV not found: {src}", file=sys.stderr)
         return 1
+    if not inv_csv.exists():
+        print(f"ERROR: invoice CSV not found: {inv_csv}", file=sys.stderr)
+        return 1
+
+    # Build per-invoice lookup: Total Payable + bill_opens_with (advance-receipt flag).
+    total_payable_by_inv: dict[str, float] = {}
+    opens_with_by_inv: dict[str, str] = {}
+    with inv_csv.open("r", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            inv = r["Invoice #"].strip()
+            tp = ffloat(r.get("Total Payable") or r.get("Gross Amount", "0"))
+            total_payable_by_inv[inv] = tp
+            opens_with_by_inv[inv] = (r.get("bill_opens_with") or "sales").strip().lower()
+
+    # Load and group payment rows by Invoice #. Within each invoice, sort by Transaction
+    # Date asc so the earliest split is index 0 (eligible for "New Ref" if advance).
+    all_rows: list[dict] = list(csv.DictReader(src.open("r", encoding="utf-8")))
+    groups: dict[str, list[tuple[int, dict]]] = {}
+    for i, row in enumerate(all_rows):
+        groups.setdefault(row["Invoice #"].strip(), []).append((i, row))
+    for inv, rows in groups.items():
+        rows.sort(key=lambda ir: (ir[1].get("Transaction Date") or "", ir[0]))
 
     vouchers: list[str] = []
     skipped_unmapped: list[str] = []
     skipped_zero = 0
 
-    with src.open("r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for i, row in enumerate(reader):
+    for invoice_no, rows in groups.items():
+        remaining = total_payable_by_inv.get(invoice_no, 0.0)
+        bill_opens_with = opens_with_by_inv.get(invoice_no, "sales")
+        n = len(rows)
+        for split_idx, (i, row) in enumerate(rows):
             amount = ffloat(row["Settlement Amount"])
             if amount <= 0:
                 skipped_zero += 1
@@ -350,7 +418,25 @@ def main() -> int:
             if not pick_payment_ledger(mode):
                 skipped_unmapped.append(mode)
                 continue
-            v = emit_voucher(row, args.alter_id_base + i)
+
+            is_last = split_idx == n - 1
+            if not is_last:
+                # Mid-split: settle as much of the bill as this split covers, no round-off.
+                cr_to_debtor = min(amount, max(remaining, 0.0))
+                round_off = 0.0
+                remaining -= cr_to_debtor
+            else:
+                # Last split: settle exactly `remaining` against the bill;
+                # anything left over is the round-off (gain or loss).
+                cr_to_debtor = max(remaining, 0.0)
+                round_off = amount - cr_to_debtor  # +ve => gain (Cr ROUND OFF)
+                remaining = 0.0
+
+            # Earliest split of an invoice whose bill is opened by Journal (advance receipt)
+            # carries New Ref on the Sundry Debtors Cr side; every other split is Agst Ref.
+            cr_bill_type = "New Ref" if (split_idx == 0 and bill_opens_with == "journal") else "Agst Ref"
+
+            v = emit_voucher(row, args.alter_id_base + i, cr_to_debtor, round_off, cr_bill_type)
             if v:
                 vouchers.append(
                     '        <TALLYMESSAGE xmlns:UDF="TallyUDF">\n'

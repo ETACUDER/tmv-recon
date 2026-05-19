@@ -23,6 +23,7 @@ CANON_COLS = [
     "Net Amount", "Tax Amount", "Tax Amount.1", "Gross Amount",
     "Discount Amount", "Adjustment", "Total Payable",
     "settlement_amount_abs", "Settlement/Particular",
+    "earliest_event_date", "bill_opens_with",
     "calc_gross", "diff",
 ]
 
@@ -63,6 +64,15 @@ def main() -> int:
                 return str(v).strip()
         return ""
 
+    # Pre-compute earliest payment-row Transaction Date per invoice (advance receipts).
+    pay = sub[
+        (sub["Settlement Amount"] != 0)
+        & (sub["Settlement/Particular"].notna())
+        & (sub["Settlement/Particular"].astype(str).str.strip() != "")
+    ].copy()
+    pay["_pdate"] = pd.to_datetime(pay.get("Transaction Date"), errors="coerce")
+    earliest_pay = pay.groupby("Invoice #")["_pdate"].min()
+
     grouped = sub.groupby("Invoice #", sort=False).agg(
         invoice_date=("_d", "first"),
         guest_name=("Guest Name", first_non_null),
@@ -78,6 +88,11 @@ def main() -> int:
         settlement_amount=("Settlement Amount", lambda s: float(s[s < 0].abs().sum())),
         settlement_mode=("Settlement/Particular", first_non_null),
     ).reset_index()
+    grouped["earliest_pay_date"] = grouped["Invoice #"].map(earliest_pay)
+    # bill_opens_with: "journal" if any payment Txn Date < Invoice date, else "sales"
+    has_advance = grouped["earliest_pay_date"].notna() & (grouped["earliest_pay_date"] < grouped["invoice_date"])
+    grouped["bill_opens_with"] = has_advance.map({True: "journal", False: "sales"})
+    grouped["earliest_event_date"] = grouped[["invoice_date", "earliest_pay_date"]].min(axis=1)
 
     grouped["calc_gross"] = grouped["net_amount"] + grouped["cgst"] + grouped["sgst"]
     grouped["diff"] = (grouped["calc_gross"] - grouped["gross_amount"]).round(2)
@@ -104,6 +119,8 @@ def main() -> int:
         "Total Payable": grouped["total_payable"],
         "settlement_amount_abs": grouped["settlement_amount"].round(2),
         "Settlement/Particular": grouped["settlement_mode"],
+        "earliest_event_date": grouped["earliest_event_date"].dt.strftime("%Y-%m-%d"),
+        "bill_opens_with": grouped["bill_opens_with"],
         "calc_gross": grouped["calc_gross"].round(2),
         "diff": grouped["diff"],
     })[CANON_COLS]
