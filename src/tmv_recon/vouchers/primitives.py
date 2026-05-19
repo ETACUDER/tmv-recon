@@ -72,19 +72,30 @@ def ledger_entry_block(
     flags: list[tuple[str, str]],
     bill_ref: str | None = None,
     bill_type: str = "New Ref",
+    pre_fields: list[tuple[str, str]] | None = None,
 ) -> str:
-    """Render one ledger entry (Sales uses LEDGERENTRIES.LIST, Journal uses ALL...)."""
+    """Render one ledger entry (Sales uses LEDGERENTRIES.LIST, Journal uses ALL...).
+
+    `pre_fields` are emitted between OLDAUDITENTRYIDS.LIST and LEDGERNAME.
+    Required for duty/tax ledgers (CGST/SGST/ROUND OFF) which Tally otherwise
+    silently drops during import: they need APPROPRIATEFOR (and ROUNDTYPE for
+    GST tax ledgers) as leading non-empty fields.
+    """
     lines = [
         f"            <{container_tag}>",
         '              <OLDAUDITENTRYIDS.LIST TYPE="Number">',
         "                <OLDAUDITENTRYIDS>-1</OLDAUDITENTRYIDS>",
         "              </OLDAUDITENTRYIDS.LIST>",
-        f"              <LEDGERNAME>{xml_escape(name)}</LEDGERNAME>",
-        "              <GSTCLASS>&#4; Not Applicable</GSTCLASS>",
     ]
+    for k, v in (pre_fields or []):
+        lines.append(f"              <{k}>{v}</{k}>")
+    lines.append(f"              <LEDGERNAME>{xml_escape(name)}</LEDGERNAME>")
+    lines.append("              <GSTCLASS>&#4; Not Applicable</GSTCLASS>")
     for k, v in flags:
         lines.append(f"              <{k}>{v}</{k}>")
     lines.append(f"              <AMOUNT>{amount:.2f}</AMOUNT>")
+    # VATEXPAMOUNT mirrors AMOUNT — present on all real Tally exports.
+    lines.append(f"              <VATEXPAMOUNT>{amount:.2f}</VATEXPAMOUNT>")
     for lst in LEDGER_EMPTY_LISTS:
         if lst == "BILLALLOCATIONS.LIST" and bill_ref:
             lines.append(bill_allocation_block(bill_ref, amount, bill_type))

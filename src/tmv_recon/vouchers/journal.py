@@ -131,6 +131,9 @@ def render_journal_voucher(
     if abs(round_off) >= ROUND_OFF_TOLERANCE:
         # round_off > 0 (paid > billed) → Cr ROUND OFF (gain), AMOUNT positive
         # round_off < 0 (paid < billed) → Dr ROUND OFF (loss), AMOUNT negative
-        entries.append(le(name=ROUND_OFF, amount=round_off, flags=round_off_flags(dr=round_off < 0)))
+        # ROUND OFF needs APPROPRIATEFOR pre-field so Tally accepts the entry.
+        entries.append(le(name=ROUND_OFF, amount=round_off,
+                          flags=round_off_flags(dr=round_off < 0),
+                          pre_fields=[("APPROPRIATEFOR", "&#4; Not Applicable")]))
 
     return "\n".join(head + flags_lines + ids + empty + entries + trailing + ["          </VOUCHER>"])

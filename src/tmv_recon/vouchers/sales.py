@@ -125,17 +125,24 @@ def render_sales_voucher(row: dict[str, Any], alter_id: int) -> str | None:
     trailing = [f"            <{lst}>            </{lst}>" for lst in VOUCHER_TRAILING_LISTS]
 
     le = lambda **kw: ledger_entry_block(container_tag="LEDGERENTRIES.LIST", **kw)
+    # Tax duty-ledger leading fields (CGST/SGST): APPROPRIATEFOR + ROUNDTYPE.
+    # Without these Tally drops the entry during import and the voucher
+    # appears unbalanced by CGST+SGST. ROUND OFF needs APPROPRIATEFOR only.
+    NA = "&#4; Not Applicable"
+    GST_PRE = [("APPROPRIATEFOR", NA), ("ROUNDTYPE", NA)]
+    RO_PRE  = [("APPROPRIATEFOR", NA)]
     entries = [
         le(name=SUNDRY_DEBTORS, amount=-total_payable, flags=LEDGER_FLAGS_PARTY_DR,
            bill_ref=invoice_no, bill_type=sd_bill_type),
         le(name=income_ledger, amount=net, flags=LEDGER_FLAGS_INCOME_CR),
-        le(name=CGST, amount=cgst, flags=LEDGER_FLAGS_INCOME_CR),
-        le(name=SGST, amount=sgst, flags=LEDGER_FLAGS_INCOME_CR),
+        le(name=CGST, amount=cgst, flags=LEDGER_FLAGS_INCOME_CR, pre_fields=GST_PRE),
+        le(name=SGST, amount=sgst, flags=LEDGER_FLAGS_INCOME_CR, pre_fields=GST_PRE),
     ]
     if abs(round_off) >= ROUND_OFF_TOLERANCE:
         # round_off > 0 → Dr ROUND OFF (loss), AMOUNT negative
         # round_off < 0 → Cr ROUND OFF (gain), AMOUNT positive (= -round_off)
-        entries.append(le(name=ROUND_OFF, amount=-round_off, flags=round_off_flags(dr=round_off > 0)))
+        entries.append(le(name=ROUND_OFF, amount=-round_off,
+                          flags=round_off_flags(dr=round_off > 0), pre_fields=RO_PRE))
 
     body = head + flags_lines + ids + empty + entries + trailing + ["          </VOUCHER>"]
     return "\n".join(body)
