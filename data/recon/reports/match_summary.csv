@@ -1,4 +1,0 @@
-stream,total_records,exact_matches,fuzzy_matches,total_matched,unmatched,match_rate_pct,unmatched_rate_pct
-bookings,3476,40,0,40,3436,1.2,98.8
-invoices,304,40,0,40,264,13.2,86.8
-payments,316,0,0,0,316,0.0,100.0
