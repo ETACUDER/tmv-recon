@@ -10,6 +10,9 @@ schema) → manual import into Tally.
 (1,083 vouchers — 506 Sales + 577 Journal, ₹23.4L, Sundry Debtors closes
 to ₹0 per invoice).
 
+**Live wizard:** <https://accounts.themangalview.com>
+(Azure App Service, single login).
+
 **Single source of truth for flow + logic:** [`docs/monthly-voucher-flow.md`](docs/monthly-voucher-flow.md).
 
 ## Wizard UI (recommended for monthly runs)

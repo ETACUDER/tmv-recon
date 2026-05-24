@@ -64,16 +64,20 @@ Reusable wizard UI exposing this pipeline lives at `web_ui/app.py`
 | `Invoice date` | EZee `Invoice date` | `YYYY-MM-DD` |
 | `Guest Name`, `Room Type`, `Travel Agent`, `Business Source` | EZee | first non-null per invoice |
 | `Net Amount` | sum of EZee `Net Amount` per invoice | taxable amount |
-| `Tax Amount` | sum CGST per invoice | |
-| `Tax Amount.1` | sum SGST per invoice | |
+| `Tax Amount` | sum CGST per invoice | label-routed across all 4 EZee tax columns |
+| `Tax Amount.1` | sum SGST per invoice | label-routed across all 4 EZee tax columns |
 | `Gross Amount` | sum of EZee `Gross Amount` | = Net + CGST + SGST |
 | `Discount Amount` | sum of EZee `Discount Amount` | typically 0 |
 | `Adjustment` | sum of EZee `Adjustment(Room Charge/Extra Charges)` | small paise-level rounding |
 | **`Total Payable`** | `Gross − Discount − Adjustment` | **what Sundry Debtors gets debited at** |
 | `settlement_amount_abs` | abs of negative settlements | informational |
 | `Settlement/Particular` | EZee | first mode |
-| `calc_gross` | `Net + CGST + SGST` | sanity check |
+| `earliest_event_date` | min(Invoice date, earliest payment Transaction Date) | drives bill_opens_with |
+| `bill_opens_with` | `"sales"` or `"journal"` | which event opens the bill (see §3) |
+| `calc_gross` | `Net + CGST + SGST` | sanity check (IGST added if present) |
 | `diff` | `calc_gross − Gross` | should be 0 |
+
+**EZee tax columns (important):** EZee exports up to 4 `(Tax Name, Tax %, Tax Amount)` triples per row — `Tax Amount`, `Tax Amount.1`, `Tax Amount.2`, `Tax Amount.3`. When an invoice is edited in EZee, tax can move between these columns (e.g. Apr 2026 invoices 87/88/89 have CGST in `.3` and SGST in `.2`). The aggregator scans all four columns per row and routes each non-zero amount into a CGST / SGST / IGST bucket based on the `Tax Name` label, not the column position. IGST detection prints a warning (the emitter currently handles only CGST + SGST).
 
 ### `payment_<mon><yr>.csv` — produced by `extract_payments_monthly.py`
 
@@ -140,7 +144,7 @@ If `Settlement == Total Payable`, no ROUND OFF entry is emitted (clean 2-line vo
 | Payment mode (EZee) | Tally ledger | Dr bill-ref |
 |---|---|---|
 | Cash | `SANDEEP SHARMA IMP A/C.` | none (bill-wise off) |
-| UPI / Credit Card / Debit Card | `CARD / UPI / PAYTM / G PAY` | none |
+| UPI / Credit Card / Debit Card | `CARD / UPI / PAYTM / G PAY` | **New Ref** |
 | Agoda | `AGODA SDR` | **New Ref** (OTA now owes us) |
 | Booking.com | `BOOKING.COM SDR` | **New Ref** |
 | Goibibo | `GOIBIBO / MAKE MY TRIP` | **New Ref** |
@@ -160,8 +164,14 @@ separate settlement journal we don't generate here.
 has bill-wise tracking off on this ledger. Cash receipts go straight to
 ledger balance.
 
-**Import order is mandatory:** Sales first → Journal second. Otherwise
-`Agst Ref` finds no bill and Tally posts "On Account".
+**Import order — use the combined XML instead.** Because ~95% of TMV
+invoices are advance receipts (OTA pre-pays before the guest checks
+out), the Sales-then-Journal sequence breaks: when Sales fires with
+`Agst Ref` against a bill the Journal hasn't opened yet, Tally silently
+converts it to On Account. **Solution: the `combined.xml` emitter writes
+all vouchers in one envelope, per-invoice in chronological order
+(opener first, settler after). Tally processes them in document order
+within one import → every bill ref resolves cleanly.** See §10.
 
 ### Dates on the Journal voucher
 
@@ -286,10 +296,38 @@ data is updated.
   --invoices data/recon/canonical/invoice_<mon><yr>.csv \
   --output   data/recon/output/journal_vouchers_<mon><yr>_verbose.xml \
   --alter-id-base 80000
+
+# Combined XML — single file, vouchers ordered per-invoice. THIS is the
+# one to import. See §10.
+.venv/bin/python scripts/generate_combined_vouchers_verbose.py \
+  --invoices data/recon/canonical/invoice_<mon><yr>.csv \
+  --payments data/recon/canonical/payment_<mon><yr>.csv \
+  --output   data/recon/output/combined_<mon><yr>_verbose.xml \
+  --sales-alter-id-base 70000 \
+  --journal-alter-id-base 80000
 ```
 
 Pick a different `--alter-id-base` per month so generated VCHKEYs don't
 collide across months (e.g. Oct=60000, Apr=70000, May=90000, …).
+
+## 7b. The Wizard UI (live)
+
+Production: <https://accounts.themangalview.com> (Azure App Service P0v3,
+Singapore region). Single login: `accounts` / `Gaurav@1`.
+
+3-section flow:
+- **A. Upload** — drop xlsx, pick the month from auto-detected list.
+- **B. Process & Generate** — single button runs aggregate → sales →
+  payments → journal → combined back-to-back with live progress dots.
+- **C. Result** — summary tiles (vouchers, Gross, Settlement, Round Off,
+  Sundry Debtors balanced ✓), download buttons (★ combined.xml.gz is
+  primary, plus sales/journal/bundle/CSVs), collapsible detail panels
+  per stage.
+
+Every run is preserved at `data/recon/runs/<YYYY-MM>/runs/<timestamp>/`
+with the raw xlsx, both canonical CSVs, all XMLs (plus .gz), bundle.zip,
+and a run.json (totals + sha256 + operator + status). Browse via
+`/history`. The flow diagram lives at `/flow`.
 
 ---
 
@@ -309,6 +347,10 @@ script wrappers.**
 | `sales.py` | `render_sales_voucher(row, alter_id) -> str` |
 | `journal.py` | `render_journal_voucher(row, alter_id, cr_to_debtor, round_off, cr_bill_type) -> str` |
 
+Combined emitter `scripts/generate_combined_vouchers_verbose.py` calls
+both `render_sales_voucher` + `render_journal_voucher` and interleaves
+their outputs per invoice in chronological order.
+
 CLI scripts in `scripts/` are thin orchestration wrappers (~30–80 lines
 each) that handle I/O, per-invoice walk for splits, and call into the
 package.
@@ -323,7 +365,7 @@ one line in `PAYMENT_LEDGER_BY_MODE`.
 - **`SALE ACCOMODATION GST @ 5 %`** has spaces both sides of `%` — the
   12% and 18% variants do **not**. Mis-emit and Tally rejects the row.
 - **`SANDEEP SHARMA IMP A/C.`** has a trailing period — required.
-- **`Sundry Debtors`** is bill-wise on (verified in Master). `CARD / UPI / PAYTM / G PAY` is also bill-wise on but we skip bill allocation on it; this currently shows as "On Account" entries on that ledger — acceptable since it nets out daily.
+- **`Sundry Debtors`** is bill-wise on (verified in Master). `CARD / UPI / PAYTM / G PAY` is also bill-wise on, so we now emit `New Ref` on its Dr side (was previously skipped).
 - Tally's import error log strips whitespace when displaying ledger
   names, so error `"Ledger 'SALE ACCOMODATION GST @5%' does not exist!"`
   was the renderer collapsing `@ 5 %` → `@5%`. The XML byte content was
@@ -331,7 +373,61 @@ one line in `PAYMENT_LEDGER_BY_MODE`.
 - Tally's import is idempotent on `<GUID>`. Manual edits in Tally are
   overwritten if you re-import. Deleted-and-reimported vouchers come
   back identical.
+- **CGST / SGST / ROUND OFF entries need extra leading fields** to be
+  accepted by Tally's import: `APPROPRIATEFOR` (always) and `ROUNDTYPE`
+  (only on the GST tax ledgers). Without these, Tally silently drops the
+  entry during import and the voucher shows as unbalanced by exactly
+  CGST+SGST. The emitter inserts them automatically; if you ever add a
+  new tax/round-off ledger, mirror this `pre_fields` pattern.
+- **`VATEXPAMOUNT` mirrors `AMOUNT`** on every ledger entry — real Tally
+  exports always include this duplicate. We emit it on every entry.
+- **EZee 4-tax-column quirk**: on edited invoices, EZee may move
+  CGST/SGST out of `Tax Amount` / `Tax Amount.1` into `Tax Amount.2` /
+  `Tax Amount.3`. The aggregator scans all four columns and routes by
+  `Tax Name` label (not column index). Apr 2026 invoices 87/88/89 are a
+  real example.
 
 ---
 
-_Last updated: 2026-05-19 — covers April 2026 month run._
+## 10. The Combined XML (current import target)
+
+`scripts/generate_combined_vouchers_verbose.py` writes ONE XML with all
+Sales + Journal vouchers in one envelope. Per-invoice emission order:
+
+```
+If bill_opens_with == "journal":
+  Journal split #1 (earliest by Transaction Date)  → opens bill, New Ref
+  Sales voucher                                    → consumes, Agst Ref
+  Journal splits #2..N                             → settle, Agst Ref
+
+If bill_opens_with == "sales":
+  Sales voucher                                    → opens bill, New Ref
+  Journal splits (in Transaction-Date order)       → settle, Agst Ref
+```
+
+**Result:** Tally processes vouchers in document order within a single
+import. The opener always fires before any settler that references the
+same bill. No "missing reference"; no manual import ordering needed.
+
+**Compression:** the emitter also writes `combined.xml.gz` (~92.5%
+size reduction — 47 MB → 3.5 MB for April).
+
+**Per-month run folder layout** (also produced by the wizard):
+```
+data/recon/runs/2026-04/
+├── latest.json                       ← {"run_id": "...", "updated_at": "..."}
+└── runs/<YYYY-MM-DD_HHMMSS>/
+    ├── raw.xlsx
+    ├── invoice.csv
+    ├── payment.csv
+    ├── sales.xml + sales.xml.gz
+    ├── journal.xml + journal.xml.gz
+    ├── combined.xml + combined.xml.gz   ← import this one
+    ├── bundle.zip                       ← everything in one zip
+    └── run.json                         ← totals, sha256s, operator, status
+```
+
+---
+
+_Last updated: 2026-05-24 — covers April 2026 month run + combined XML +
+wizard deploy + 4-tax-column EZee fix._
