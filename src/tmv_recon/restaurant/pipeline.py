@@ -52,7 +52,7 @@ SUSPENSE_LEDGER = "SUSPENSE"
 FY_PREFIX = "25-26"                                     # invoice no = 25-26/REC-####
 
 # EZee 'Settlement Detail' Payment channel -> Tally debtor ledger (all in Master).
-# UPI/Card ("bank") -> the F&B card debtor; the aggregators route to their own.
+# UPI/Card ("bank") -> the F&B card debtor; Dineout + Swiggy settle via Bundl; Zomato its own.
 # Built-in defaults; the accountant can override any of these from the config page
 # (saved to rooftop_channel_ledgers.json in TMV_DATA_DIR).
 CHANNEL_LEDGER: dict[str, str] = {
@@ -63,23 +63,50 @@ CHANNEL_LEDGER: dict[str, str] = {
     "CARD": COLLECTION_LEDGER,
     "PAYTM": COLLECTION_LEDGER,
     "DINEOUT": BUNDAL_LEDGER,
-    "SWIGGY": SWIGGY_LEDGER,
+    "SWIGGY": BUNDAL_LEDGER,
     "ZOMATO": ZOMATO_LEDGER,
 }
+# Journal flag per channel. True  = book the sale to SUNDRY DEBTORS RESTAURENT (New Ref)
+#                                   then a routing Journal Dr <channel ledger> / Cr the debtor.
+#                          False = book the sale DIRECTLY to <channel ledger> (party = that
+#                                   ledger), no Journal — used for the aggregators so the
+#                                   party shows as BUNDAL/ZOMATO, not the generic debtor.
+# Aggregators default OFF (sale only); every other channel defaults ON ("as is").
+DIRECT_CHANNELS: set[str] = {"DINEOUT", "SWIGGY", "ZOMATO"}
 import os as _os
 _DATA_BASE = _os.environ.get("TMV_DATA_DIR") or str(ROOT / "data")
 CHANNEL_OVERRIDES_PATH = Path(_DATA_BASE) / "recon" / "rooftop_channel_ledgers.json"
 
 
-def channel_map() -> dict[str, str]:
-    """Built-in channel→ledger map merged with the accountant's saved overrides."""
-    m = dict(CHANNEL_LEDGER)
+def channel_map() -> dict[str, dict]:
+    """Built-in channel map merged with the accountant's saved overrides.
+
+    Returns {CHANNEL: {"ledger": str, "journal": bool}}. Overrides may be a plain
+    string (ledger only — back-compat) or an object {"ledger", "journal"}.
+    """
+    m = {k: {"ledger": v, "journal": k not in DIRECT_CHANNELS}
+         for k, v in CHANNEL_LEDGER.items()}
     try:
         for k, v in json.loads(CHANNEL_OVERRIDES_PATH.read_text(encoding="utf-8")).items():
-            m[k.strip().upper()] = v
+            key = k.strip().upper()
+            cur = dict(m.get(key) or {"ledger": None, "journal": key not in DIRECT_CHANNELS})
+            if isinstance(v, dict):
+                if v.get("ledger"):
+                    cur["ledger"] = v["ledger"]
+                if "journal" in v:
+                    cur["journal"] = bool(v["journal"])
+            else:
+                cur["ledger"] = v
+            m[key] = cur
     except (OSError, ValueError):
         pass
     return m
+
+
+def _cled(cmap: dict, ch) -> str | None:
+    """Ledger for a channel name from a channel_map() dict (None if unknown)."""
+    ci = cmap.get((ch or "").upper())
+    return ci["ledger"] if ci else None
 
 _GUID_PREFIX = "029dfefd-5996-4e71-8914-ec5a8528c655"
 _GUID_NS = uuid.UUID(_GUID_PREFIX)
@@ -138,7 +165,9 @@ def parse_settlement_detail(path: str | Path) -> dict:
             amt = _f(v[6]) if len(v) > 6 else 0.0
             date = _tdate(v[7]) if len(v) > 7 else ""
             if rec:
-                out[rec] = {"channel": cur, "ledger": cmap.get((cur or "").upper()),
+                ci = cmap.get((cur or "").upper())
+                out[rec] = {"channel": cur, "ledger": ci["ledger"] if ci else None,
+                            "journal": ci["journal"] if ci else True,
                             "amount": round(amt, 2), "date": date}
         elif len(ne) == 1 and ne[0].upper() in known:
             cur = ne[0]
@@ -357,11 +386,16 @@ def _ids(kind: str, month: str, seq: int, alter_base: int) -> dict:
             "VKEY": str(197916387900000 + aid), "VRETAIN": str(seq)}
 
 
-def render_sale(*, inv: str, date: str, amount: float, mode: str,
+def render_sale(*, inv: str, date: str, amount: float, mode: str, party: str,
                 seq: int, month: str, alter_base: int) -> str:
-    """Sales invoice: Dr SUNDRY DEBTORS RESTAURENT (New Ref) / Cr SALES UNDER COMPOSITION SCHEME."""
+    """Sales invoice: Dr `party` (New Ref) / Cr SALES UNDER COMPOSITION SCHEME.
+
+    `party` is SUNDRY DEBTORS RESTAURENT when a routing Journal follows, or the
+    channel's own ledger (BUNDAL/ZOMATO/…) when the sale is booked directly.
+    """
     amt = f"{abs(amount):.2f}"
     sub = {**_ids("Sales", month, seq, alter_base), "DATE": date, "INV": xesc(inv),
+           "PARTY": xesc(party),
            "NARR": xesc(f"I.NO {inv} AGAINST REC IN  {mode}"),
            "AMT_NEG": f"-{amt}", "AMT_POS": amt}
     return _fill(_TMPL_SALE, sub)
@@ -495,14 +529,19 @@ def _settlement_txns(path: str | Path) -> list[tuple]:
 
 def generate(sales_html, settlement_detail_html, out_path, month: str,
              bank_path=None, alter_base: int = 300000) -> dict:
-    """Per-order Sales + Journal (+ optional bank Receipts/Payments) → Tally XML.
+    """Per-order Sales (+ routing Journal) + optional bank Receipts/Payments → Tally XML.
 
-    Per order (Sales Detail = amounts, Settlement Detail = payment channel):
-      Sales    Dr SUNDRY DEBTORS RESTAURENT (New Ref) / Cr SALES UNDER COMPOSITION SCHEME
-      Journal  Dr <channel debtor> (New Ref)          / Cr SUNDRY DEBTORS RESTAURENT (Agst Ref)
-    Channel comes straight from the Settlement Detail (Cash/UPI/Card/Dineout/Zomato/Swiggy);
-    no fuzzy matching. Bank statement is OPTIONAL — with it, Receipts (credits) + Payments
-    (debits) are added; without it, only Sales + Journal are generated.
+    Per order (Sales Detail = amounts, Settlement Detail = payment channel). Each
+    channel carries a `journal` flag (config page / rooftop_channel_ledgers.json):
+      journal ON  (Cash/UPI/Card, default):
+        Sales    Dr SUNDRY DEBTORS RESTAURENT (New Ref) / Cr SALES UNDER COMPOSITION SCHEME
+        Journal  Dr <channel debtor> (New Ref)          / Cr SUNDRY DEBTORS RESTAURENT (Agst Ref)
+      journal OFF (Dineout/Swiggy/Zomato aggregators, default):
+        Sales    Dr <channel ledger> (New Ref)          / Cr SALES UNDER COMPOSITION SCHEME
+        (booked directly to the aggregator ledger — no intermediary, no Journal)
+    Channel comes straight from the Settlement Detail; no fuzzy matching. Bank
+    statement is OPTIONAL — with it, Receipts (credits) + Payments (debits) are
+    added; without it, only Sales (+ Journals) are generated.
     """
     ledgers = load_ledgers()
     cmap = channel_map()
@@ -517,9 +556,11 @@ def generate(sales_html, settlement_detail_html, out_path, month: str,
             o["mode"] = (info["channel"] or "").upper()
             o["channel"] = info["ledger"]
             o["channel_name"] = info["channel"]
+            o["journal"] = info.get("journal", True)
         else:
             o["mode"], o["channel"] = "CASH", IMPREST_LEDGER
             o["channel_name"] = (info.get("channel") if info else None) or "(not in settlement)"
+            o["journal"] = cmap.get("CASH", {}).get("journal", True)
             unrouted.append(o)
         by_channel[o["channel_name"]][0] += 1
         by_channel[o["channel_name"]][1] += o["net"]
@@ -540,14 +581,21 @@ def generate(sales_html, settlement_detail_html, out_path, month: str,
             payments.append({**dbt, "ledger": m["ledger"], "map": m})
 
     # ----- render -----
-    vouchers, seq = [], 0
+    # journal ON  → Sale to SUNDRY DEBTORS RESTAURENT + routing Journal to the channel ledger.
+    # journal OFF → Sale booked DIRECTLY to the channel ledger (party = it), no Journal.
+    vouchers, seq, journal_count = [], 0, 0
     for o in sorted(orders, key=lambda x: (x["date"], x["rec"])):
+        use_journal = o.get("journal", True)
+        party = SALES_DEBTOR if use_journal else o["channel"]
         seq += 1
         vouchers.append(render_sale(inv=o["inv"], date=o["date"], amount=o["net"],
-                                    mode=o["mode"], seq=seq, month=month, alter_base=alter_base))
-        seq += 1
-        vouchers.append(render_journal(inv=o["inv"], date=o["date"], amount=o["net"], mode=o["mode"],
-                                       channel=o["channel"], seq=seq, month=month, alter_base=alter_base))
+                                    mode=o["mode"], party=party, seq=seq, month=month,
+                                    alter_base=alter_base))
+        if use_journal:
+            seq += 1
+            journal_count += 1
+            vouchers.append(render_journal(inv=o["inv"], date=o["date"], amount=o["net"], mode=o["mode"],
+                                           channel=o["channel"], seq=seq, month=month, alter_base=alter_base))
     for r in sorted(receipts, key=lambda x: x["date"]):
         seq += 1
         vouchers.append(render_voucher(vtype="Receipt", date=r["date"], party=r["ledger"],
@@ -595,7 +643,7 @@ def generate(sales_html, settlement_detail_html, out_path, month: str,
         return {"label": label, "count": count, "amount": round(amount, 2), "role": role}
 
     sales_total = round(sum(o["net"] for o in orders), 2)
-    chan_rows = [row(f"{ch} → {cmap.get((ch or '').upper(), '(review)')}", n, a)
+    chan_rows = [row(f"{ch} → {_cled(cmap, ch) or '(review)'}", n, a)
                  for ch, (n, a) in sorted(by_channel.items(), key=lambda x: -x[1][1])]
     chan_rows.append(row("Total turnover (orders)", len(orders), sales_total, "total"))
     recon = [{"title": "F&B sales by channel (EZee Settlement Detail)", "rows": chan_rows}]
@@ -609,14 +657,14 @@ def generate(sales_html, settlement_detail_html, out_path, month: str,
             row("Mapped to a ledger", *_n(payments), "total")]})
 
     sales_paytm = round(sum(a for ch, (n, a) in by_channel.items()
-                            if cmap.get((ch or "").upper()) == COLLECTION_LEDGER), 2)
+                            if _cled(cmap, ch) == COLLECTION_LEDGER), 2)
     sales_cash = round(sum(a for ch, (n, a) in by_channel.items()
-                           if cmap.get((ch or "").upper()) == IMPREST_LEDGER), 2)
+                           if _cled(cmap, ch) == IMPREST_LEDGER), 2)
     return {
         "month": month, "out": str(out_path), "total_vouchers": len(vouchers),
-        "orders": len(orders), "sales_count": len(orders), "journal_count": len(orders),
+        "orders": len(orders), "sales_count": len(orders), "journal_count": journal_count,
         "sales_total": sales_total,
-        "sales_by_channel": {ch: {"orders": n, "amount": round(a, 2), "ledger": cmap.get((ch or "").upper())}
+        "sales_by_channel": {ch: {"orders": n, "amount": round(a, 2), "ledger": _cled(cmap, ch)}
                              for ch, (n, a) in by_channel.items()},
         "sales_paytm": sales_paytm, "sales_cash": sales_cash,
         "bank_used": bank_used,

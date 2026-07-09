@@ -129,8 +129,10 @@ $("rf-form").addEventListener("submit", async (e) => {
     const bych = d.sales_by_channel || {};
     const chLine = Object.entries(bych).sort((a,b)=>b[1].amount-a[1].amount)
       .map(([ch,v])=>`${ch} ${v.orders}/${inr(v.amount)}`).join(" · ");
+    const direct = d.sales_count - d.journal_count;
     let notes = `<div class="muted2"><b>${d.sales_count}</b> orders → ${d.sales_count} Sales + ${d.journal_count} Journal`+
-      `${d.bank_used ? "" : " (no bank statement — Sales + Journal only)"}.</div>`+
+      `${direct>0 ? ` (${direct} aggregator orders booked directly — no journal)` : ""}`+
+      `${d.bank_used ? "" : ". No bank statement — Sales + Journal only"}.</div>`+
       `<div class="muted2" style="margin-top:4px">By channel: ${chLine}</div>`;
     const ec = d.exception_count || 0;
     notes += `<div style="margin-top:6px;"><span class="pill ${ec?'warn':'ok'}">${ec?'⚠ '+ec+' exceptions ('+inr(d.exception_amount)+')':'✓ 0 exceptions'}</span> — every gap is row-level in the <a href="${d.report}" target="_blank">validation report</a> with its category.</div>`;

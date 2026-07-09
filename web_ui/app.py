@@ -322,10 +322,10 @@ def api_config_mappings():
         pass
     cmap = rp.channel_map()
     rooftop = {"ledgers": sorted(master),
-               "mappings": [{"channel": ch, "ledger": led,
+               "mappings": [{"channel": ch, "ledger": ci["ledger"], "journal": ci["journal"],
                              "source": "override" if ch in rf_ov else "built-in",
-                             "in_master": (led in master) if master else None}
-                            for ch, led in sorted(cmap.items())]}
+                             "in_master": (ci["ledger"] in master) if master else None}
+                            for ch, ci in sorted(cmap.items())]}
 
     # Hotel — built-in + accountant overrides (no master list to validate against).
     reload_payment_overrides()
@@ -355,7 +355,12 @@ def api_config_mapping():
         from tmv_recon.restaurant import pipeline as rp
         path = rp.CHANNEL_OVERRIDES_PATH
         data = _json.loads(path.read_text()) if path.exists() else {}
-        data[key.upper()] = ledger
+        k = key.upper()
+        if "journal" in d:
+            journal = bool(d.get("journal"))
+        else:  # keep the channel's current journal flag if none was sent
+            journal = rp.channel_map().get(k, {}).get("journal", k not in rp.DIRECT_CHANNELS)
+        data[k] = {"ledger": ledger, "journal": journal}
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(_json.dumps(data, indent=2))
     else:

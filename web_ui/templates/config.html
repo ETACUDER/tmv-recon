@@ -37,11 +37,12 @@ main { max-width: 920px; margin: 0 auto; padding: 20px 24px 60px; }
 <main>
   <section class="card-section">
     <h2>🍽️ Rooftop — payment channel → ledger</h2>
-    <p class="muted2">From the EZee Settlement Detail. <span class="warn-dot">●</span> = ledger not found in the restaurant Tally master (create it in Tally, or fix the name).</p>
-    <table class="map-tbl" id="rf-tbl"><thead><tr><th style="width:130px">Channel</th><th>Tally ledger</th><th style="width:70px">Source</th><th style="width:90px"></th></tr></thead><tbody></tbody></table>
+    <p class="muted2">From the EZee Settlement Detail. <b>Journal</b> on = sale posts to Sundry Debtors then a routing journal to this ledger; <b>off</b> = book the sale <b>directly</b> to this ledger, no journal (used for Dineout / Swiggy / Zomato). <span class="warn-dot">●</span> = ledger not in the restaurant Tally master (create it in Tally, or fix the name).</p>
+    <table class="map-tbl" id="rf-tbl"><thead><tr><th style="width:120px">Channel</th><th>Tally ledger</th><th style="width:64px">Journal</th><th style="width:64px">Source</th><th style="width:80px"></th></tr></thead><tbody></tbody></table>
     <div class="addrow" style="margin-top:8px">
-      <input type="text" id="rf-newkey" placeholder="new channel (e.g. SWIGGY)">
-      <input type="text" id="rf-newledger" placeholder="Tally ledger" style="width:250px">
+      <input type="text" id="rf-newkey" placeholder="new channel (e.g. CARD)">
+      <input type="text" id="rf-newledger" placeholder="Tally ledger" style="width:230px">
+      <label class="muted2"><input type="checkbox" id="rf-newjr" checked> journal</label>
       <button type="button" id="rf-add">Add</button>
     </div>
   </section>
@@ -78,9 +79,10 @@ function rfRow(m) {
   tr.innerHTML = `<td><b>${m.channel}</b></td>
     <td><input type="text" class="v" value="${escv(m.ledger)}">
         <span class="dot">${inMaster===false?'<span class="warn-dot" title="not in Tally master">●</span>':(inMaster?'<span class="ok-dot">●</span>':'')}</span></td>
+    <td style="text-align:center"><input type="checkbox" class="jr" ${m.journal?'checked':''} title="On = Sundry Debtors + routing journal. Off = book sale directly to this ledger, no journal."></td>
     <td><span class="tag ${m.source==='override'?'ov':'bi'}">${m.source}</span></td>
     <td><button type="button" class="save">Save</button><span class="saved" hidden>✓</span></td>`;
-  tr.querySelector(".save").addEventListener("click", () => save("rooftop", m.channel, tr.querySelector(".v").value, null, tr));
+  tr.querySelector(".save").addEventListener("click", () => save("rooftop", m.channel, tr.querySelector(".v").value, tr.querySelector(".jr").checked, tr));
   const inp = tr.querySelector(".v");
   inp.addEventListener("input", () => { tr.querySelector(".dot").innerHTML = MASTER.has(inp.value)?'<span class="ok-dot">●</span>':'<span class="warn-dot">●</span>'; });
   return tr;
@@ -97,11 +99,11 @@ function hRow(m) {
   return tr;
 }
 
-async function save(system, key, ledger, new_ref, tr) {
+async function save(system, key, ledger, flag, tr) {
   ledger = (ledger||"").trim();
   if (!ledger) { alert("Enter the Tally ledger name"); return; }
   const body = { system, key, ledger };
-  if (new_ref !== null) body.new_ref = new_ref;
+  if (flag !== null) { if (system === "rooftop") body.journal = flag; else body.new_ref = flag; }
   const r = await fetch("/api/config/mapping", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body) });
   const d = await r.json();
   if (!r.ok) { alert(d.error||"failed"); return; }
@@ -111,7 +113,7 @@ async function save(system, key, ledger, new_ref, tr) {
 
 function escv(s){ return String(s||"").replace(/"/g,"&quot;"); }
 
-$("rf-add").addEventListener("click", () => save("rooftop", $("rf-newkey").value.trim(), $("rf-newledger").value, null, null).then(()=>{$("rf-newkey").value="";$("rf-newledger").value="";}));
+$("rf-add").addEventListener("click", () => save("rooftop", $("rf-newkey").value.trim(), $("rf-newledger").value, $("rf-newjr").checked, null).then(()=>{$("rf-newkey").value="";$("rf-newledger").value="";}));
 $("h-add").addEventListener("click", () => save("hotel", $("h-newkey").value.trim(), $("h-newledger").value, $("h-newnr").checked, null).then(()=>{$("h-newkey").value="";$("h-newledger").value="";}));
 load();
 </script>
