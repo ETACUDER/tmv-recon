@@ -28,6 +28,7 @@ from tmv_recon.vouchers.primitives import (
     write_xml,
 )
 from tmv_recon.vouchers.journal import render_journal_voucher
+from tmv_recon.vouchers.review import invoice_review
 
 
 def main() -> int:
@@ -68,11 +69,18 @@ def main() -> int:
     vouchers: list[str] = []
     skipped_unmapped: list[str] = []
     skipped_zero = 0
+    review: list[dict] = []
 
     for invoice_no, rows in groups.items():
         remaining = total_payable_by_inv.get(invoice_no, 0.0)
         bill_opens_with = opens_with_by_inv.get(invoice_no, "sales")
         n = len(rows)
+
+        # Reversal/refund present -> flag for manual review, exclude from auto-book.
+        rec = invoice_review(invoice_no, [r for _, r in rows], remaining)
+        if rec:
+            review.append(rec)
+            continue
         for split_idx, (i, row) in enumerate(rows):
             amount = ffloat(row["Settlement Amount"])
             if amount <= 0:
@@ -104,6 +112,10 @@ def main() -> int:
     envelope = wrap_envelope(vouchers)
     write_xml(out, envelope)
 
+    if review:
+        print(f"  MANUAL REVIEW (reversal/refund — excluded, enter in Tally): {len(review)}")
+        for r in review:
+            print(f"    {r['invoice']}: {r['treatment']}")
     print(f"Wrote {len(vouchers)} Journal vouchers")
     print(f"  -> {out}")
     print(f"  size: {out.stat().st_size:,} bytes")

@@ -1,19 +1,41 @@
 # tmv-recon
 
-**Monthly EZee → Tally voucher pipeline** for **The Mangal View Residency**.
+**Monthly EZee → Tally voucher pipelines** for **two entities** under one wizard:
 
-EZee Transaction Detail Report (.xlsx) → canonical CSVs → verbose Tally
-Sales + Journal vouchers (UTF-16 LE+BOM XML, matches native Tally export
-schema) → manual import into Tally.
+| Entity | GST | Source | Output |
+|---|---|---|---|
+| 🏨 **The Mangal View Residency** (hotel) | Regular | EZee *Transaction Detail Report* (.xlsx) | Sales + Journal (CGST/SGST, bill-wise) |
+| 🍽️ **TMV Rooftop Restaurant** | Composition | EZee *Sales Detail* + *Settlement Detail* (.html); bank optional | Sales + Journal (+ Receipt/Payment) |
 
-**Status:** Live for FY 2026 monthly runs. Most recent: **April 2026**
-(1,083 vouchers — 506 Sales + 577 Journal, ₹23.4L, Sundry Debtors closes
-to ₹0 per invoice).
+Both emit verbose UTF-16 LE+BOM XML matching the native Tally export schema
+for manual import. **Live wizard:** <https://accounts.themangalview.com> —
+landing page picks the entity; **⚙ Ledger mappings** page edits how each
+channel/mode posts to a Tally ledger.
 
-**Live wizard:** <https://accounts.themangalview.com>
-(Azure App Service, single login).
+**Status:** Live (Azure App Service, single login). Hotel latest clean run
+April 2026 (1,083 vouchers). Rooftop live for March 2026.
 
-**Single source of truth for flow + logic:** [`docs/monthly-voucher-flow.md`](docs/monthly-voucher-flow.md).
+**Flow + logic detail:** [`docs/monthly-voucher-flow.md`](docs/monthly-voucher-flow.md).
+
+## Hotel — the pipeline in one paragraph
+EZee report → canonical `invoice.csv` + `payment.csv` → **Sales** (Dr Sundry
+Debtors New Ref / Cr GST-rated Sales + CGST/SGST) and **Journal** (settle the
+bill via Agst Ref) → `combined.xml`. A **close-out check** confirms Sundry
+Debtors nets to ₹0 before import. Two safety layers: (1) settlement **modes
+with no ledger** are flagged in the result and mappable from the wizard
+(self-service, no code change); (2) invoices with a **reversal/refund** are
+quarantined for **manual review** with a plain-English treatment (see
+`src/tmv_recon/vouchers/review.py`) instead of fudging a balancing entry.
+
+## Rooftop — the pipeline in one paragraph
+EZee **Settlement Detail** gives the per-order payment **channel** (Cash / UPI /
+Credit Card / Debit Card / Dineout / Zomato / Swiggy); joined to **Sales Detail**
+by receipt #. Per order: **Sales** (Dr `SUNDRY DEBTORS RESTAURENT` New Ref / Cr
+`SALES UNDER COMPOSITION SCHEME`) + **Journal** (Dr channel ledger / Cr the
+restaurant debtor). Channel → ledger map lives in `restaurant/pipeline.py`
+(`CHANNEL_LEDGER`, override-able from `/config`). The **bank statement is
+optional** — with it, Receipts (credits) + Payments (debits) are added; without
+it, only Sales + Journal. Composition dealer: no output GST, no bill-wise.
 
 ## Wizard UI (recommended for monthly runs)
 
@@ -123,6 +145,40 @@ data/recon/newTally/           reference: Master.xml + Transactions.xml from Tal
   master has bill-wise off.
 
 Full details in [`docs/monthly-voucher-flow.md`](docs/monthly-voucher-flow.md).
+
+## Ledger mappings (`/config`)
+
+How each payment channel/mode posts to a Tally ledger, viewable + editable
+in the browser at **`/config`**:
+- **Rooftop** channel → ledger (Dineout → `BUNDAL TECHNOLOGIES`, Swiggy →
+  `SWIGGY SCR`, UPI/Card → `CARD / UPI / PAYTM / G PAY [F&B]`, Cash →
+  `SANDEEP SHARMA IMP A/C.`, Zomato → `ZOMATO`). Validated against the
+  restaurant Tally master (`data/recon/rooftop/ledgers.json`) — a red dot
+  means the ledger isn't in the master.
+- **Hotel** mode → ledger (Agoda/Booking/Goibibo/UPI/Cash… + any the
+  accountant adds).
+
+Built-in defaults live in code (`restaurant/pipeline.py CHANNEL_LEDGER`,
+`vouchers/ledgers.py PAYMENT_LEDGER_BY_MODE`); edits are saved as **overrides**
+(`recon/rooftop_channel_ledgers.json`, `recon/hotel_payment_ledgers.json`) and
+merged at run time. `GET/POST /api/config/mapping(s)`.
+
+## Deploy & persistence
+
+Production is **Azure App Service `tmv-accounts`** (rg `tmv-accounts`) mapped to
+`accounts.themangalview.com`. Deploy is a **manual zip** (no CI): bundle
+`web_ui/ src/ scripts/` + `requirements.txt startup.txt .deployment` +
+`data/recon/rooftop/ledgers.json`, then
+
+```bash
+az webapp deploy -g tmv-accounts -n tmv-accounts --src-path app.zip --type zip
+```
+
+Oryx builds from `requirements.txt` (`SCM_DO_BUILD_DURING_DEPLOYMENT=true`);
+startup runs `gunicorn --chdir web_ui app:app`. **Runtime data (runs, uploads,
+saved mappings) lives under `TMV_DATA_DIR`** — set to `/home/data` on Azure (the
+persistent share) so redeploys don't wipe run history or mappings. Locally it
+defaults to `./data`. Login via env `TMV_USER` / `TMV_PASS` / `TMV_SECRET_KEY`.
 
 ## Setup
 

@@ -149,3 +149,9 @@ code { background: var(--panel-2); padding: 1px 4px; border-radius: 3px; font-si
 details { background: var(--panel); border:1px solid var(--border); border-radius:8px; padding: 12px; margin-bottom: 12px; }
 details summary { cursor: pointer; padding: 4px 0; }
 details[open] table.data { margin-top: 10px; }
+
+/* Self-service payment-ledger mapping (close-out gap) */
+.unmapped-box { background:#fff8e1; border:1px solid var(--warn); border-radius:8px; padding:12px 14px; margin-top:10px; }
+.unmapped-box p { margin:0 0 8px; font-size:13px; }
+.um-nr { font-size:11px; color:var(--muted); margin-left:8px; white-space:nowrap; }
+.um-row input[type=text] { padding:4px 6px; border:1px solid var(--border); border-radius:4px; }

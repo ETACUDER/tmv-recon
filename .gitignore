@@ -67,3 +67,11 @@ data/booking/processed/
 tmp/
 .cache/
 data/recon/runs/
+
+# raw client Tally exports — large, never commit/deploy
+TMV_tally/
+# runtime rooftop outputs + uploads
+data/recon/rooftop/runs/
+data/uploads/
+# editor backups
+*.bak*

@@ -138,7 +138,10 @@ document.getElementById("run-process").addEventListener("click", async () => {
 });
 
 // ---- C. Result ----
-function showResult({ agg, sales, pay, journal }) {
+let lastResult = null;
+function showResult(ctx) {
+  const { agg, sales, pay, journal } = ctx;
+  lastResult = ctx;
   show("sec-result");
 
   // Summary tiles
@@ -156,10 +159,8 @@ function showResult({ agg, sales, pay, journal }) {
     <div class="kv"><span class="k">Sundry Debtors net</span><span class="v" style="color:${okClass}">${fmtINR(co.net || 0)} ${co.balanced ? '✓' : '✗'}</span></div>
   `;
 
-  // Closeout strip
-  document.getElementById("result-closeout").innerHTML = co.balanced
-    ? `<div class="result success">All vouchers balance. Sundry Debtors closes to ₹0 per invoice after both XMLs import.</div>`
-    : `<div class="result error">Sundry Debtors does NOT close. Net = ${fmtINR(co.net || 0)} — investigate before importing.</div>`;
+  // Closeout strip (+ self-service ledger mapping when it doesn't close)
+  renderCloseout(journal);
 
   // Downloads
   const dl = document.getElementById("downloads");
@@ -179,6 +180,86 @@ function showResult({ agg, sales, pay, journal }) {
 
   window.scrollTo({ top: document.getElementById("sec-result").offsetTop - 20, behavior: "smooth" });
 }
+
+// Close-out strip + self-service mapping when Sundry Debtors doesn't close
+function renderCloseout(journal) {
+  const co = journal.closeout || {};
+  const el = document.getElementById("result-closeout");
+  const mr = co.manual_review || [];
+
+  // Manual-review sheet (reversal/refund invoices — excluded from import, enter in Tally)
+  let reviewHtml = "";
+  if (mr.length) {
+    reviewHtml = `<div class="unmapped-box"><p><b>${mr.length} invoice(s) need manual entry in Tally</b> — they have a reversal/refund and are <b>excluded</b> from the import XML (the rest imports clean). Enter these by hand:</p>
+      <table class="data" style="max-width:100%"><thead><tr><th>Invoice</th><th class="num">Billed</th><th class="num">Net paid</th><th>Suggested treatment</th></tr></thead><tbody>`;
+    mr.forEach(r => {
+      reviewHtml += `<tr><td><b>${r.invoice}</b></td><td class="num">${fmtINR(r.billed)}</td><td class="num">${fmtINR(r.net)}</td><td style="font-size:12px">${r.treatment}</td></tr>`;
+    });
+    reviewHtml += `</tbody></table></div>`;
+  }
+
+  if (co.balanced) {
+    el.innerHTML = `<div class="result success">All vouchers balance. Sundry Debtors closes to ₹0 per invoice after import.</div>` + reviewHtml;
+    return;
+  }
+  const um = co.unmapped_modes || [];
+  let html = `<div class="result error">Sundry Debtors does NOT close. Net = ${fmtINR(co.net || 0)} — investigate before importing.</div>`;
+  if (um.length) {
+    html += `<div class="unmapped-box">
+      <p><b>${um.length} payment mode(s) have no Tally ledger</b>, so no Journal settles them — that is the ₹${fmtINR(co.net||0).replace('₹','')} gap. Map each to its exact Tally ledger (it must already exist in the company master), then re-run:</p>
+      <table class="data" style="max-width:720px"><thead><tr><th>Mode</th><th class="num">Count</th><th class="num">Amount</th><th>Map to Tally ledger</th><th></th></tr></thead><tbody>`;
+    um.forEach(u => {
+      html += `<tr class="um-row" data-mode="${escAttr(u.mode)}">
+        <td><b>${u.mode}</b></td><td class="num">${u.count}</td><td class="num">${fmtINR(u.amount)}</td>
+        <td><input type="text" class="um-ledger" placeholder="e.g. CLEAR TRIP SDR" style="width:210px">
+            <label class="um-nr" title="bill-wise: opens a New Ref receivable (like AGODA SDR)"><input type="checkbox" class="um-newref" checked> bill-wise</label></td>
+        <td><button type="button" class="um-add">Add</button></td></tr>`;
+    });
+    html += `</tbody></table>
+      <div class="actions" style="margin-top:8px"><button type="button" id="um-rerun" disabled>↻ Re-run Journal</button>
+      <span id="um-status" class="muted"></span></div></div>`;
+  }
+  el.innerHTML = html + reviewHtml;
+  el.querySelectorAll(".um-add").forEach(b => b.addEventListener("click", onAddMapping));
+  const rr = document.getElementById("um-rerun");
+  if (rr) rr.addEventListener("click", rerunJournal);
+}
+
+async function onAddMapping(e) {
+  const row = e.target.closest(".um-row");
+  const mode = row.dataset.mode;
+  const ledger = row.querySelector(".um-ledger").value.trim();
+  const newRef = row.querySelector(".um-newref").checked;
+  if (!ledger) { alert("Enter the exact Tally ledger name"); return; }
+  e.target.disabled = true; e.target.textContent = "…";
+  try {
+    const r = await fetch("/api/payment-ledger-map", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode, ledger, new_ref: newRef }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "failed");
+    e.target.textContent = "✓ mapped"; row.style.opacity = ".55";
+    row.querySelector(".um-ledger").disabled = true;
+    document.getElementById("um-rerun").disabled = false;
+    document.getElementById("um-status").textContent = `mapped ${d.key} → ${ledger}. Add the rest, then re-run.`;
+  } catch (err) { alert("Failed: " + err.message); e.target.disabled = false; e.target.textContent = "Add"; }
+}
+
+async function rerunJournal() {
+  const st = document.getElementById("um-status");
+  const btn = document.getElementById("um-rerun");
+  btn.disabled = true; st.textContent = "re-generating Journal with the new mapping(s)…";
+  const base = parseInt(document.getElementById("journal-alter-id").value) || 80000;
+  try {
+    const r = await fetch("/api/generate-journal", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ month: state.month, run_id: state.runId, alter_id_base: base }) });
+    const journal = await r.json();
+    if (!r.ok) throw new Error(journal.error);
+    lastResult.journal = journal;
+    showResult(lastResult);   // re-renders; closes cleanly if all modes now mapped
+  } catch (err) { st.textContent = "❌ " + err.message; btn.disabled = false; }
+}
+
+function escAttr(s) { return String(s).replace(/"/g, "&quot;"); }
 
 function addBtn(parent, label, href, primary=false) {
   const a = document.createElement("a");

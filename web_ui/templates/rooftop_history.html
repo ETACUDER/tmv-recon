@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TMV Rooftop · Run history</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+main { max-width: 980px; margin: 0 auto; padding: 20px 24px 60px; }
+table.data td.num, table.data th.num { text-align:right; }
+</style>
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <div>
+      <h1 style="margin:0;">🍽️ TMV Rooftop Restaurant · Run history</h1>
+      <p class="muted">Every generate run is preserved with its uploaded settlement + bank statement, the combined XML and a summary.</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a class="btn-link" href="/" title="Switch entity">⇄ Switch</a>
+      <a class="btn-link" href="/rooftop">Generator</a>
+      <a class="btn-link active" href="/rooftop/history">History</a>
+      {% if auth_enabled %}<a class="btn-link" href="/logout">Logout</a>{% endif %}
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="history"></div>
+</main>
+
+<script>
+const fmtINR = n => "₹" + Number(n||0).toLocaleString("en-IN", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+(async () => {
+  const root = document.getElementById("history");
+  const j = await (await fetch("/api/rooftop/runs")).json();
+  if (!j.months || !j.months.length) {
+    root.innerHTML = `<p class="muted">No runs yet. Head to the <a href="/rooftop">Generator</a> to make your first run.</p>`;
+    return;
+  }
+  for (const m of j.months) {
+    const det = document.createElement("details");
+    det.open = m === j.months[0];
+    det.innerHTML = `<summary><strong>${m.month}</strong> <span class="muted">— ${m.run_count} run(s)${m.latest_run_id ? ', latest: ' + m.latest_run_id : ''}</span></summary>`;
+    const tbl = document.createElement("table");
+    tbl.className = "data";
+    tbl.innerHTML = `<thead><tr>
+      <th>Run</th><th class="num">Vouchers</th><th class="num">Sales</th><th class="num">Sales ₹</th>
+      <th class="num">Receipts</th><th class="num">Payments</th><th class="num">Pay ₹</th><th class="num">Unmapped</th><th>File</th>
+    </tr></thead>`;
+    const tb = document.createElement("tbody");
+    for (const run of m.runs) {
+      const dl = run.xml ? `<a class="btn-link sm" target="_blank" href="/api/rooftop/file/${m.month}/${run.run_id}/${run.xml}">⬇ XML</a>` : '-';
+      tb.insertAdjacentHTML("beforeend", `<tr>
+        <td>${run.run_id}${run.is_latest ? ' <span style="color:var(--good)">★</span>' : ''}</td>
+        <td class="num">${run.total_vouchers ?? '-'}</td>
+        <td class="num">${run.sales_count ?? '-'}</td>
+        <td class="num">${fmtINR(run.sales_total)}</td>
+        <td class="num">${run.receipts ?? '-'}</td>
+        <td class="num">${run.payments ?? '-'}</td>
+        <td class="num">${fmtINR(run.payment_total)}</td>
+        <td class="num">${run.unmapped_count ? '<span class="pill warn">'+run.unmapped_count+'</span>' : '0'}</td>
+        <td>${dl}</td>
+      </tr>`);
+    }
+    tbl.appendChild(tb); det.appendChild(tbl); root.appendChild(det);
+  }
+})();
+</script>
+</body>
+</html>

@@ -10,6 +10,9 @@ error may not.
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 # ----- Default party ledger (receivables) -----
 SUNDRY_DEBTORS = "Sundry Debtors"
 
@@ -65,7 +68,51 @@ def pick_sales_ledger(net: float, cgst: float, sgst: float) -> str:
     return SALES_LEDGER_BY_GST_RATE[5]
 
 
+# ----- Accountant-added overrides (self-service; extends the built-in map) -----
+# JSON at data/recon/hotel_payment_ledgers.json, e.g.
+#   {"CLEARTRIP": {"ledger": "CLEAR TRIP SDR", "new_ref": true},
+#    "BANK TRANSFER": {"ledger": "INDIAN BANK CARD", "new_ref": true}}
+# so a new EZee settlement mode can be mapped from the wizard, no code change.
+import os as _os
+_DATA_BASE = _os.environ.get("TMV_DATA_DIR") or str(Path(__file__).resolve().parents[3] / "data")
+OVERRIDES_PATH = Path(_DATA_BASE) / "recon" / "hotel_payment_ledgers.json"
+PAYMENT_LEDGER_OVERRIDES: dict[str, dict] = {}
+
+
+def reload_payment_overrides() -> dict:
+    """Reload accountant overrides from disk (called at import + after an add)."""
+    global PAYMENT_LEDGER_OVERRIDES
+    try:
+        raw = json.loads(OVERRIDES_PATH.read_text(encoding="utf-8"))
+        PAYMENT_LEDGER_OVERRIDES = {k.strip().upper(): v for k, v in raw.items()}
+    except (OSError, ValueError):
+        PAYMENT_LEDGER_OVERRIDES = {}
+    for v in PAYMENT_LEDGER_OVERRIDES.values():
+        if v.get("new_ref", True):
+            NEW_REF_LEDGERS.add(v["ledger"])
+    return PAYMENT_LEDGER_OVERRIDES
+
+
+reload_payment_overrides()
+
+
+def _prefix_match(key: str, table: dict) -> str | None:
+    """Match a mode against table keys as a prefix, at a clean boundary.
+    Handles EZee modes with a booking-id suffix like 'CLEARTRIP-425340'."""
+    for k, v in table.items():
+        if key.startswith(k) and (len(key) == len(k) or not key[len(k)].isalnum()):
+            return v["ledger"] if isinstance(v, dict) else v
+    return None
+
+
 def pick_payment_ledger(mode: str) -> str | None:
-    """Return target Tally ledger for an EZee settlement mode; None if unmapped."""
+    """Return target Tally ledger for an EZee settlement mode; None if unmapped.
+    Order: exact override → exact built-in → prefix override → prefix built-in."""
     key = (mode or "").strip().upper()
-    return PAYMENT_LEDGER_BY_MODE.get(key)
+    if not key:
+        return None
+    if key in PAYMENT_LEDGER_OVERRIDES:
+        return PAYMENT_LEDGER_OVERRIDES[key]["ledger"]
+    if key in PAYMENT_LEDGER_BY_MODE:
+        return PAYMENT_LEDGER_BY_MODE[key]
+    return _prefix_match(key, PAYMENT_LEDGER_OVERRIDES) or _prefix_match(key, PAYMENT_LEDGER_BY_MODE)

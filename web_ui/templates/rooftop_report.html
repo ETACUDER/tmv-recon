@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rooftop · Validation Report · {{ month }}</title>
+<style>
+  :root{
+    --paper:#ffffff; --ink:#1a1c1e; --muted:#5c6470; --rule:#d7dbe0;
+    --band:#f4f6f8; --accent:#155e63;                 /* deep teal */
+    --high:#b3261e; --high-bg:#fbeceb;
+    --med:#8a5a00;  --med-bg:#fdf3e0;
+    --info:#3a5a78; --info-bg:#eef2f6;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#e9ecef;color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:13.5px;line-height:1.5;}
+  .sheet{max-width:900px;margin:24px auto;background:var(--paper);padding:34px 40px 48px;
+    box-shadow:0 2px 20px rgba(0,0,0,.10);}
+  h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:0;text-wrap:balance;}
+  .toolbar{max-width:900px;margin:0 auto;display:flex;justify-content:flex-end;gap:8px;}
+  .btn{font:inherit;font-size:12px;padding:7px 14px;border:1px solid var(--rule);border-radius:6px;
+    background:#fff;color:var(--ink);cursor:pointer;text-decoration:none;}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  /* header */
+  .head{display:flex;justify-content:space-between;align-items:flex-start;
+    border-bottom:2px solid var(--accent);padding-bottom:14px;}
+  .head h1{font-size:22px;letter-spacing:.01em;}
+  .head .sub{color:var(--muted);font-size:12.5px;margin-top:3px;}
+  .head .meta{text-align:right;font-size:12px;color:var(--muted);line-height:1.7;}
+  .eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:10.5px;color:var(--accent);font-weight:700;}
+  /* sections */
+  section{margin-top:26px;}
+  section > h2{font-size:15px;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--rule);}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .stat{border:1px solid var(--rule);border-radius:8px;padding:10px 12px;background:var(--band);}
+  .stat .n{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .stat .l{font-size:11px;color:var(--muted);margin-top:1px;}
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule);vertical-align:top;}
+  th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;}
+  td.r,th.r{text-align:right;}
+  tbody tr:nth-child(even){background:#fafbfc;}
+  .recon td:first-child{color:var(--muted);} .recon td:last-child{text-align:right;font-weight:600;}
+  .recon-grid{display:flex;flex-direction:column;gap:16px;}
+  table.recon2 th{border-bottom:1.5px solid var(--accent);color:var(--accent);}
+  table.recon2 td{padding:5px 9px;border-bottom:1px solid #eceef1;}
+  table.recon2 tr.rr-line td{color:var(--ink);}
+  table.recon2 tr.rr-total td{font-weight:700;border-top:1.5px solid var(--ink);border-bottom:none;background:var(--band);}
+  table.recon2 tr.rr-pending td{color:var(--high);background:var(--high-bg);}
+  .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--high);margin-right:7px;vertical-align:middle;}
+  /* severity */
+  .chip{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:999px;text-transform:uppercase;}
+  .high{color:var(--high);background:var(--high-bg);} .med{color:var(--med);background:var(--med-bg);} .info{color:var(--info);background:var(--info-bg);}
+  .cat-h{border-left:3px solid var(--high);} .cat-m{border-left:3px solid var(--med);} .cat-i{border-left:3px solid var(--info);}
+  .amt{white-space:nowrap;}
+  /* grouped exceptions — category/action stated once, rows compact */
+  .exc-group{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-bottom:12px;}
+  .exc-head{display:flex;align-items:center;gap:9px;padding:7px 12px;background:var(--band);border-bottom:1px solid var(--rule);}
+  .exc-head b{font-size:13px;}
+  .exc-head.h{border-left:3px solid var(--high);} .exc-head.m{border-left:3px solid var(--med);} .exc-head.i{border-left:3px solid var(--info);}
+  .exc-meta{margin-left:auto;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .exc-action{padding:5px 12px;font-size:11px;color:var(--muted);background:#fcfcfd;border-bottom:1px solid #eef0f2;}
+  table.exc-rows{width:100%;} table.exc-rows td{padding:3px 12px;border-bottom:1px solid #f2f4f6;font-size:11.5px;}
+  table.exc-rows tr:last-child td{border-bottom:none;}
+  table.exc-rows td.d{width:78px;color:var(--muted);} table.exc-rows td.amt{width:96px;font-weight:600;} table.exc-rows td.rf{color:var(--muted);}
+  .clean{background:var(--info-bg);border:1px solid #cfe0d9;border-radius:8px;padding:12px 14px;color:#2c4a3d;font-size:12.5px;}
+  .foot{margin-top:34px;display:flex;gap:40px;font-size:12px;color:var(--muted);}
+  .sign{flex:1;border-top:1px solid var(--ink);padding-top:6px;margin-top:34px;}
+  .note{font-size:11.5px;color:var(--muted);margin-top:4px;}
+  @media print{
+    html,body{background:#fff;font-size:11.5px;}
+    .toolbar{display:none;} .sheet{box-shadow:none;margin:0;max-width:none;padding:0 6mm;}
+    tr,section,.stat{break-inside:avoid;} thead{display:table-header-group;}
+    @page{margin:14mm 12mm;}
+  }
+</style>
+</head>
+<body>
+{% set inr = "{:,.2f}".format %}
+{% set catlabel = {
+  "UNMATCHED_PAYTM":"Paytm settlement — no matching order",
+  "UNROUTED_CREDIT":"Bank credit — not recognised",
+  "UNMAPPED_PAYMENT":"Bank payment — no ledger match",
+  "LOW_CONF_PAYMENT":"Payment ledger — low confidence",
+  "SWIGGY_ZOMATO":"Swiggy / Zomato — accountant to book" } %}
+{% set sevclass = {"high":"high","medium":"med","info":"info"} %}
+{% set catclass = {"high":"cat-h","medium":"cat-m","info":"cat-i"} %}
+
+<div class="toolbar">
+  <a class="btn" href="/rooftop/history">← History</a>
+  <a class="btn" href="{{ d.exceptions_csv }}">⬇ Exceptions CSV</a>
+  <button class="btn primary" onclick="window.print()">🖨 Print</button>
+</div>
+
+<div class="sheet">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Reconciliation &amp; Validation</div>
+      <h1>TMV Rooftop Restaurant</h1>
+      <div class="sub">GST Composition · GSTIN 08GFRPS2684G1ZM · Indian Bank 8150353104</div>
+    </div>
+    <div class="meta">
+      Period <b style="color:var(--ink)">{{ month }}</b><br>
+      Run {{ run_id }}<br>
+      {{ d.total_vouchers }} vouchers generated
+    </div>
+  </div>
+
+  <section>
+    <h2>Vouchers generated</h2>
+    <div class="grid">
+      <div class="stat"><div class="n">{{ d.sales_count }}</div><div class="l">Sales invoices</div></div>
+      <div class="stat"><div class="n">{{ d.journal_count }}</div><div class="l">Journals (mode routing)</div></div>
+      <div class="stat"><div class="n">{{ d.receipts }}</div><div class="l">Receipts (bank)</div></div>
+      <div class="stat"><div class="n">{{ d.payments }}</div><div class="l">Payments (bank)</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Reconciliation</h2>
+    <div class="recon-grid">
+      {% for block in d.recon %}
+      <table class="recon2">
+        <thead><tr><th>{{ block.title }}</th><th class="r" style="width:64px">Count</th><th class="r" style="width:112px">Amount ₹</th></tr></thead>
+        <tbody>
+          {% for r in block.rows %}
+          <tr class="rr-{{ r.role }}">
+            <td>{% if r.role=='pending' %}<span class="dot"></span>{% endif %}{{ r.label }}</td>
+            <td class="r">{{ r.count }}</td>
+            <td class="r">{{ inr(r.amount) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endfor %}
+    </div>
+    <p class="note" style="margin-top:8px">Rows marked <span class="dot"></span> are <b>pending</b> — not cleanly booked; each appears line-by-line in Exceptions below.</p>
+  </section>
+
+  <section>
+    <h2>Exceptions — {{ d.exception_count }} item(s) · ₹ {{ inr(d.exception_amount) }}</h2>
+    {% if d.exceptions %}
+    {% for cat, items in d.exceptions | groupby('category') %}
+    {% set first = items[0] %}
+    <div class="exc-group">
+      <div class="exc-head {{ {'high':'h','medium':'m','info':'i'}[first.severity] }}">
+        <span class="chip {{ sevclass[first.severity] }}">{{ first.severity }}</span>
+        <b>{{ catlabel.get(cat, cat) }}</b>
+        <span class="exc-meta">{{ items|length }} · ₹ {{ inr(items|sum(attribute='amount')) }} · → {{ first.ledger }}</span>
+      </div>
+      <div class="exc-action">{{ first.action }}</div>
+      <table class="exc-rows"><tbody>
+        {% for e in items %}
+        <tr><td class="d">{{ e.date }}</td><td class="r amt">₹ {{ inr(e.amount) }}</td><td class="rf">{{ e.ref }}</td></tr>
+        {% endfor %}
+      </tbody></table>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="clean">✓ No exceptions — every order, receipt and payment mapped cleanly.</div>
+    {% endif %}
+  </section>
+
+  <div class="foot">
+    <div class="sign">Prepared / imported by &nbsp;·&nbsp; date</div>
+    <div class="sign">Verified by (accountant) &nbsp;·&nbsp; date</div>
+  </div>
+  <div class="note" style="margin-top:16px">
+    Generated by tmv-recon. Mode is derived (EZee carries no payment mode) by matching each order to a Paytm settlement transaction on date + amount; unmatched orders default to cash. Swiggy/Zomato sales, receipts and RCM commission (GSTR-4A) are booked separately by the accountant.
+  </div>
+</div>
+</body>
+</html>

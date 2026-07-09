@@ -57,7 +57,11 @@ def main() -> int:
         "Invoice date": pay["_d"].dt.strftime("%Y-%m-%d"),
         "Guest Name": pay["Guest Name"].fillna("").astype(str),
         "Settlement/Particular": pay["Settlement/Particular"].astype(str).str.strip(),
-        "Settlement Amount": pay["Settlement Amount"].abs().round(2),  # store as positive
+        # EZee sign: negative = collection (money in), positive = refund/reversal.
+        # Negate so a collection is +ve and a refund is -ve — the sign is meaning,
+        # not noise, and must survive to the journal (a dropped sign turns a refund
+        # into a phantom over-collection).
+        "Settlement Amount": (-pay["Settlement Amount"]).round(2),
         "Reference #": pay.get("Reference #", "").fillna("").astype(str),
         "Transaction Date": pd.to_datetime(pay.get("Transaction Date"), errors="coerce").dt.strftime("%Y-%m-%d").fillna(""),
     })[CANON_COLS]
@@ -66,10 +70,11 @@ def main() -> int:
     out.to_csv(a.out, index=False)
 
     total = out["Settlement Amount"].sum()
+    refunds = int((out["Settlement Amount"] < 0).sum())
     by_mode = out.groupby("Settlement/Particular").agg(count=("Invoice #","count"), amt=("Settlement Amount","sum"))
     print(f"wrote {a.out}")
-    print(f"  payment rows: {len(out)}  unique invoices: {out['Invoice #'].nunique()}")
-    print(f"  sum settlement (abs): {total:,.2f}")
+    print(f"  payment rows: {len(out)}  unique invoices: {out['Invoice #'].nunique()}  refund/reversal rows: {refunds}")
+    print(f"  net settlement (signed): {total:,.2f}")
     print(f"  by mode:")
     for mode, row in by_mode.iterrows():
         print(f"    {mode:<20} {int(row['count']):>4}  ₹{row['amt']:>14,.2f}")

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TMV Recon · Choose entity</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.landing { max-width: 940px; margin: 0 auto; padding: 40px 24px; }
+.landing-head { display:flex; justify-content:space-between; align-items:baseline; }
+.entity-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:28px; }
+.entity-card { display:block; text-decoration:none; color:inherit;
+  background: var(--panel); border:1px solid var(--border); border-radius:12px;
+  padding:24px; transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease; }
+.entity-card:hover { box-shadow:0 8px 24px rgba(0,0,0,.10); transform:translateY(-2px); border-color: var(--accent); }
+.entity-card h2 { margin:6px 0 4px; font-size:20px; }
+.entity-tag { display:inline-block; font-size:11px; font-weight:600; letter-spacing:.02em;
+  padding:3px 9px; border-radius:999px; background: var(--accent-dim); color: var(--accent); }
+.entity-meta { font-size:12.5px; color: var(--muted); line-height:1.7; margin-top:14px;
+  border-top:1px solid var(--border); padding-top:12px; }
+.entity-cta { margin-top:14px; font-size:13px; font-weight:600; color: var(--accent); }
+@media (max-width:680px){ .entity-grid{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="landing">
+  <div class="landing-head">
+    <div>
+      <h1 style="margin:0;">TMV Recon</h1>
+      <p class="muted">Two separate entities — pick one to work on.</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a class="btn-link" href="/config">⚙ Ledger mappings</a>
+      {% if auth_enabled %}<a class="btn-link" href="/logout">Logout</a>{% endif %}
+    </div>
+  </div>
+
+  <div class="entity-grid">
+    <a class="entity-card" href="/hotel">
+      <span class="entity-tag">Hotel</span>
+      <h2>🏨 The Mangal View Residency</h2>
+      <p class="muted">Monthly EZee → Tally vouchers.</p>
+      <div class="entity-cta">Open →</div>
+    </a>
+
+    <a class="entity-card" href="/rooftop">
+      <span class="entity-tag">Restaurant</span>
+      <h2>🍽️ TMV Rooftop Restaurant</h2>
+      <p class="muted">Monthly sales → Tally vouchers.</p>
+      <div class="entity-cta">Open →</div>
+    </a>
+  </div>
+</div>
+</body>
+</html>

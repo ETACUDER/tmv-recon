@@ -34,6 +34,7 @@ from tmv_recon.vouchers.primitives import (
 )
 from tmv_recon.vouchers.sales import render_sales_voucher
 from tmv_recon.vouchers.journal import render_journal_voucher
+from tmv_recon.vouchers.review import invoice_review
 
 
 def main() -> int:
@@ -78,6 +79,7 @@ def main() -> int:
     skipped_unmapped: list[str] = []
     sales_emitted = 0
     journal_emitted = 0
+    review: list[dict] = []
 
     # Process invoices in their CSV order (which is already in Invoice-date order
     # for the per-month canonical). Stable enough.
@@ -91,6 +93,13 @@ def main() -> int:
         remaining = total_payable
         splits = pay_groups.get(invoice_no, [])
         n = len(splits)
+
+        # Reversal/refund present -> flag for manual review, quarantine the WHOLE
+        # invoice (skip sales + journal) so the rest imports clean.
+        rec = invoice_review(invoice_no, [pr for _, pr in splits], total_payable)
+        if rec:
+            review.append(rec)
+            continue
 
         # --- decide per-invoice emission order ---
         events: list[tuple[str, int]] = []  # ("sales", -1) or ("journal", split_idx)
@@ -141,6 +150,10 @@ def main() -> int:
     envelope = wrap_envelope(vouchers_xml)
     write_xml(out, envelope)
 
+    if review:
+        print(f"  MANUAL REVIEW (reversal/refund — quarantined, enter in Tally): {len(review)}")
+        for r in review:
+            print(f"    {r['invoice']}: {r['treatment']}")
     print(f"Wrote {len(vouchers_xml)} vouchers into {out}")
     print(f"  Sales: {sales_emitted}  Journal: {journal_emitted}")
     print(f"  size: {out.stat().st_size:,} bytes")

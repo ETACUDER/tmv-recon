@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TMV Rooftop Restaurant · Vouchers</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+main { max-width: 1000px; margin: 0 auto; padding: 20px 24px 60px; }
+.kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:14px 0; }
+.kpi { background: var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.kpi .n { font-size:20px; font-weight:700; } .kpi .l { font-size:12px; color:var(--muted); margin-top:2px; }
+.up-row { display:flex; gap:16px; flex-wrap:wrap; }
+.up-row .fld { flex:1; min-width:220px; } .fld label { font-size:13px; font-weight:600; display:block; margin-bottom:5px; }
+table.data td.r, table.data th.r { text-align:right; }
+.pill { font-size:11px; padding:2px 8px; border-radius:999px; }
+.pill.ok { background: var(--accent-dim); color: var(--accent); }
+.pill.warn { background:#fff3cd; color: var(--warn); }
+.hidden { display:none; } .muted2 { color:var(--muted); font-size:12.5px; }
+tr.lowscore { background:#fff8e1; }
+</style>
+</head>
+<body>
+<header>
+  <div class="head-row">
+    <div>
+      <h1 style="margin:0;">🍽️ TMV Rooftop Restaurant</h1>
+      <p class="muted">Composition dealer · GSTIN 08GFRPS2684G1ZM · Indian Bank 8150353104 — EZee sales + settlement + bank → Tally Sales/Receipt/Payment XML</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a class="btn-link" href="/" title="Switch entity">⇄ Switch</a>
+      <a class="btn-link active" href="/rooftop">Generator</a>
+      <a class="btn-link" href="/rooftop/history">History</a>
+      {% if auth_enabled %}<a class="btn-link" href="/logout">Logout</a>{% endif %}
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="card-section">
+    <h2><span class="step-pill">A</span> Upload the month's 3 files</h2>
+    <form id="rf-form">
+      <div class="up-row">
+        <div class="fld">
+          <label>EZee Sales Detail (.html) — <b>required</b></label>
+          <input type="file" id="rf-sales" accept=".html,.htm" required>
+          <div class="muted2">dated F&B turnover → Sales vouchers</div>
+        </div>
+        <div class="fld">
+          <label>EZee Settlement Detail (.html) — <b>required</b></label>
+          <input type="file" id="rf-settlement" accept=".html,.htm" required>
+          <div class="muted2">per-order payment channel (Cash/UPI/Card/Dineout/Zomato/Swiggy)</div>
+        </div>
+        <div class="fld">
+          <label>Indian Bank statement (.xlsx) — <span class="muted2">optional</span></label>
+          <input type="file" id="rf-bank" accept=".xlsx">
+          <div class="muted2">if given → adds Receipts + Payments; skip to generate Sales + Journal only</div>
+        </div>
+        <div class="fld" style="max-width:150px;flex:0 0 150px;">
+          <label>Month (YYYY-MM)</label>
+          <input type="text" id="rf-month" value="2026-03" pattern="\d{4}-\d{2}" style="width:110px">
+        </div>
+      </div>
+      <div class="actions" style="margin-top:14px;">
+        <button type="submit" id="rf-go">▶ Generate Tally XML</button>
+        <span id="rf-status" class="muted"></span>
+      </div>
+    </form>
+  </section>
+
+  <section id="rf-result" class="card-section hidden">
+    <h2><span class="step-pill">B</span> Result</h2>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="n" id="k-total">–</div><div class="l">Total vouchers</div></div>
+      <div class="kpi"><div class="n" id="k-sales">–</div><div class="l">Sales + Journal (per order)</div></div>
+      <div class="kpi"><div class="n" id="k-rcpt">–</div><div class="l">Receipts</div></div>
+      <div class="kpi"><div class="n" id="k-pay">–</div><div class="l">Payments</div></div>
+    </div>
+    <div class="actions"><a id="rf-download" class="btn-link" href="#">⬇ Download combined XML</a>
+      <a id="rf-report" class="btn-link" href="#" target="_blank">🖨 Validation report</a>
+      <a id="rf-csv" class="btn-link" href="#">⬇ Exceptions CSV</a>
+      <span class="muted2">Import the XML; give the report to the accountant to validate.</span></div>
+
+    <div id="rf-notes" style="margin-top:12px;"></div>
+
+    <details class="details-block mt" style="margin-top:16px;"><summary>Payment ledger mapping (review before import)</summary>
+      <table class="data" id="rf-map" style="margin-top:8px;">
+        <thead><tr><th>Date</th><th class="r">Amount</th><th>Mapped ledger</th><th>Conf.</th><th>Bank narration</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </details>
+  </section>
+
+  <details class="details-block" style="margin-top:8px;"><summary>How it works / booking logic</summary>
+    <div class="muted" style="padding:8px 0;line-height:1.8;">
+      Reproduces the reference Tally export exactly (Composition dealer → no output GST). <b>Per order</b> (invoice = <code>25-26/REC-####</code>):<br>
+      <b>1 · Sale</b> (invoice) — <code>Dr SUNDRY DEBTORS RESTAURENT (New Ref) / Cr SALES UNDER COMPOSITION SCHEME</code>.<br>
+      <b>2 · Journal</b> (mode routing) — <code>Dr channel debtor (New Ref) / Cr SUNDRY DEBTORS RESTAURENT (Agst Ref)</code>.
+      Mode is <b>derived</b> (EZee has none): order matched to a Paytm settlement txn → <code>CARD/UPI/PAYTM [F&amp;B]</code>, else cash → <code>SANDEEP SHARMA IMP A/C.</code><br>
+      <b>3 · Receipt</b> — one per bank credit: <code>Dr Indian Bank / Cr channel debtor</code>.
+      <b>4 · Payment</b> — one per bank debit: <code>Dr &lt;auto-mapped ledger&gt; / Cr Indian Bank</code>.<br>
+      <b>Swiggy &amp; Zomato</b> (sales, receipts, and the RCM commission Purchase entries) are left for the accountant.
+    </div>
+  </details>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const inr = n => "₹" + Number(n||0).toLocaleString("en-IN");
+$("rf-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const sales=$("rf-sales").files[0], bank=$("rf-bank").files[0], settle=$("rf-settlement").files[0], m=$("rf-month").value.trim();
+  if (!sales || !settle) { $("rf-status").textContent="Sales Detail and Settlement Detail are required."; return; }
+  const fd = new FormData();
+  fd.append("sales", sales); fd.append("settlement", settle); fd.append("month", m);
+  if (bank) fd.append("bank", bank);
+  $("rf-go").disabled = true; $("rf-status").textContent = "Generating…";
+  try {
+    const r = await fetch("/api/rooftop/generate", { method: "POST", body: fd });
+    const d = await r.json();
+    if (!r.ok) { $("rf-status").textContent = "❌ " + (d.error || "failed"); return; }
+    $("rf-status").textContent = "✓ done";
+    $("k-total").textContent = d.total_vouchers;
+    $("k-sales").textContent = (d.sales_count + d.journal_count) + " · " + inr(d.sales_total);
+    $("k-rcpt").textContent  = d.bank_used ? (d.receipts + " · " + inr(d.receipt_total)) : "—";
+    $("k-pay").textContent   = d.bank_used ? (d.payments + " · " + inr(d.payment_total)) : "—";
+    $("rf-download").href = d.download;
+    $("rf-report").href = d.report;
+    $("rf-csv").href = d.exceptions_csv;
+    const bych = d.sales_by_channel || {};
+    const chLine = Object.entries(bych).sort((a,b)=>b[1].amount-a[1].amount)
+      .map(([ch,v])=>`${ch} ${v.orders}/${inr(v.amount)}`).join(" · ");
+    let notes = `<div class="muted2"><b>${d.sales_count}</b> orders → ${d.sales_count} Sales + ${d.journal_count} Journal`+
+      `${d.bank_used ? "" : " (no bank statement — Sales + Journal only)"}.</div>`+
+      `<div class="muted2" style="margin-top:4px">By channel: ${chLine}</div>`;
+    const ec = d.exception_count || 0;
+    notes += `<div style="margin-top:6px;"><span class="pill ${ec?'warn':'ok'}">${ec?'⚠ '+ec+' exceptions ('+inr(d.exception_amount)+')':'✓ 0 exceptions'}</span> — every gap is row-level in the <a href="${d.report}" target="_blank">validation report</a> with its category.</div>`;
+    $("rf-notes").innerHTML = notes;
+    const tb = $("rf-map").querySelector("tbody"); tb.innerHTML = "";
+    (d.payment_map || []).forEach(p => {
+      const tr = document.createElement("tr");
+      if (p.score < 0.6) tr.className = "lowscore";
+      tr.innerHTML = `<td>${p.date}</td><td class="r">${inr(p.amount)}</td><td>${p.ledger}</td>`+
+        `<td><span class="pill ${p.score<0.6?'warn':'ok'}">${p.score}</span></td><td class="muted2">${p.desc}</td>`;
+      tb.appendChild(tr);
+    });
+    $("rf-result").classList.remove("hidden");
+    $("rf-result").scrollIntoView({ behavior: "smooth" });
+  } catch (err) { $("rf-status").textContent = "❌ " + err; }
+  finally { $("rf-go").disabled = false; }
+});
+</script>
+</body>
+</html>
