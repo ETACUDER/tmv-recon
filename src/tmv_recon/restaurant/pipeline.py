@@ -49,7 +49,7 @@ IMPREST_LEDGER = "SANDEEP SHARMA IMP A/C."              # cash float (Loans & Ad
 SALES_LEDGER = "SALES UNDER COMPOSITION SCHEME"         # revenue (Sales Accounts)
 SALES_DEBTOR = "SUNDRY DEBTORS RESTAURENT"              # generic sales receivable
 SUSPENSE_LEDGER = "SUSPENSE"
-FY_PREFIX = "25-26"                                     # invoice no = 25-26/REC-####
+FY_PREFIX = "25-26"                                    # fallback only; real FY derived per order date (fy_prefix)
 
 # EZee 'Settlement Detail' Payment channel -> Tally debtor ledger (all in Master).
 # UPI/Card ("bank") -> the F&B card debtor; Dineout + Swiggy settle via Bundl; Zomato its own.
@@ -107,6 +107,21 @@ def _cled(cmap: dict, ch) -> str | None:
     """Ledger for a channel name from a channel_map() dict (None if unknown)."""
     ci = cmap.get((ch or "").upper())
     return ci["ledger"] if ci else None
+
+
+def fy_prefix(yyyymmdd: str) -> str:
+    """Indian fiscal-year label (Apr–Mar) for a YYYYMMDD date.
+
+    EZee resets its receipt numbers each fiscal year, so the bill number's FY
+    prefix must follow the order's own date, not a fixed value:
+      20260331 -> '25-26'   20260401 -> '26-27'
+    """
+    try:
+        y, m = int(str(yyyymmdd)[:4]), int(str(yyyymmdd)[4:6])
+        s = y if m >= 4 else y - 1
+        return f"{s % 100:02d}-{(s + 1) % 100:02d}"
+    except (ValueError, TypeError):
+        return FY_PREFIX
 
 _GUID_PREFIX = "029dfefd-5996-4e71-8914-ec5a8528c655"
 _GUID_NS = uuid.UUID(_GUID_PREFIX)
@@ -226,7 +241,7 @@ def parse_sales_detail_orders(path: str | Path) -> list[dict]:
             rec = next((c for c in vals if c.startswith("REC-")), "")
             net = _f(vals[7]) if len(vals) > 7 else 0.0
             if net > 0.005:
-                orders.append({"date": cur, "rec": rec, "inv": f"{FY_PREFIX}/{rec}",
+                orders.append({"date": cur, "rec": rec, "inv": f"{fy_prefix(cur)}/{rec}",
                                "net": round(net, 2)})
     return orders
 
